@@ -19,7 +19,8 @@ sample size determination (including for *A*-, *D*-, and *E*-optimal
 designs), trial simulation, analytical operating characteristic
 calculation (including the conjunctive power, disjunctive power,
 family-wise error rate, and false discovery rate), and the production of
-several informative plots.
+several informative plots. An R Shiny graphical user interface is also
+provided to ease design determination.
 
 ## Getting started
 
@@ -38,29 +39,32 @@ For further help, please contact Michael Grayling at
 
 ## Details
 
-Seven key functions are provided: `des_ma()`, `des_ma_int()`,
-`build_ma()`, `opchar_ma()`, `sim_ma()`, `an_ma()`, and
-`plot.multiarm_des_ma()`. Outputs from the first three functions are
-also supported by S3 `print()` and `summary()` generics.
+Eight key functions are provided: `an_ma()`, `build_ma()`,
+`des_int_ma()`, `des_ma()`, `gui_ma()`, `opchar_ma()`,
+`plot.multiarm_des_ma()`, and `sim_ma()`. Outputs from all but
+`gui_ma()` and `plot.multiarm_des_ma()` are also supported by S3
+`print()` and `summary()` generics.
 
   - `an_ma()`: Analyses summary statistics from a supplied fixed-sample
-    multi-arm clinical trial design to determine which null hypotheses
-    to reject.
+    multi-arm clinical trial design, in order to determine which null
+    hypotheses to reject.
   - `build_ma()`: Builds a fixed-sample multi-arm clinical trial design
-    object, like those returned by `des_ma()` and `des_ma_int()`. For
+    object, like those returned by `des_ma()` and `des_int_ma()`. For
     use when a specific design is of interest.
-  - `des_ma()`: Determines the sample size required a fixed-sample
-    multi-arm clinical trial when a variety of multiple comparison
-    procedures are used.
-  - `des_ma_int()`: Determines the *A*-, *D*-, and *E*-optimal
+  - `des_int_ma()`: Determines the *A*-, *D*-, and *E*-optimal
     allocation of a set of patients in a fixed-sample multi-arm clinical
     trial.
+  - `des_ma()`: Determines the sample size required a fixed-sample
+    multi-arm clinical trial when one of a variety of multiple
+    comparison procedures is used.
+  - `gui_ma()`: Provides a graphical user interface to design
+    determination.
   - `opchar_ma()`: Analytically determines the operating characteristics
     (power, family-wise error rates, etc.) of a supplied fixed-sample
     multi-arm clinical trial design.
-  - `plot.multiarm_des_ma()`: Produces a variety of informative plots
-    (power, false discovery rate curves, etc.) relating to a supplied
-    fixed-sample multi-arm clinical trial design.
+  - `plot.multiarm_des_ma()`: Produces informative plots (power, false
+    discovery rate curves, etc.) relating to a supplied fixed-sample
+    multi-arm clinical trial design.
   - `sim_ma()`: Empirically estimates the operating characteristics
     (power, family-wise error rates, etc.) of a supplied fixed-sample
     multi-arm clinical trial design, via simulation.
@@ -68,7 +72,7 @@ also supported by S3 `print()` and `summary()` generics.
 ## Example
 
 Typically, `des_ma()` is used first to identify a design for the trial
-parameters of interest. For example, consider designing a trial for:
+parameters of interest. For example, consider designing a trial for
 
   - three experimental treatment arms (see `K`);
   - desiring a familywise error-rate of at most 5%, controlling using
@@ -77,9 +81,9 @@ parameters of interest. For example, consider designing a trial for:
     clinically relevant difference of 1 (see `beta`, `delta1`, and
     `power`);
   - assuming the standard deviation of all responses is 1 (see `sigma`);
-  - allocating patients equally to each arm (see `rho`).
+  - allocating patients equally to each arm (see `ratio`).
 
-To compute the implied design, we would run:
+To compute the implied design, we would run
 
 ``` r
 des <- multiarm::des_ma(K          = 3,
@@ -87,21 +91,21 @@ des <- multiarm::des_ma(K          = 3,
                         beta       = 0.2,
                         delta1     = 1,
                         sigma      = rep(1, 4),
-                        rho        = rep(0.25, 4),
+                        ratio      = rep(1, 3),
                         correction = "dunnett",
                         power      = "marginal")
 ```
 
-Then, the total required sample size is:
+Then, the total required sample size is
 
 ``` r
 des$N
-#> [1] 67.44309
+#> [1] 67.46351
 ```
 
 In addition, the operating characteristics under the *global null*,
 *global alternative*, and each of the *least favourable configurations*,
-can be accessed with:
+can be accessed with
 
 ``` r
 des$opchar
@@ -110,14 +114,14 @@ des$opchar
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
 #> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.0500
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0     
-#> 3     1     0     0 0.800  0.00330 0.800  0.0196 0.0196 0.0359 0.0187
-#> 4     0     1     0 0.800  0.00330 0.0196 0.800  0.0196 0.0359 0.0187
-#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.0187
+#> 3     1     0     0 0.800  0.00328 0.800  0.0196 0.0196 0.0359 0.0187
+#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.0187
+#> 5     0     0     1 0.801  0.00329 0.0196 0.0196 0.800  0.0359 0.0187
 ```
 
 Useful plots can then be produced with `plot.multiarm_des_ma()`. For
 example, the conjunctive, disjunctive, and marginal powers can be
-plotted with:
+plotted with
 
 ``` r
 #plots <- plot(des, output = T)

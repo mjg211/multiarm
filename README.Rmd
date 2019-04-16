@@ -14,7 +14,6 @@ knitr::opts_chunk$set(
 ```
 # multiarm
 
-[![HitCount](http://hits.dwyl.io/mjg211/multiarm.svg)](http://hits.dwyl.io/mjg211/multiarm)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 `r badger::badge_lifecycle("maturing", "blue")`
 `r badger::badge_code_size("mjg211/multiarm")`
@@ -82,7 +81,7 @@ correction (see `alpha` and `correction`);
 - desiring marginal power to reject each null hypothesis of 80\% for a
 clinically relevant difference of 1 (see `beta`, `delta1`, and `power`);
 - assuming the standard deviation of all responses is 1 (see `sigma`);
-- allocating patients equally to each arm (see `rho`).
+- allocating patients equally to each arm (see `ratio`).
 
 To compute the implied design, we would run
 
@@ -92,7 +91,7 @@ des <- multiarm::des_ma(K          = 3,
                         beta       = 0.2,
                         delta1     = 1,
                         sigma      = rep(1, 4),
-                        rho        = rep(0.25, 4),
+                        ratio      = rep(1, 3),
                         correction = "dunnett",
                         power      = "marginal")
 ```
