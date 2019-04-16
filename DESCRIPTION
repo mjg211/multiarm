@@ -1,0 +1,47 @@
+Package: multiarm
+Type: Package
+Title: Design and analysis of fixed-sample multi-arm clinical trials
+Version: 0.9.0
+Authors@R: c(person(given = "Michael J.", family = "Grayling",
+                    email = "michael.grayling@newcastle.ac.uk",
+                    role = c("aut", "cre")))
+Description: Provides functionality to assist with the design and analysis of
+    fixed-sample multi-arm clinical trials utilising one of several supported
+    multiple comparison corrections. Available functions allow for sample size
+    determination (including for A-, D-, and E-optimal designs), trial
+    simulation, analytical operating characteristic calculation (including the
+    conjunctive power, disjunctive power, family-wise error rate, and false
+    discovery rate), and the production of several informative plots. An R Shiny
+    graphical user interface is also provided to ease design determination.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Imports:
+    dplyr,
+    ggplot2,
+    ggthemes,
+    iterpc,
+    magrittr,
+    mvtnorm,
+    Rfast,
+    rmarkdown,
+    Rsolnp,
+    shiny,
+    shinyalert,
+    shinycssloaders,
+    shinydashboard,
+    shinyFeedback,
+    shinyhelper,
+    shinyjs,
+    shinyWidgets,
+    stats,
+    tibble,
+    tidyr
+Date: 2019-04-11
+URL: http://github.com/mjg211/multiarm
+BugReports: http://github.com/mjg211/multiarm/issues
