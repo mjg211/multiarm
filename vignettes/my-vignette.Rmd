@@ -1,0 +1,279 @@
+---
+title: "multiarm: Design and analysis of fixed-sample multi-arm clinical trials"
+author: "Michael J. Grayling"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{multiarm: Design and analysis of fixed-sample multi-arm clinical trials}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = T,
+                      comment  = "#>"
+)
+```
+
+# 1. Introduction
+
+__multiarm__ provides functionality to assist with the design and analysis of
+fixed-sample multi-arm clinical trials utilising one of several supported
+multiple comparison corrections. Available functions allow for sample size
+determination (including for $A$-, $D$-, and $E$-optimal designs), trial
+simulation, analytical operating characteristic calculation (including the
+conjunctive power, disjunctive power, family-wise error rate, and false
+discovery rate), and the production of several informative plots. An R Shiny
+graphical user interface is also provided to ease design determination.
+
+This vignette will proceed by first precisely detailing the type of trial design
+__multiarm__ supports. Each of the available functions will then be described,
+before several examples and useful further information are provided.
+
+# 2. Fixed-sample multi-arm clinical trials
+
+## 2.1. Design setting
+
+**multiarm** supports the design and analysis of fixed-sample multi-arm clinical
+trials that use a many-to-one design. I.e., a design where a single shared
+control treatment arm is compared in a pairwise manner to some number of
+experimental treatment arms, following the accrual of outcome data from a
+specified number of patients on each arm.
+
+Formally, it supposes that outcomes $X_{ik}\sim N(\mu_k,\sigma_k^2)$ will be
+accrued from patients $i\in\{1,\dots,n_k\}$ on treatment arms
+$k\in\{0,\dots,K\}$. Then, specifying that arm $k=0$ corresponds to the shared
+control arm, and arms $k\in\{1,\dots,K\}$ to the experimental arms, the
+hypotheses of interest are assumed to be
+
+$$ H_k\ :\ \tau_k = \mu_k - \mu_0 \le 0,\ \ k\in\{1,\dots,K\}.$$
+
+That is, we test whether the differences between the mean responses on arms
+$k\in\{1,\dots,K\}$ and arm $k=0$ are negative, hoping that they will be
+positive (i.e., we assume higher mean responses correspond to patient benefit).
+Later, we will make use of the notation $\boldsymbol{\tau}=(\tau_1,\dots,\tau_K)^\top\in\mathbb{R}^K$.
+
+To test hypothesis $H_k$, given outcomes $X_{ik}=x_{ik}$, we assume throughout
+that a Wald-style test statistic, $z_k$, is computed
+
+$$ z_k = \frac{\hat{\tau}_k}{\text{Var}(\hat{\tau}_k)} =
+\frac{\bar{x}_k - \bar{x}_0}{\sqrt{\frac{\sigma_0^2}{n_0} +
+\frac{\sigma_k^2}{n_k}}},\ \ k\in\{1,\dots,K\}, $$
+
+where
+
+$$ \bar{x}_k = \frac{1}{n_k}\sum_{i=1}^{n_k}x_{ik},\ \ k\in\{0,\dots,K\}.$$
+
+Thus, it is important to state here that **multiarm** assumes that the
+$\sigma_k^2$, for $k\in\{0,\dots,K\}$, are known.
+
+Note that brevity in what follows, we will use the notation
+$\boldsymbol{z}=(z_1,\dots,z_K)^\top\in\mathbb{R}^K$. To this end, note that
+$\boldsymbol{Z}$, the random (pre-trial) value of the to-be-computed
+$\boldsymbol{z}$, has a $K$-dimensional multivariate normal (MVN) distribution,
+with
+
+\begin{align}
+\mathbb{E}(Z_k) &= \frac{\tau_k}{\sqrt{\frac{\sigma_0^2}{n_0} +
+\frac{\sigma_k^2}{n_k}}},\\
+\text{Cov}(Z_{k_1},Z_{k_2}) &= \frac{\sigma_1^2}{n_1}+\mathbb{I}(k_1 = k_2)\frac{\sigma_{k_1}^2}{n_{k_1}},
+\end{align}
+
+where $\mathbb{I}(A)$ is the indicator function on event $A$.
+
+Next, the $z_k$ are converted to a set of $p$-values,
+$\boldsymbol{p}=(p_1,\dots,p_K)^\top\in[0,1]^K$, via
+
+$$ p_k = 1 - \Phi_1(z_k,0,1),\ \ k\in\{1,\dots,K\}.$$
+
+Here, $\Phi_n\{(a_1,\dots,a_n)^\top,\boldsymbol{\lambda},\Sigma\}$ is the
+cumulative distribution function of an $n$-dimensional MVN distribution, with
+mean $\boldsymbol{\lambda}$ and covariance matrix $\Sigma$
+
+$$ \Phi_n\{(a_1,\dots,a_n)^\top,\boldsymbol{\lambda},\Sigma\} = \int_{-\infty}^{a_1}\dots\int_{-\infty}^{a_n}\phi_n\{\boldsymbol{x},\boldsymbol{\lambda},\Sigma\}\mathrm{d}x_n\dots\mathrm{d}x_1, $$
+where $\phi_n\{\boldsymbol{x},\boldsymbol{\lambda},\Sigma\}$ is the probability
+density function of an $n$-dimensional MVN distribution with mean
+$\boldsymbol{\lambda}$ and covariance matrix $\Sigma$, evaluated at vector
+$\boldsymbol{x}=(x_1,\dots,x_n)^\top$.
+
+Finally, to determine whether to reject each null hypothesis, the $p_k$ are
+compared to a set of significance thresholds, which are specified based on a
+chosen multiple comparison procedure, in combination with a nominated
+significance level $\alpha\in(0,1)$.
+
+With the above, the principal goal of **multiarm** is to provide a set of
+functions that
+
+(a) helps choose the significance thresholds against which the $p_k$ are
+compared, typically to control the family-wise error rate (see Section 2.2);
+(b) helps make choices on appropriate values for the $n_k$, $k\in\{0,\dots,K\}$,
+to achieve some desired level of statistical power (see Section 2.3);
+(c) helps evaluate the statistical characteristics of a chosen design.
+
+The forthcoming sections now describe how exactly this is achieved.
+
+## 2.2. Multiple comparison procedures
+
+The most simple possible solution for selecting the significance thresholds
+against which to compare the $p_k$, is to compare each to the chosen
+significance level $\alpha$. I.e., to reject $H_k$ for $k\in\{1,\dots,K\}$ if
+$p_k \le \alpha$ (in the various functions provided in **multiarm** this choice
+is made by setting `correction = "none"`). This controls the per-hypothesis
+error-rate to $\alpha$.
+
+The problem with this, however, particularly when $K$ is large, is that the
+statistical operating characteristics of the resulting design may not be
+desirable (e.g., in terms of the probability of incorrectly rejecting at least
+one null hypothesis). For this reason, in general one may wish to make use of a
+multiple comparison procedure (MCP). Currently, **multiarm** supports the use of
+a variety of such MCPs, which aim to control either the family-wise error-rate
+(with these techniques sub-divided into single-step, step-down, and step-up procedures) or
+the false discovery rate.
+
+### 2.2.1. Single-step family-wise error rate control
+
+These procedures test each of the $H_k$ against a common significance level,
+$\alpha'$, rejecting $H_k$ if $p_k \le \alpha'$. In each instance, the value of
+$\alpha'$ is chosen such that the maximal probability of incorrectly rejecting
+at least one of the null hypotheses $H_k$, $k\in\{1,\dots,K\}$, over all
+possible values of $\boldsymbol{\tau}\in\mathbb{R}^K$ is at most
+$\alpha$. This is referred to as *strong control of the family-wise error rate*.
+
+The supported single-step procedures are
+
+- Bonferroni's correction: This sets $\alpha'=\alpha/K$, and can be chosen with
+`correction = "bonferroni"`.
+- Sidak's correction: This sets $\alpha'=1 - (1 - \alpha)^{1/K}$, and can be
+chosen with `correction = "sidak"`.
+- Dunnett's correction: This sets $\alpha' = 1 - \Phi\{z_D\}$, where
+$z_\text{D}$ is the solution of the following equation
+
+$$ 1 - \alpha = \Phi_K\{(z_D,\dots,z_D)^\top,\boldsymbol{0}_K,\text{Cov}(\boldsymbol{Z})\}, $$
+with $\boldsymbol{0}_n=(0,\dots,0)^\top\in\mathbb{R}^n$ an $n$-dimensional
+vector of zeroes. It can be chosen by setting `correction = "dunnett"`.
+
+### 2.2.2. Step-down family-wise error rate control
+
+These procedures work by first ranking the $p$-values from smallest to largest.
+We will refer to these ranked $p$-values by $p_{(1)},\dots,p_{(K)}$, with associated
+hypotheses $H_{(1)},\dots,H_{(K)}$. The $p_{(k)}$ are compared to a set of significance levels $\alpha_1,\dots,\alpha_K\in(0,1)$. Precisely, the maximal index $k$ such that
+$p_{(k)}>\alpha_k$ is identified, and then $H_{(1)},\dots,H_{(k-1)}$ are rejected
+and $H_{(k)},\dots,H_{(K)}$ are not rejected. If $k=1$ then we do not reject any of the null hypotheses, and if no such $k$ exists then we reject all of the null hypotheses.
+
+The supported step-down procedures are
+
+- Holm's procedure: This sets $\alpha_k=\alpha/(K+1-k)$, and can be chosen with
+`correction = "holm"`.
+- Step-down Dunnett correction: This can only currently be used when $\sigma_1^2/n_1=\dots=\sigma_K^2/n_K$. In this case, it sets $\alpha_k== 1 - \Phi\{z_{Dk}\}$,
+where $z_{Dk}$ is the solution to
+$$ 1 - \alpha = \Phi_{K+1-k}\{(z_{Dk},\dots,z_{Dk})^\top,\boldsymbol{0}_{K+1-k},aI_{K+1-k}+bJ_{K+1-k}\}, $$
+here $I_n$ and $J_n$ are the $n$-dimensional identity matrix and $n$-dimensional
+matrix of ones respectively.
+
+### 2.2.3. Step-up family-wise error rate control
+
+These procedures also work by first ranking the $p$-values from smallest to largest.
+We will refer to these ranked $p$-values by $p_{(1)},\dots,p_{(K)}$, with associated
+hypotheses $H_{(1)},\dots,H_{(K)}$. The $p_{(k)}$ are compared to a set of significance levels $\alpha_1,\dots,\alpha_K\in(0,1)$. Here, find largest $k$ such that $p_{(k)} \le \alpha_k$ and reject all hypotheses $H_{(1)},\dots,H_{(k)}$, and do not reject $H_{(k+1)},\dots,H_{(K)}$.
+
+Currently, one is supported
+
+- Hochberg's correction: This sets $\alpha_k=\alpha/(K+1-k)$, and can be chosen with
+`correction = "hochberg"`.
+
+### 2.2.3. False discovery rate control
+
+Whilst all of the above control the family-wise error rate in the strong sense,
+may be of interest instead to control the false discovery rate (FDR), defined as the expected
+proportion of rejected null hypotheses that are actually true. Currently, one method
+that will contorl the FDR to at most $\alpha$ over all $\tau$ is
+
+- Benjamini-Hochberg: the ordered p-values, $p_{(1)},\dots,p_{(K)}$ are compared
+to $\alpha_k=k\alpha/K$. The maximum $k$ for which $p_{(k)}\le\alpha_k$ is found, then
+$H_{(1)},\dots,H_{(k)}$ are rejected, and $H_{(k+1)},\dots,H_{(K)}$ are not.
+
+## 2.3. Power and sample size determination
+
+Specify interesting and uninteresting treatment effects, $\delta_1\in\mathbb{R}^+$
+and $\delta_0\in(-\infty,\delta_1)$. Then, package supports evaluation of a variety of
+types of power, and determination of sample size to control each of these types of power.
+For this, first useful to think of $\boldsymbol{n}=N(\rho_0,\dots,\rho_K)=N\boldsymbol{\rho}$
+for $\boldsymbol{\rho}\in(0,1)^{K+1}$. For now, we will  assume that $N\in\mathbb{N}\backslash\{1,\dots,2K\}$,
+ignoring requirement that each group size must be an integer. That is, enforce
+at least two patients in each group
+
+- Conjunctive power: Probability reject all of the null hypotheses, $\mathbb{P}(Reject H_k for k\in\{1,\dots,K} \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n})=P_\text{con}(\boldsymbol{\tau})$.
+- Disjunctive power: Probability reject at least one null hypothesis, $\mathbb{P}(Reject H_k for some k \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n})=P_\text{dis}(\boldsymbol{\tau})$.
+- Marginal power: Probability reject $H_k$ for each $k$, $\mathbb{P}(Reject H_k \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n})=P_k(\boldsymbol{\tau})$.
+
+Can compute required sample size to control either the disjunctive power, conjunctive power,
+or minimal marginal power, defined as $\min_{k\in\{1,\dots,K\}}P_k(\boldsymbol{\tau})$.
+Each to level $1-\beta$. The disjunctive power and conjunctive power are controlled under the global alternative hypothesis $H_A$ where. In contrast the marginal power is evaluated for
+each $k$ under its LFC, given by.
+
+First type supposes that the rho is fixed. Alternatively, these can be optimised
+according to a variety of criteria, as outlined in next section.
+
+## 2.5. *A*-, *D*-, and *E*-optimal design
+
+Simple rule would be equal allocaiton, also has been advocated on grounds of power that
+use this $\sqrt{K}$ rule through which . However, also long been interest in
+optimising the design. Currently, multiarm supports determination for a variety
+of different criteria. That is, rho will first be determined, before subsequent
+sample size calculation for the identified rho is performed. The at present available
+optimlaity criteria are
+
+
+
+# 3. Functions
+
+## 3.1. `des_ma()`
+
+
+
+## 3.2. `des_ma_int()`
+
+
+
+## 3.3. `opchar_ma()`
+
+
+## 3.4. `sim_ma()`
+
+
+
+## 3.5. `an_ma()`
+
+
+
+## 3.6. `plot.des_ma()`
+
+
+## 3.7. `print()` and `summary()` functions
+
+
+
+# 4. Examples
+
+## 4.1. Example 1
+
+## 4.2. Example 2
+
+# 5. Miscellaneous
+
+## 5.1. Contact
+
+The first-line response to a possible bug should be to submit it as a
+_New issue_ [here](https://github.com/mjg211/mjg211/issues). If the issue is
+more complex, or a patch is not provided in reasonable time, please contact
+Michael Grayling at michael.grayling@newcastle.ac.uk. Similarly, please feel
+free to contact with suggestions for new features, or for further support with
+using the pacakge.
+
+## 5.2. Citing multiarm
+
+The latest details on how to cite **multiarm** can be found using `citation()`
+
+```{r}
+citation("multiarm")
+```

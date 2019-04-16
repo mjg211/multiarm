@@ -1,0 +1,157 @@
+---
+output: html_document
+params:
+  K:          NA
+  alpha:      NA
+  beta:       NA
+  delta1:     NA
+  delta0:     NA
+  sigma:      NA
+  ratio_type: NA
+  ratio_init: NA
+  ratio:      NA
+  correction: NA
+  power:      NA
+  integer:    NA
+  large_N:    NA
+  small_n:    NA
+  opchar:     NA
+  pi:         NA
+  piO:        NA
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(echo    = F,
+                      results = "asis")
+show_text <- T
+```
+
+#### Design setting
+
+The trial will be designed to compare $K$ experimental treatments to a shared
+control arm. Response $X_{ik}$ from patient $i=1,...,n_k$ in arm $k=0,...,K$
+will be assumed to be distributed as $X_{ik} \sim N(\mu_k,\sigma_k^2)$. Then,
+the hypotheses to be tested will be:
+$$ H_k : \tau_k = \mu_k - \mu_0 \le 0,\ k=1,...,K.$$
+The global null hypothesis, $H_G$, will be given by:
+$$ \tau_1 = ... = \tau_K = 0. $$
+The global alternative hypothesis, $H_G$, will be given by:
+$$ \tau_1 = ... = \tau_K = \delta_1. $$
+The least favourable configuration for experimental arm $k$, $LFC_k$, will be
+given by:
+$$ \tau_k = \delta_1,\ \tau_1 = ... = \tau_{k-1} = \tau_{k+1} = ... = \tau_K = \delta_0. $$
+
+#### Inputs
+
+`r params$K` experimental treatments will be included in the trial.
+
+The standard devaiations of the responses, $\sigma_0,...,\sigma_K$, will be
+assumed to be: `r paste(params$sigma, collapse = ", ")`.
+
+```{r, echo = F, results = "asis"}
+init <- paste0("A significance level of ", params$alpha, " will be used,")
+if (params$correction == "bonferroni") {
+  cat(init, "in combination with Bonferroni's correction.")
+} else if (params$correction == "dunnett") {
+  cat(init, "in combination with Dunnett's correction.")
+}  else if (params$correction == "none") {
+  cat(init, "with no multiple comparison correction.")
+}  else if (params$correction == "sidak") {
+  cat(init, "in combination with Sidak's correction.")
+}  else if (params$correction == "benjamini_hochberg") {
+  cat(init, "in combination with the Benjamini-Hochberg correction.")
+}  else if (params$correction == "hochberg") {
+  cat(init, "in combination with Hochberg's correction.")
+}  else if (params$correction == "holm") {
+  cat(init, "in combination with Holm's correction.")
+}  else if (params$correction == "step_down_dunnett") {
+  cat(init, "in combination with the step-down version of Dunnett's ",
+      "correction.")
+}
+```
+
+```{r, echo = F, results = "asis"}
+if (params$power == "conjunctive") {
+  cat("The conjunctive power will be controlled to level", 1 - params$beta,
+      "under the global alternative hypothesis.")
+} else if (params$power == "disjunctive") {
+  cat("The disjunctive power will be controlled to level", 1 - params$beta,
+      "under the global alternative hypothesis.")
+} else if (params$power == "marginal") {
+  cat("The marginal power for each null hypothesis will be controlled to level",
+      1 - params$beta, "under each of their respective least favourable",
+      "configurations.")
+}
+```
+
+The interesting and uninterresting treatment effects, $\delta_1$ and $\delta_0$
+respectively, will be: `r round(params$delta1, 3)` and
+`r round(params$delta0, 3)`.
+
+```{r, echo = F, results = "asis"}
+if (params$ratio_type == "equal_all") {
+  cat("The allocation to the experimental arms will be the same as the control",
+      "arm.")
+} else if (params$ratio_type == "equal_exp") {
+  cat("The target allocation to each of the experimental arms will be",
+      params$ratio_init[1], "times that of the control arm.")
+} else if (params$ratio_type == "unequal") {
+  cat("The target allocation to each of the experimental arms will be",
+      paste(params$ratio_init[1:params$K], collapse = ", "), "times that of ",
+      "the control arm.")
+} else if (params$ratio_type == "root_K") {
+  cat("The target allocation to each of the experimental arms will be",
+      round(1/sqrt(params$K), 3), "times that of the control arm.")
+} else {
+  cat("The target allocation to each of the experimental arms will be chosen ",
+      "for ", params$ratio_type, "-optimality.", sep = "")
+} 
+```
+
+```{r, echo = F, results = "asis"}
+if (params$integer) {
+  cat("The sample size in each arm will be required to be a whole number.")
+} else {
+  cat("The sample size in each arm will not be required to be a whole number.")
+}
+```
+
+#### Outputs
+
+The total required sample size was computed as: `r round(params$large_N, 3)`.
+
+The required sample size in each arm is:
+`r paste(round(params$small_n, 3), collapse = ", ")`.
+
+Thus, the realised allocation ratios to the experimental arms, $r_1,\dots,r_K$,
+are: `r paste(round(params$ratio, 3), collapse = ", ")`.
+
+```{r, echo = F, results = "asis"}
+if (params$correction %in% c("benjamini_hochberg", "hochberg", "holm",
+                             "step_down_dunnett")) {
+  cat("The following critical thresholds should be used with the chosen ",
+      "multiple comparison correction: ", paste(round(params$piO, 3),
+                                                 collapse = ", "), ".",
+      sep = "")
+} else {
+  cat("The following critical threshold should be used with the chosen ",
+      "multiple comparison correction: ", round(params$pi, 3), ".", sep = "")
+}
+```
+
+The maximum familywise error-rate will be: `r round(params$opchar$FWER[1], 3)`.
+
+```{r, echo = F, results = "asis"}
+if (params$power == "conjunctive") {
+  cat("The conjunctive power will be: ", round(params$opchar[2, 4], 3), ".",
+      sep = "")
+} else if (params$power == "disjunctive") {
+  cat("The disjunctive power will be: ", round(params$opchar[2, 3], 3), ".",
+      sep = "")
+} else if (params$power == "marginal") {
+  cat("The minimum marginal power will be: ",
+      round(min(diag(as.matrix(
+        params$opchar[-(1:2), (params$K + 3):(2*params$K + 2)]))), 3), ".",
+      sep = "")
+}
+```

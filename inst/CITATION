@@ -1,0 +1,9 @@
+citHeader("To cite multiarm in publications please use")
+
+citEntry(entry = "Misc",
+         key = "grayling2019",
+         title = "{multiarm: Design and analysis of fixed-sample multi-arm clinical trials}",
+         author = as.person("Michael J. Grayling"),
+         year = "2019",
+         url = "http://www.github.com/mjg211/multiarm/",
+         textVersion = paste("Grayling MJ (2019) multiarm: Design and analysis of fixed-sample multi-arm clinical trials. URL: http://www.github.com/mjg211/multiarm/."))
