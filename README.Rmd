@@ -36,7 +36,7 @@ You can install the latest development version of multiarm from
 [Github](https://github.com/) with:
 
 ``` r
-devtools::install_github("mjg211/multiarm/")
+devtools::install_github("mjg211/multiarm")
 ```
 
 An introductory example of how to make use of the package's core functionality

@@ -3,6 +3,7 @@
 library(magrittr)
 library(multiarm)
 library(rmarkdown)
+library(rvest)
 library(shiny)
 library(shinyalert)
 library(shinycssloaders)
@@ -11,6 +12,7 @@ library(shinyFeedback)
 library(shinyhelper)
 library(shinyjs)
 library(shinyWidgets)
+library(xml2)
 
 ##### UI #######################################################################
 ui <- dashboardPage(
@@ -50,6 +52,7 @@ ui <- dashboardPage(
                 box(useShinyjs(),
                     useShinyalert(),
                     useShinyFeedback(),
+                    withMathJax(),
                     id          = "box_design_parameters",
                     title       = "Design parameters",
                     width       = 4,
@@ -217,21 +220,22 @@ ui <- dashboardPage(
                              size    = "m",
                              colour  = "black"),
                     tags$head(tags$style(".full_width{width:100%;}")),
-                    downloadButton(outputId = "design_report_html",
+                    radioButtons(inputId = "design_format",
                                    label    =
-                                     "\U2000 Download report (.html) \U2000",
-                                   class    = "full_width"),
-                    p(),
-                    downloadButton(outputId = "design_report_pdf",
+                                     "Download format",
+                                 choices = c("PDF" = "pdf", "HTML" = "html",
+                                             "Word" = "word"),
+                                 selected = "pdf"),
+                    downloadButton(outputId = "design_report",
                                    label    =
-                                     "\U2000 Download report (.pdf) \U2000",
+                                     "\U2000 Download report \U2000",
                                    class    = "full_width")
                 ),
                 box(title       = "Design summary",
                     width       = 8,
                     solidHeader = T,
                     status      = "primary",
-                    withSpinner(uiOutput("design_summary"),
+                    withSpinner(htmlOutput("design_summary"),
                                 type  = 6,
                                 color = "#3C8DBC",
                                 size  = 1/3)
@@ -652,8 +656,9 @@ server <- function(input, output, session) {
     progress$inc(amount  = 0.25 + as.numeric(!input$design_plots),
                  message = "Rendering design summary")
 
-    rmarkdown::render("design_summary.Rmd",
-                      output_file = "design_summary.html",
+    rmarkdown::render("./design_summary.Rmd",
+                      output_format = "html_document",
+                      output_file = file.path(tempdir(), "design_summary.html"),
                       params = list(K          = design$K,
                                     alpha      = design$alpha,
                                     beta       = design$beta,
@@ -676,6 +681,9 @@ server <- function(input, output, session) {
                                     pi        = design$pi,
                                     piO        = design$piO)
     )
+    xml2::write_html(rvest::html_node(xml2::read_html(paste0(tempdir(), "/design_summary.html")),
+                                      "body"),
+                     file = paste0(tempdir(), "/design_summary_modified.html"))
 
     design$data_og <- design$opchar
     design$data <- data.frame(design$opchar,
@@ -766,7 +774,7 @@ server <- function(input, output, session) {
                                          sep = "")))
       } else {
         design$plot_global <- design$plot_global +
-          ggplot2::xlab(expression(bquote(tau[1], " = \u00B7\u00B7\u00B7 = ", tau[.(design$K)],
+          ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(design$K)],
                                           sep = "")))
       }
 
@@ -805,9 +813,9 @@ server <- function(input, output, session) {
                                         col = type)) +
         ggplot2::scale_colour_manual(values = colours[2:(design$K + 1)],
                                       labels = labels) +
-        ggplot2::xlab(bquote(paste(tau[italic(k)], " = ",
-                                   tau[italic(l)], " + ", delta, ", ", italic(l), " \U2260 ",
-                                   italic(k), ", ", delta, " = ", .(input$design_delta),
+        ggplot2::xlab(bquote(paste("... = ", tau[italic(k)-1], " + ", .(input$design_delta), " = ",
+                                   tau[italic(k)], " = ",
+                                   tau[italic(k)+1], " + ", .(input$design_delta), " = ... ",
                                    sep = ""))) +
         ggplot2::ylab("Probability") +
         ggplot2::theme_bw() +
@@ -889,10 +897,11 @@ server <- function(input, output, session) {
     )
   })
 
-  output$design_summary <- renderText({
+  output$design_summary <- renderUI({
     input$design_update
     N <- des()$N
-    includeHTML("design_summary.html")
+    print(tempdir())
+    withMathJax(includeHTML(path = file.path(tempdir(), "/design_summary_modified.html")))
   })
 
 
@@ -928,11 +937,17 @@ server <- function(input, output, session) {
     shinyjs::reset("box_design_parameters")
   })
 
-  output$design_report_html <- downloadHandler(
-    filename = paste0(input$design_filename, ".html"),
+  output$design_report <- downloadHandler(
+    filename = function() {
+      paste(input$design_filename, sep = '.', switch(
+        input$design_format, pdf = 'pdf', html = 'html', word = 'docx'
+      ))
+    },
     content = function(file) {
-      tempReport <- file.path(tempdir(), "design_report_html.Rmd")
-      file.copy("design_report_html.Rmd", tempReport, overwrite = T)
+      src <- normalizePath('./design_report.Rmd')
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, 'design_report.Rmd', overwrite = T)
       params <- list(K          = des()$K,
                      alpha      = des()$alpha,
                      beta       = des()$beta,
@@ -958,47 +973,11 @@ server <- function(input, output, session) {
                      plot_global = des()$plot_global,
                      plot_LFC = des()$plot_LFC,
                      data = des()$data_og)
-       rmarkdown::render(tempReport, output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv())
-      )
-    }
-  )
-
-  output$design_report_pdf <- downloadHandler(
-    filename = paste0(input$design_filename, ".pdf"),
-    content = function(file) {
-      tempReport <- file.path(tempdir(), "design_report_pdf.Rmd")
-      file.copy("design_report_pdf.Rmd", tempReport, overwrite = T)
-      params <- list(K          = des()$K,
-                     alpha      = des()$alpha,
-                     beta       = des()$beta,
-                     delta1     = des()$delta1,
-                     delta0     = des()$delta0,
-                     sigma      = des()$sigma,
-                     ratio_type = input$design_ratio_type,
-                     ratio_init = c(input$design_ratio_1,
-                                    input$design_ratio_2,
-                                    input$design_ratio_3,
-                                    input$design_ratio_4,
-                                    input$design_ratio_5),
-                     ratio      = des()$ratio,
-                     correction = des()$correction,
-                     power      = des()$power,
-                     integer    = des()$integer,
-                     large_N    = des()$N,
-                     small_n    = des()$n,
-                     opchar     = des()$opchar,
-                     pi        = des()$pi,
-                     piO        = des()$piO,
-                     plots       = input$design_plots,
-                     plot_global = des()$plot_global,
-                     plot_LFC = des()$plot_LFC,
-                     data = des()$data_og)
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv())
-      )
+      out <- render("design_report.Rmd", switch(
+        input$design_format,
+        pdf = pdf_document(), html = html_document(), word = word_document()
+      ), params = params, envir = new.env(parent = globalenv()))
+      file.rename(out, file)
     }
   )
 

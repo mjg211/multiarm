@@ -22,7 +22,7 @@ ease design determination.
 You can install the latest development version of multiarm from
 \href{https://github.com/}{Github} with:
 
-\code{devtools::install_github("mjg211/multiarm/")}
+\code{devtools::install_github("mjg211/multiarm")}
 
 An introductory example of how to make use of the package's core
 functionality can be found \href{https://github.com/mjg211/multiarm}{here}.

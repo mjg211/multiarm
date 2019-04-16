@@ -20,5 +20,5 @@ gui_ma <- function() {
     stop("Could not find required directory for Shiny graphical user ",
          "interface. Try re-installing multiarm.", call. = F)
   }
-  shiny::runApp(app_dir, display.mode = "normal")
+  shiny::runApp(app_dir, display.mode = "normal", launch.browser = T)
 }

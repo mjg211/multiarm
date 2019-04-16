@@ -31,6 +31,7 @@ Imports:
     Rfast,
     rmarkdown,
     Rsolnp,
+    rvest,
     shiny,
     shinyalert,
     shinycssloaders,
@@ -41,7 +42,8 @@ Imports:
     shinyWidgets,
     stats,
     tibble,
-    tidyr
+    tidyr,
+    xml2
 Date: 2019-04-11
 URL: http://github.com/mjg211/multiarm
 BugReports: http://github.com/mjg211/multiarm/issues

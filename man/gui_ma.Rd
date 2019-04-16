@@ -13,7 +13,9 @@ running the functions \code{\link{des_ma}} and
 }
 \examples{
 # Launch the GUI
+\dontrun{
 gui_ma()
+}
 }
 \seealso{
 \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},

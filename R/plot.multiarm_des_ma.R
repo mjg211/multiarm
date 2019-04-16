@@ -124,7 +124,7 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
   beta  <- des$beta
   delta0 <- des$delta0
   delta1 <- des$delta1
-  plots$power_global <- ggplot2::ggplot() +
+  plots$plot_global <- ggplot2::ggplot() +
     ggplot2::geom_line(data = dplyr::filter(opchar_global,
                                             !(type %in% c("FWER"))),
                        ggplot2::aes(x   = tau1,
@@ -157,18 +157,16 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
     ggplot2::geom_vline(xintercept = delta1,
                         linetype   = 2)
   if (des$K == 2) {
-    plots$power_global <- plots$power_global +
+    plots$plot_global <- plots$plot_global +
       ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
   } else if (des$K == 3) {
-    plots$power_global <- plots$power_global +
-      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3],
-                                      sep = "")))
+    plots$plot_global <- plots$plot_global +
+      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3], sep = "")))
   } else {
-    plots$power_global <- plots$power_global +
-      ggplot2::xlab(expression(bquote(tau[1], " = \u00B7\u00B7\u00B7 = ", tau[.(des$K)],
-                                      sep = "")))
+    plots$plot_global <- plots$plot_global +
+      ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(design$K)], sep = "")))
   }
-  print(plots$power_global)
+  print(plots$plot_global)
 
   opchar_matrix    <- NULL
   for (k in 1:des$K) {
@@ -190,16 +188,15 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
   for (i in 1:des$K) {
     labels[i] <- parse(text = paste("italic(P)[", i, "]", sep = ""))
   }
-  plots$power_LFC <- ggplot2::ggplot() +
+  plots$plot_LFC <- ggplot2::ggplot() +
     ggplot2::geom_line(data = opchar_LFC,
                        ggplot2::aes(x   = .data$tauk,
                                     y   = P,
                                     col = type)) +
     ggplot2::scale_colour_manual(values = colours[2:(des$K + 1)], labels = labels) +
-    ggplot2::xlab(bquote(paste(tau[italic(k)], " = ",
-                               tau[italic(l)], " + ", delta, ", ", italic(l), " \U2260 ",
-                               italic(k), ", ", delta, " = ", .(delta),
-                               sep = ""))) +
+    ggplot2::xlab(bquote(paste("... = ", tau[italic(k)-1], " + ", .(delta), " = ",
+                                tau[italic(k)], " = ",
+                                tau[italic(k)+1], " + ", .(delta), " = ... ", sep = ""))) +
     ggplot2::ylab("Probability") +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position  = "bottom",
@@ -213,7 +210,7 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                         linetype   = 2) +
     ggplot2::geom_vline(xintercept = delta1,
                         linetype   = 2)
-  print(plots$power_LFC)
+  print(plots$plot_LFC)
 
   ##### Outputting #############################################################
 
