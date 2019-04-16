@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 `r badger::badge_lifecycle("maturing", "blue")`
-`r badger::badge_code_size("mjg211/multiarm")`
+`r badger::badge_code_size("mjg211/multiarm/")`
 `r badger::badge_last_commit("mjg211/multiarm")`
 
 ## Description

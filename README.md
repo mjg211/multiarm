@@ -3,7 +3,6 @@
 
 # multiarm
 
-[![HitCount](http://hits.dwyl.io/mjg211/multiarm.svg)](http://hits.dwyl.io/mjg211/multiarm)
 [![contributions
 welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 [![](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
@@ -100,7 +99,7 @@ Then, the total required sample size is
 
 ``` r
 des$N
-#> [1] 67.46351
+#> [1] 67.44266
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -114,9 +113,9 @@ des$opchar
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
 #> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.0500
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0     
-#> 3     1     0     0 0.800  0.00328 0.800  0.0196 0.0196 0.0359 0.0187
-#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.0187
-#> 5     0     0     1 0.801  0.00329 0.0196 0.0196 0.800  0.0359 0.0187
+#> 3     1     0     0 0.800  0.00330 0.800  0.0196 0.0196 0.0359 0.0187
+#> 4     0     1     0 0.801  0.00329 0.0196 0.800  0.0196 0.0359 0.0187
+#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.0187
 ```
 
 Useful plots can then be produced with `plot.multiarm_des_ma()`. For
