@@ -638,7 +638,6 @@ server <- function(input, output, session) {
     } else {
       ratio   <- input$design_ratio_type
     }
-    print(input$design_correction)
     design  <- multiarm::des_ma(K          = input$design_K,
                                 alpha      = input$design_alpha,
                                 beta       = 1 - input$design_beta,
@@ -691,7 +690,6 @@ server <- function(input, output, session) {
 
 
     if (input$design_plots) {
-      print(class(design))
       progress$inc(amount  = 0.25,
                    message = "Rendering plots")
       tau                <- matrix(0, as.numeric(input$design_density),
@@ -718,6 +716,7 @@ server <- function(input, output, session) {
       }
       labels[(design$K + 2L):(design$K + 3L)] <- c(parse(text = "italic(P)[con]"),
                                                    parse(text = "italic(P)[dis]"))
+      colours <- ggthemes::ptol_pal()(3 + design$K)
       alpha              <- design$alpha
       beta               <- design$beta
       delta0             <- design$delta0
@@ -740,10 +739,9 @@ server <- function(input, output, session) {
                            ggplot2::aes(x   = tau1,
                                         y   = P,
                                         col = type)) +
-        ggthemes::scale_color_ptol(labels = labels) +
-        ggplot2::xlab(expression(paste(tau[1], " = \u00B7\u00B7\u00B7 = ",
-                                       tau[K], sep = ""))) +
+        ggplot2::scale_colour_manual(values = colours, labels = labels) +
         ggplot2::ylab("Probability/Rate") +
+        ggplot2::theme_bw() +
         ggplot2::theme(legend.position  = "bottom",
                        legend.title     = ggplot2::element_blank(),
                        legend.spacing.x = grid::unit(0.2, "cm"),
@@ -759,6 +757,18 @@ server <- function(input, output, session) {
                             linetype   = 2) +
         ggplot2::geom_vline(xintercept = delta1,
                             linetype   = 2)
+      if (design$K == 2) {
+        design$plot_global <- design$plot_global +
+          ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
+      } else if (design$K == 3) {
+        design$plot_global <- design$plot_global +
+          ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3],
+                                         sep = "")))
+      } else {
+        design$plot_global <- design$plot_global +
+          ggplot2::xlab(expression(bquote(tau[1], " = \u00B7\u00B7\u00B7 = ", tau[.(design$K)],
+                                          sep = "")))
+      }
 
       progress$inc(amount  = 0.25,
                    message = "Rendering plots")
@@ -793,15 +803,14 @@ server <- function(input, output, session) {
                            ggplot2::aes(x   = .data$tauk,
                                         y   = P,
                                         col = type)) +
-        ggthemes::scale_color_ptol(labels = labels) +
-        ggplot2::xlab(bquote(paste(tau[1], " + ", delta,
-                                   " = \u00B7\u00B7\u00B7 = ", tau[k - 1],
-                                   " + ", delta, " = ", tau[k], " = ",
-                                   tau[k + 1], " + ", delta,
-                                   " = \u00B7\u00B7\u00B7 = ", tau[K], " + ",
-                                   delta, ", ", delta, " = ", .(delta),
+        ggplot2::scale_colour_manual(values = colours[2:(design$K + 1)],
+                                      labels = labels) +
+        ggplot2::xlab(bquote(paste(tau[italic(k)], " = ",
+                                   tau[italic(l)], " + ", delta, ", ", italic(l), " \U2260 ",
+                                   italic(k), ", ", delta, " = ", .(input$design_delta),
                                    sep = ""))) +
         ggplot2::ylab("Probability") +
+        ggplot2::theme_bw() +
         ggplot2::theme(legend.position  = "bottom",
                        legend.title     = ggplot2::element_blank(),
                        legend.spacing.x = grid::unit(0.2, "cm"),

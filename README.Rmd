@@ -110,10 +110,8 @@ accessed with
 des$opchar
 ```
 
-Useful plots can then be produced with `plot.multiarm_des_ma()`. For example,
-the conjunctive, disjunctive, and marginal powers can be plotted with
+Useful plots can then be produced with `plot.multiarm_des_ma()` as follows
 
-```{r}
-plots <- plot(des, output = T)
-plots$power_global
+```{r dpi = 600}
+multiarm:::plot.multiarm_des_ma(des)
 ```

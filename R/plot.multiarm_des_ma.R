@@ -119,6 +119,7 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
   }
   labels[(des$K + 2L):(des$K + 3L)] <- c(parse(text = "italic(P)[con]"),
                                  parse(text = "italic(P)[dis]"))
+  colours <- ggthemes::ptol_pal()(3 + des$K)
   alpha <- des$alpha
   beta  <- des$beta
   delta0 <- des$delta0
@@ -141,10 +142,9 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                        ggplot2::aes(x   = tau1,
                                     y   = P,
                                     col = type)) +
-    ggthemes::scale_color_ptol(labels = labels) +
-    ggplot2::xlab(expression(paste(tau[1], " = \u00B7\u00B7\u00B7 = ", tau[K],
-                                   sep = ""))) +
+    ggplot2::scale_colour_manual(values = colours, labels = labels) +
     ggplot2::ylab("Probability/Rate") +
+    ggplot2::theme_bw() +
     ggplot2::theme(legend.position  = "bottom",
                    legend.title     = ggplot2::element_blank(),
                    legend.spacing.x = grid::unit(0.2, "cm")) +
@@ -156,6 +156,18 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                         linetype   = 2) +
     ggplot2::geom_vline(xintercept = delta1,
                         linetype   = 2)
+  if (des$K == 2) {
+    plots$power_global <- plots$power_global +
+      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
+  } else if (des$K == 3) {
+    plots$power_global <- plots$power_global +
+      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3],
+                                      sep = "")))
+  } else {
+    plots$power_global <- plots$power_global +
+      ggplot2::xlab(expression(bquote(tau[1], " = \u00B7\u00B7\u00B7 = ", tau[.(des$K)],
+                                      sep = "")))
+  }
   print(plots$power_global)
 
   opchar_matrix    <- NULL
@@ -183,15 +195,13 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                        ggplot2::aes(x   = .data$tauk,
                                     y   = P,
                                     col = type)) +
-    ggthemes::scale_color_ptol(labels = labels) +
-    ggplot2::xlab(bquote(paste(tau[1], " + ", delta,
-                                   " = \u00B7\u00B7\u00B7 = ", tau[k - 1],
-                                   " + ", delta, " = ", tau[k], " = ",
-                                   tau[k + 1], " + ", delta,
-                                   " = \u00B7\u00B7\u00B7 = ", tau[K], " + ",
-                                   delta, ", ", delta, " = ", .(delta),
-                                   sep = ""))) +
+    ggplot2::scale_colour_manual(values = colours[2:(des$K + 1)], labels = labels) +
+    ggplot2::xlab(bquote(paste(tau[italic(k)], " = ",
+                               tau[italic(l)], " + ", delta, ", ", italic(l), " \U2260 ",
+                               italic(k), ", ", delta, " = ", .(delta),
+                               sep = ""))) +
     ggplot2::ylab("Probability") +
+    ggplot2::theme_bw() +
     ggplot2::theme(legend.position  = "bottom",
                    legend.title     = ggplot2::element_blank(),
                    legend.spacing.x = grid::unit(0.2, "cm")) +
