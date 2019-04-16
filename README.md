@@ -99,7 +99,7 @@ Then, the total required sample size is
 
 ``` r
 des$N
-#> [1] 67.44266
+#> [1] 67.48324
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -111,18 +111,25 @@ des$opchar
 #> # A tibble: 5 x 10
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3   FWER    FDR
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
-#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.0500
+#> 1     0     0     0 0.0499 0.00108 0.0196 0.0196 0.0196 0.0499 0.0499
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0     
-#> 3     1     0     0 0.800  0.00330 0.800  0.0196 0.0196 0.0359 0.0187
-#> 4     0     1     0 0.801  0.00329 0.0196 0.800  0.0196 0.0359 0.0187
-#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.0187
+#> 3     1     0     0 0.801  0.00328 0.800  0.0196 0.0196 0.0359 0.0187
+#> 4     0     1     0 0.800  0.00328 0.0196 0.800  0.0196 0.0359 0.0187
+#> 5     0     0     1 0.800  0.00328 0.0196 0.0196 0.800  0.0359 0.0187
 ```
 
 Useful plots can then be produced with `plot.multiarm_des_ma()`. For
 example, the conjunctive, disjunctive, and marginal powers can be
-plotted with
+plotted
+with
 
 ``` r
-#plots <- plot(des, output = T)
-#plot$power
+plots <- plot(des, output = T)
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" /><img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" />
+
+``` r
+plots$power_global
+#> NULL
 ```
