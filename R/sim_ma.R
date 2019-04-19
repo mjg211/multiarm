@@ -40,8 +40,7 @@
 #'                              c(0, 0.5)))
 #' @seealso \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},
 #' \code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, and their associated S3
-#' \code{\link{print}} and \code{\link{summary}} generics.
+#' \code{\link{plot.multiarm_des_ma}}.
 #' @export
 sim_ma <- function(des = des_ma(integer = T), tau, replicates = 100000,
                    summary = F) {

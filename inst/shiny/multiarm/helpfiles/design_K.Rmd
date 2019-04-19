@@ -5,6 +5,6 @@ output: md_document
 
 # Number of experimental treatment arms
 
-__multiarm__ assumes that some number of experimental treatment arms, referred
-to as $K$, are compared to a common control arm. Specify your chosen number of
-experimental treatment arms here.
+__multiarm__ assumes that some number of experimental treatment arms, $K$, are
+compared to a common control arm. Specify your chosen number of experimental
+treatment arms here.

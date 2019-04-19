@@ -5,7 +5,7 @@ output: md_document
 
 # Plot treatment effect shift
 
-__multiarm__ can produce a selection of informative power curve plots. One of
-these requires a value to be specified for a shift in the treatment effects
-between the experimental arms, referred to as $\delta$. Specify your choice for
-the treatment effect shift here.
+__multiarm__ can produce a selection of power curve plots. One of these requires
+a value, $\delta$, to be specified for a shift in the treatment effects between
+the experimental arms. Specify your choice for the treatment effect shift here.
+It should be strictly positive.

@@ -1,749 +1,798 @@
 ##### Load required packages ###################################################
 
-library(magrittr)
 library(multiarm)
-library(rmarkdown)
-library(rvest)
-library(shiny)
-library(shinyalert)
-library(shinycssloaders)
-library(shinydashboard)
-library(shinyFeedback)
-library(shinyhelper)
-library(shinyjs)
-library(shinyWidgets)
-library(xml2)
 
 ##### UI #######################################################################
-ui <- dashboardPage(
+ui <- shinydashboard::dashboardPage(
   ##### Dashboard: Header ######################################################
-  dashboardHeader(title      = "multiarm",
-                  titleWidth = 175),
+  shinydashboard::dashboardHeader(
+    title      = "multiarm",
+    titleWidth = 175),
   ##### Dashboard: Sidebar #####################################################
-  dashboardSidebar(
+  shinydashboard::dashboardSidebar(
     width = 175,
-    sidebarMenu(
-      menuItem(text    = "Home",
-               tabName = "home",
-               icon    = icon("home")),
-      menuItem(text       = "Design",
-               tabName    = "design",
-               icon       = icon(name = "list-alt",
+    shinydashboard::sidebarMenu(
+      shinydashboard::menuItem(
+        text    = "Home",
+        tabName = "home",
+        icon    = shiny::icon(name = "home")),
+      shinydashboard::menuItem(
+        text       = "Design",
+        tabName    = "design",
+        icon       = shiny::icon(name = "list-alt",
                                  lib  = "glyphicon"),
-               badgeLabel = "new",
-               badgeColor = "green"),
-      menuItem(text    = "About",
-               tabName = "about",
-               icon    = icon(name = "question")),
-      menuItem(text    = "Source code",
-               icon    = icon(name = "file-code-o"),
-               href    = "https://github.com/mjg211/multiarm/")
+        badgeLabel = "new",
+        badgeColor = "green"),
+      shinydashboard::menuItem(
+        text    = "About",
+        tabName = "about",
+        icon    = shiny::icon(name = "question")),
+      shinydashboard::menuItem(
+        text    = "Source code",
+        icon    = shiny::icon(name = "file-code-o"),
+        href    = "https://github.com/mjg211/multiarm/")
     )
   ),
   ##### Dashboard: Body ########################################################
-  dashboardBody(
-    tabItems(
+  shinydashboard::dashboardBody(
+    shinydashboard::tabItems(
       ##### Tab: Home ##########################################################
-      tabItem(tabName = "home"),
-      ##### Tab: Design ########################################################
-      tabItem(tabName = "design",
-              ### Row 1: Design parameters & Design summary ###
-              fluidRow(
-                box(useShinyjs(),
-                    useShinyalert(),
-                    useShinyFeedback(),
-                    withMathJax(),
-                    id          = "box_design_parameters",
-                    title       = "Design parameters",
-                    width       = 4,
-                    solidHeader = T,
-                    status      = "primary",
-                    tags$style(type = "text/css",
-                               ".irs-grid-pol.small {height: 0px;}"),
-                    sliderInput(inputId = "design_K",
-                                label   = paste0("Number of experimental ",
-                                                 "treatment arms (\U1D43E):"),
-                                min     = 2,
-                                max     = 5,
-                                value   = 2,
-                                step    = 1) %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_K",
-                             size    = "m",
-                             colour  = "black"),
-                    selectInput(inputId  = "design_correction",
-                                label    = "Multiple comparison correction:",
-                                choices  =
-                                  list("Single-step" =
-                                         list("Bonferroni"      = "bonferroni",
-                                              "Dunnett"         = "dunnett",
-                                              "None"            = "none",
-                                              "\U0160id\U00E1k" = "sidak"),
-                                       "Step-wise"   =
-                                         list("Benjamini-Hochberg" =
-                                                "benjamini_hochberg",
-                                              "Hochberg"           = "hochberg",
-                                              "Holm"               = "holm",
-                                              "Step-down Dunnett"  =
-                                                "step_down_dunnett")),
-                                selected = "dunnett") %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_correction",
-                             size    = "m",
-                             colour  = "black"),
-                    numericInput(inputId = "design_alpha",
-                                 label   = "Significance level (\U1D6FC):",
-                                 value   = 0.05,
-                                 min     = 0,
-                                 max     = 1,
-                                 step    = 0.01) %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_alpha",
-                             size    = "m",
-                             colour  = "black"),
-                    selectInput(inputId = "design_power",
-                                label   = "Type of power to control:",
-                                choices = c("Conjunctive" = "conjunctive",
-                                            "Disjunctive" = "disjunctive",
-                                            "Marginal"    = "marginal"),
-                                selected = "marginal")  %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_power",
-                             size    = "m",
-                             colour  = "black"),
-                    numericInput(inputId = "design_beta",
-                                 label   = "Desired power (1 \U2212 \U1D6FD):",
-                                 value   = 0.8,
-                                 min     = 0,
-                                 max     = 1,
-                                 step    = 0.025)  %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_beta",
-                             size    = "m",
-                             colour  = "black"),
-                    numericInput(inputId = "design_delta1",
-                                 label   = paste0("Interesting treatment ",
-                                                  "effect (\U1D6FF\U2081):"),
-                                 value   = 0.5,
-                                 min     = 0,
-                                 max     = NA,
-                                 step    = 0.1) %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_delta1",
-                             size    = "m",
-                             colour  = "black"),
-                    uiOutput("outputNumericInput_design_delta0"),
-                    selectInput(inputId = "design_sigma_type",
-                                label   = "Standard deviations:",
-                                choices = c("Equal across all arms"          =
-                                              "equal_all",
-                                            "Equal across experimental arms" =
-                                              "equal_exp",
-                                            "Unequal across all arms"        =
-                                              "unequal"),
-                                selected = "equal_all")  %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_sigma_type",
-                             size    = "m",
-                             colour  = "black"),
-                    uiOutput("outputNumericInput_design_sigma"),
-                    selectInput(
-                      inputId = "design_ratio_type",
-                      label   = "Allocation ratios:",
-                      choices =
-                        list("Explicit" =
-                               list("Equal across all arms"          =
-                                      "equal_all",
-                                    "Equal across experimental arms" =
-                                      "equal_exp",
-                                    "Unequal across all arms"        =
-                                      "unequal",
-                                    "\U221A\U1D43E-rule"             =
-                                      "root_K"),
-                             "Implicit" = list("\U1D434-optimal" = "A",
-                                               "\U1D437-optimal" = "D",
-                                               "\U1D438-optimal" = "E")),
-                      selected = "equal_all")  %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_ratio_type",
-                             size    = "m",
-                             colour  = "black"),
-                    uiOutput("outputNumericInput_design_ratio"),
-                    prettySwitch(inputId = "design_integer",
-                                 label   = "Require integer sample sizes",
-                                 status  = "info",
-                                 value   = F,
-                                 slim    = T)  %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_integer",
-                             size    = "m",
-                             colour  = "black"),
-                    prettySwitch(inputId = "design_plots",
-                                 label   = "Plot power curves",
-                                 status  = "info",
-                                 value   = T,
-                                 slim    = T) %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_plots",
-                             size    = "m",
-                             colour  = "black"),
-                    uiOutput("outputSelectInput_design_density"),
-                    uiOutput("outputNumericInput_design_delta"),
-                    hr(),
-                    actionButton(inputId = "design_reset",
-                                 label   = "\U2000 Reset inputs \U2000",
-                                 icon    = icon(name = "eraser"),
-                                 width   = "100%"),
-                    hr(),
-                    uiOutput("outputWarning_design"),
-                    actionButton(inputId = "design_update",
-                                 label   = "\U2000 Update outputs \U2000",
-                                 icon    = icon(name = "check-square-o"),
-                                 width   = "100%"),
-                    hr(),
-                    textInput(inputId = "design_filename",
-                              label   = "Report filename:",
-                              value   = "multiarm_design")  %>%
-                      helper(type    = "markdown",
-                             title   = "",
-                             content = "design_filename",
-                             size    = "m",
-                             colour  = "black"),
-                    tags$head(tags$style(".full_width{width:100%;}")),
-                    radioButtons(inputId = "design_format",
-                                   label    =
-                                     "Download format",
-                                 choices = c("PDF" = "pdf", "HTML" = "html",
-                                             "Word" = "word"),
-                                 selected = "pdf"),
-                    downloadButton(outputId = "design_report",
-                                   label    =
-                                     "\U2000 Download report \U2000",
-                                   class    = "full_width")
-                ),
-                box(title       = "Design summary",
-                    width       = 8,
-                    solidHeader = T,
-                    status      = "primary",
-                    withSpinner(htmlOutput("design_summary"),
-                                type  = 6,
-                                color = "#3C8DBC",
-                                size  = 1/3)
-                )
-              ),
-              fluidRow(
-                valueBoxOutput("design_ss_box"),
-                valueBoxOutput("design_fwer_box"),
-                valueBoxOutput("design_power_box")
-              ),
-              fluidRow(
-                box(title       = "Operating characteristics summary",
-                    width       = 12,
-                    solidHeader = T,
-                    collapsible = T,
-                    status      = "primary",
-                    column(width = 12,
-                           align = "center",
-                           withSpinner(tableOutput('summary'),
-                                       type  = 6,
-                                       color = "#3C8DBC",
-                                       size  = 1/3))
-                )
-              ),
-              fluidRow(
-                box(title       = "Equal treatment effects",
-                    width       = 6,
-                    solidHeader = T,
-                    collapsible = T,
-                    status      = "primary",
-                    withSpinner(plotOutput("plot_global",
-                                           dblclick = "plot_global_dblclick",
-                                           brush    =
-                                             brushOpts(
-                                               id         = "plot_global_brush",
-                                               resetOnNew = T
-                                             )
-                    ),
-                    type  = 6,
-                    color = "#3C8DBC",
-                    size  = 1/3)
-                ),
-                box(title       = "Least favourable configurations",
-                    width       = 6,
-                    solidHeader = T,
-                    collapsible = T,
-                    status      = "primary",
-                    withSpinner(plotOutput("plot_LFC",
-                                           dblclick = "plot_LFC_dblclick",
-                                           brush    = brushOpts(
-                                             id = "plot_LFC_brush",
-                                             resetOnNew = TRUE
-                                           )
-                    ),
-                    type  = 6,
-                    color = "#3C8DBC",
-                    size  = 1/3)
-                )
-              ),
-              fluidRow(
-                box(title       = "Session Information",
-                    status      = "primary",
-                    solidHeader = T,
-                    width       = 12,
-                    collapsible = T,
-                    collapsed   = T,
-                    verbatimTextOutput("design_debug")
-                )
-              )
+      shinydashboard::tabItem(
+        tabName = "home",
+        h1(strong("multiarm:"),
+           "Design and analysis of fixed-sample multi-arm clinical trials"),
+        p("Welcome to the R Shiny graphical user interface (GUI) to the R ",
+          "package multiarm, which is currently available from:"),
+        a(href = "https://github.com/mjg211/multiarm",
+          "https://github.com/mjg211/multiarm"),
+        p(""),
+        p("Within R, multiarm provides functionality to assist with the design",
+          "and analysis of fixed-sample multi-arm clinical trial utilising one",
+          "of several supported multiple comparison corrections. Available",
+          "functions allow for sample size determination (including for A-,",
+          "D-, and E-optimal designs), trial simulation, analytical operating",
+          "characteristic calculation (including the conjunctive power,",
+          "disjunctive power, family-wise error-rate, and false discovery",
+          "rate), and the production of several plots."),
+        p("At present, this GUI supports execution of the commands for design",
+          " determination and plot production. Additional functionality will",
+          "be added over time."),
+        p("See the 'Design' tab on the sidebar for code execution, or the",
+          "'About' tab for further information on the GUI.")
       ),
-      tabItem(tabName = "about")
+      ##### Tab: Design ########################################################
+      shinydashboard::tabItem(
+        tabName = "design",
+        ##### Row 1: Design parameters & Design summary ########################
+        shiny::fluidRow(
+          shinydashboard::box(
+            shinyjs::useShinyjs(),
+            shinyalert::useShinyalert(),
+            shinyFeedback::useShinyFeedback(),
+            shiny::withMathJax(),
+            id          = "box_design_parameters",
+            title       = "Design parameters",
+            width       = 4,
+            solidHeader = T,
+            status      = "primary",
+            tags$style(type = "text/css",
+                       ".irs-grid-pol.small {height: 0px;}"),
+            shiny::sliderInput(
+              inputId = "design_K",
+              label   = "Number of experimental treatment arms:",
+              min     = 2,
+              max     = 5,
+              value   = 2,
+              step    = 1) %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_K",
+                size    = "m",
+                colour  = "black"),
+            shiny::selectInput(
+              inputId  = "design_correction",
+              label    = "Multiple comparison correction:",
+              choices  =
+                list("Single-step" =
+                       list("Bonferroni"      = "bonferroni",
+                            "Dunnett"         = "dunnett",
+                            "None"            = "none",
+                            "Sidak"           = "sidak"),
+                     "Step-wise"   =
+                       list("Benjamini-Hochberg" = "benjamini_hochberg",
+                            "Hochberg"           = "hochberg",
+                            "Holm"               = "holm",
+                            "Step-down Dunnett"  = "step_down_dunnett")),
+              selected = "dunnett") %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_correction",
+                size    = "m",
+                colour  = "black"),
+            shiny::numericInput(
+              inputId = "design_alpha",
+              label   = "Significance level:",
+              value   = 0.05,
+              min     = 0,
+              max     = 1,
+              step    = 0.01) %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_alpha",
+                size    = "m",
+                colour  = "black"),
+            shiny::selectInput(
+              inputId = "design_power",
+              label   = "Type of power to control:",
+              choices = c("Conjunctive" = "conjunctive",
+                          "Disjunctive" = "disjunctive",
+                          "Marginal"    = "marginal"),
+              selected = "marginal") %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_power",
+                size    = "m",
+                colour  = "black"),
+            shiny::numericInput(
+              inputId = "design_beta",
+              label   = "Desired power:",
+              value   = 0.8,
+              min     = 0,
+              max     = 1,
+              step    = 0.025) %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_beta",
+                size    = "m",
+                colour  = "black"),
+            shiny::numericInput(
+              inputId = "design_delta1",
+              label   = "Interesting treatment effect:",
+              value   = 0.5,
+              min     = 0,
+              max     = NA,
+              step    = 0.1) %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_delta1",
+                size    = "m",
+                colour  = "black"),
+            shiny::uiOutput("design_delta0"),
+            shiny::selectInput(
+              inputId = "design_sigma_type",
+              label   = "Standard deviations:",
+              choices = c("Equal across all arms"          = "equal_all",
+                          "Equal across experimental arms" = "equal_exp",
+                          "Unequal across all arms"        = "unequal"),
+              selected = "equal_all") %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_sigma_type",
+                size    = "m",
+                colour  = "black"),
+            shiny::uiOutput("design_sigma"),
+            shiny::selectInput(
+              inputId = "design_ratio_type",
+              label   = "Allocation ratios:",
+              choices =
+                list("Explicit" =
+                       list("Equal across all arms"          = "equal_all",
+                            "Equal across experimental arms" = "equal_exp",
+                            "Unequal across all arms"        = "unequal",
+                            "root-K rule"                    = "root_K"),
+                     "Implicit" = list("A-optimal" = "A",
+                                       "D-optimal" = "D",
+                                       "D-optimal" = "E")),
+              selected = "equal_all") %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_ratio_type",
+                size    = "m",
+                colour  = "black"),
+            shiny::uiOutput("design_ratio"),
+            shinyWidgets::prettySwitch(
+              inputId = "design_integer",
+              label   = "Require integer sample sizes",
+              status  = "info",
+              value   = F,
+              slim    = T) %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_integer",
+                size    = "m",
+                colour  = "black"),
+            shinyWidgets::prettySwitch(
+              inputId = "design_plots",
+              label   = "Plot power curves",
+              status  = "info",
+              value   = T,
+              slim    = T) %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_plots",
+                size    = "m",
+                colour  = "black"),
+            shiny::uiOutput("design_density"),
+            shiny::uiOutput("design_delta"),
+            shiny::hr(),
+            shiny::actionButton(
+              inputId = "design_reset",
+              label   = " Reset inputs  ",
+              icon    = shiny::icon(name = "eraser"),
+              width   = "100%"),
+            shiny::hr(),
+            shiny::uiOutput("design_warning"),
+            shiny::actionButton(
+              inputId = "design_update",
+              label   = "  Update outputs  ",
+              icon    = shiny::icon(name = "check-square-o"),
+              width   = "100%"),
+            shiny::hr(),
+            shiny::textInput(
+              inputId = "design_filename",
+              label   = "Report filename:",
+              value   = "multiarm_design") %>%
+              shinyhelper::helper(
+                type    = "markdown",
+                title   = "",
+                content = "design_filename",
+                size    = "m",
+                colour  = "black"),
+            tags$head(tags$style(".full_width{width:100%;}")),
+            shiny::radioButtons(
+              inputId = "design_format",
+              label   = "Download format",
+              choices = c("PDF"  = "pdf",
+                          "HTML" = "html",
+                          "Word" = "word"),
+              selected = "pdf",
+              inline   = T),
+            shiny::downloadButton(
+              outputId = "design_report",
+              label    = "  Download report  ",
+              class    = "full_width")
+          ),
+          shinydashboard::box(
+            title       = "Design summary",
+            width       = 8,
+            solidHeader = T,
+            status      = "primary",
+            shinycssloaders::withSpinner(
+              shiny::withMathJax(shiny::htmlOutput("design_summary")),
+              type  = 6,
+              color = "#3C8DBC",
+              size  = 1/3
+            )
+          )
+        ),
+        ##### Row 2: Value box outputs #########################################
+        shiny::fluidRow(
+          shinydashboard::valueBoxOutput("design_ss_box"),
+          shinydashboard::valueBoxOutput("design_fwer_box"),
+          shinydashboard::valueBoxOutput("design_power_box")
+        ),
+        ##### Row 3: Operating characteristics summary #########################
+        shiny::fluidRow(
+          shinydashboard::box(
+            title       = "Operating characteristics summary",
+            width       = 12,
+            solidHeader = T,
+            collapsible = T,
+            status      = "primary",
+            shiny::column(
+              width = 12,
+              align = "center",
+              shinycssloaders::withSpinner(
+                shiny::tableOutput("design_tab"),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          )
+        ),
+        ##### Row 4: Plots #####################################################
+        shiny::fluidRow(
+          shinydashboard::box(
+            title       = "Equal treatment effects",
+            width       = 6,
+            solidHeader = T,
+            collapsible = T,
+            status      = "primary",
+            shinycssloaders::withSpinner(
+              shiny::plotOutput(
+                "equal",
+                dblclick = "equal_dblclick",
+                brush    = shiny::brushOpts(id         = "equal_brush",
+                                            resetOnNew = T)
+              ),
+              type  = 6,
+              color = "#3C8DBC",
+              size  = 1/3
+            )
+          ),
+          shinydashboard::box(
+            title       = "Shifted treatment effects",
+            width       = 6,
+            solidHeader = T,
+            collapsible = T,
+            status      = "primary",
+            shinycssloaders::withSpinner(
+              shiny::plotOutput(
+                "shifted",
+                dblclick = "shifted_dblclick",
+                brush    = shiny::brushOpts(id         = "shifted_brush",
+                                            resetOnNew = T)
+              ),
+              type  = 6,
+              color = "#3C8DBC",
+              size  = 1/3
+            )
+          )
+        ),
+        shiny::fluidRow(
+          shinydashboard::box(
+            title       = "Session Information",
+            status      = "primary",
+            solidHeader = T,
+            width       = 12,
+            collapsible = T,
+            collapsed   = T,
+            shiny::verbatimTextOutput("design_debug")
+          )
+        )
+      ),
+      ##### Tab: About #########################################################
+      shinydashboard::tabItem(
+        tabName = "about",
+        h1("About"),
+        p("This graphical user interface (GUI) is built upon (and in to)",
+          " v.0.9.1 of the R package multiarm, written by Michael Grayling",
+          "(Newcastle University)."),
+        p("The first-line response to a possible bug should be to submit it as",
+          " a 'New issue' at:"),
+        a(href = "https://github.com/mjg211/multiarm/issues",
+          "https://github.com/mjg211/multiarm/issues"),
+        p(),
+        p("If the issue is more complex, or a patch is not provided in",
+          "reasonable time, please contact Michael Grayling at",
+          "michael.grayling@newcastle.ac.uk. Similarly, please feel free to",
+          "contact with suggestions for new features, or for further support",
+          "with using the package or GUI."),
+        p("If you use multiarm, please cite it with:"),
+        p("Grayling MJ (2019) multiarm: Design and analysis of fixed-sample ",
+          "multi-arm clinical trials.",
+          "URL: http://www.github.com/mjg211/multiarm/.")
+      )
     )
   ),
   title = "multiarm",
   skin  = "blue"
 )
 
+##### Server ###################################################################
 server <- function(input, output, session) {
 
-  observe_helpers(withMathJax = T)
-  ranges_global <- reactiveValues(x = NULL, y = NULL)
-  ranges_LFC    <- reactiveValues(x = NULL, y = NULL)
+  ##### Initial set-up #########################################################
 
-  ##### Reactive warning messages ##############################################
+  shinyhelper::observe_helpers(withMathJax = T)
+  ranges_equal   <- shiny::reactiveValues(x = NULL, y = NULL)
+  ranges_shifted <- shiny::reactiveValues(x = NULL, y = NULL)
 
-  observeEvent(input$design_alpha, {
-    feedbackDanger(inputId   = "design_alpha",
-                   condition = any(input$design_alpha <= 0,
-                                   input$design_alpha >= 1),
-                   text      = "\U1D6FC must be strictly between 0 and 1"
-    )
+  ##### Design: shinyFeedback warning messages #################################
+
+  shiny::observeEvent(input$design_alpha, {
+    shinyFeedback::feedbackDanger(
+      inputId   = "design_alpha",
+      condition = any(input$design_alpha <= 0, input$design_alpha >= 1),
+      text      = "Must be strictly between 0 and 1")
   })
 
-  observeEvent(input$design_beta, {
-    feedbackDanger(inputId   = "design_beta",
-                   condition = any(input$design_beta <= 0,
-                                   input$design_beta >= 1),
-                   text      = "Desired power must be strictly between 0 and 1"
-    )
+  shiny::observeEvent(input$design_beta, {
+    shinyFeedback::feedbackDanger(
+      inputId   = "design_beta",
+      condition = any(input$design_beta <= 0, input$design_beta >= 1),
+      text      = "Must be strictly between 0 and 1")
   })
 
-  observeEvent(input$design_delta1, {
-    feedbackDanger(inputId   = "design_delta1",
-                   condition = (input$design_delta1 <= 0),
-                   text      = "\U1D6FF\U2081 must be strictly positive"
-    )
+  shiny::observeEvent(input$design_delta1, {
+    shinyFeedback::feedbackDanger(
+      inputId   = "design_delta1",
+      condition = (input$design_delta1 <= 0),
+      text      = "Must be strictly positive")
   })
 
-  observeEvent(input$design_delta0, {
-    feedbackDanger(inputId   = "design_delta0",
-                   condition = (input$design_delta0 >= input$design_delta1),
-                   text      = paste0("\U1D6FF\U2080 must be strictly smaller ",
-                                      " than \U1D6FF\U2081")
-    )
+  shiny::observeEvent(input$design_delta0, {
+    shinyFeedback::feedbackDanger(
+      inputId   = "design_delta0",
+      condition = (input$design_delta0 >= input$design_delta1),
+      text      =
+        "Must be strictly smaller than the interesting treatment effect")
   })
 
-  observeEvent(input$design_sigma, {
-    feedbackDanger(inputId   = "design_sigma",
-                   condition = (input$design_sigma <= 0),
-                   text      = "Standard deviations must be strictly positive"
-    )
+  shiny::observeEvent(input$design_sigma, {
+    shinyFeedback::feedbackDanger(
+      inputId   = "design_sigma",
+      condition = (input$design_sigma <= 0),
+      text      = "Must be strictly positive")
   })
 
-  observeEvent(input$design_sigma_0, {
-    feedbackDanger(inputId   = "design_sigma_0",
-                   condition = (input$design_sigma_0 <= 0),
-                   text      = "Standard deviations must be strictly positive"
-    )
+  shiny::observeEvent(input$design_sigma_0, {
+    shinyFeedback::feedbackDanger(
+      inputId   = "design_sigma_0",
+      condition = (input$design_sigma_0 <= 0),
+      text      = "Must be strictly positive")
   })
 
-  observeEvent(c(input$design_sigma_1, input$design_sigma_2,
-                 input$design_sigma_3,
-                 input$design_sigma_4,
-                 input$design_sigma_5), {
-                   vals <- c(input$design_sigma_1, input$design_sigma_2, input$design_sigma_3,
-                             input$design_sigma_4, input$design_sigma_5)
-                   for (i in 1:5) {
-                     feedbackDanger(inputId   = paste0("design_sigma_", i),
-                                    condition = (vals[i] <= 0),
-                                    text      = "Standard deviations must be strictly positive"
-                     )
-                   }
-                 })
+  shiny::observeEvent(c(input$design_sigma_1, input$design_sigma_2,
+                        input$design_sigma_3, input$design_sigma_4,
+                        input$design_sigma_5), {
+    vals <- c(input$design_sigma_1, input$design_sigma_2, input$design_sigma_3,
+              input$design_sigma_4, input$design_sigma_5)
+    for (i in 1:5) {
+      shinyFeedback::feedbackDanger(
+        inputId   = paste0("design_sigma_", i),
+        condition = (vals[i] <= 0),
+        text      = "Must be strictly positive")
+    }
+  })
 
-  observeEvent(c(input$design_ratio_1, input$design_ratio_2,
-                 input$design_ratio_3, input$design_ratio_4,
-                 input$design_ratio_5), {
-                   vals <- c(input$design_ratio_1, input$design_ratio_2, input$design_ratio_3,
-                             input$design_ratio_4, input$design_ratio_5)
-                   for (i in 1:5) {
-                     feedbackDanger(inputId   = paste0("design_ratio_", i),
-                                    condition = (vals[i] <= 0),
-                                    text      = "Allocation ratios must be strictly positive"
-                     )
-                   }
-                 })
+  shiny::observeEvent(c(input$design_ratio_1, input$design_ratio_2,
+                        input$design_ratio_3, input$design_ratio_4,
+                        input$design_ratio_5), {
+    vals <- c(input$design_ratio_1, input$design_ratio_2, input$design_ratio_3,
+              input$design_ratio_4, input$design_ratio_5)
+    for (i in 1:5) {
+      shinyFeedback::feedbackDanger(
+        inputId   = paste0("design_ratio_", i),
+        condition = (vals[i] <= 0),
+        text      = "Must be strictly positive")
+    }
+  })
 
-  observeEvent(input$design_filename, {
-    feedbackWarning(
+  shiny::observeEvent(input$design_filename, {
+    shinyFeedback::feedbackWarning(
       inputId   = "design_filename",
       condition = any(strsplit(input$design_filename, split = "")[[1]] %in%
                         c('/', '\\', '?', "%", "*", ":", "|", "<", ">")),
       text      = paste0('It is generally inadvisable to use the characters /',
-                         ', \\, ?, %, *, :, |, ", <, and > in a filename')
-    )
+                         ', \\, ?, %, *, :, |, ", <, and > in a filename'))
   })
 
-  observeEvent(input$design_delta, {
-    feedbackDanger(inputId   = "design_delta",
+  shiny::observeEvent(input$design_delta, {
+    shinyFeedback::feedbackDanger(inputId   = "design_delta",
                    condition = (input$design_delta <= 0),
-                   text      = "\U1D6FF must be strictly positive"
-    )
+                   text      = "\U1D6FF must be strictly positive")
   })
 
-  output$outputNumericInput_design_delta0 <- renderUI({
-    if (input$design_K > 1) {
-      numericInput(inputId = "design_delta0",
-                   label   = "Uninteresting treatment effect (\U1D6FF\U2080):",
-                   value   = 0,
-                   min     = NA,
-                   max     = input$design_delta1,
-                   step    = 0.1)  %>%
-        helper(type    = "markdown",
-               title   = "",
-               content = "design_delta0",
-               size    = "m",
-               colour  = "black")
-    }
+  ##### Design: Dynamic UI elements ############################################
+
+  output$design_delta0 <- renderUI({
+    shiny::numericInput(
+      inputId = "design_delta0",
+      label   = "Uninteresting treatment effect:",
+      value   = 0,
+      min     = NA,
+      max     = input$design_delta1,
+      step    = 0.1)  %>%
+      shinyhelper:: helper(
+        type    = "markdown",
+        title   = "",
+        content = "design_delta0",
+        size    = "m",
+        colour  = "black")
   })
 
-  output$outputNumericInput_design_sigma <- renderUI({
-    subscripts             <- c("\U2081", "\U2082", "\U2083", "\U2084",
-                                "\U2085")
+  output$design_sigma <- renderUI({
     if (input$design_sigma_type == "equal_all") {
-      if (input$design_K > 1) {
-        label_design_sigma <-
-          paste0("Standard deviation of the responses (\U1D70E\U2080 = \U22EF ",
-                 "= \U1D70E", subscripts[input$design_K], "):")
-      } else {
-        label_design_sigma <-
-          "Standard deviation of the responses (\U1D70E\U2080 = \U1D70E\U2081):"
-      }
-      numericInput(inputId = "design_sigma",
-                   label   = label_design_sigma,
-                   value   = 1,
-                   min     = 0,
-                   max     = NA,
-                   step    = 0.1)
+      shiny::numericInput(
+        inputId = "design_sigma",
+        label   = paste0("Standard deviation of the responses (arms 0, ..., ",
+                         input$design_K, ")"),
+        value   = 1,
+        min     = 0,
+        max     = NA,
+        step    = 0.1)
     } else if (input$design_sigma_type == "equal_exp") {
-      if (input$design_K == 1) {
-        label_sigma_1      <-
-          "Standard deviation of the experimental responses (\U1D70E\U2081):"
-      } else if (input$design_K == 2) {
-        label_sigma_1      <-
-          paste0("Standard deviation of the experimental responses (\U1D70E",
-                 "\U2081 = \U1D70E\U2082):")
-      } else {
-        label_sigma_1      <-
-          paste0("Standard deviation of the experimental responses (\U1D70E",
-                 "\U2081 = \U22EF = \U1D70E", subscripts[input$design_K], "):")
-      }
-      tagList(numericInput(inputId = "design_sigma_0",
-                           label   = paste0("Standard deviation of the control",
-                                            " responses (\U1D70E\U2080):"),
-                           value   = 1,
-                           min     = 0,
-                           max     = NA,
-                           step    = 0.1),
-              numericInput(inputId = "design_sigma_1",
-                           label   = label_sigma_1,
-                           value   = 1,
-                           min     = 0,
-                           max     = NA,
-                           step    = 0.1))
+      shiny::tagList(
+        shiny::numericInput(
+          inputId = "design_sigma_0",
+          label   = "Standard deviation of the control arm responses (arm 0):",
+          value   = 1,
+          min     = 0,
+          max     = NA,
+          step    = 0.1),
+        shiny::numericInput(
+          inputId = "design_sigma_1",
+          label   = paste0("Standard deviation of the experimental arm ",
+                           "responses (arms 1, ..., ", input$design_K, ")"),
+          value   = 1,
+          min     = 0,
+          max     = NA,
+          step    = 0.1)
+      )
     } else {
-      inputTagList         <-
-        tagList(numericInput(inputId = "design_sigma_0",
-                             label   =
-                               paste0("Standard deviation of the control ",
-                                      "responses (\U1D70E\U2080):"),
-                             value   = 1,
-                             min     = 0,
-                             max     = NA,
-                             step    = 0.1))
+      inputTagList   <-
+        shiny::tagList(
+          shiny::numericInput(
+            inputId = "design_sigma_0",
+            label   =
+              "Standard deviation of the control arm responses (arm 0):",
+            value   = 1,
+            min     = 0,
+            max     = NA,
+            step    = 0.1)
+        )
       lapply(1:input$design_K, function(i) {
-        newInput           <-
-          numericInput(inputId = paste0("design_sigma_", i),
-                       label   = paste0("Standard deviation of experimental ",
-                                        "arm ", i, " responses (\U1D70E",
-                                        subscripts[i], "):"),
-                       value   = 1,
-                       min     = 0,
-                       max     = NA,
-                       step    = 0.1)
-        inputTagList       <<- tagAppendChild(inputTagList, newInput)
+        newInput     <-
+          shiny::numericInput(
+            inputId = paste0("design_sigma_", i),
+            label   = paste0("Standard deviation of experimental arm ", i,
+                             " responses:"),
+            value   = 1,
+            min     = 0,
+            max     = NA,
+            step    = 0.1)
+        inputTagList <<- tagAppendChild(inputTagList, newInput)
       })
       inputTagList
     }
   })
 
-  output$outputNumericInput_design_ratio <- renderUI({
-    subscripts             <- c("\U2081", "\U2082", "\U2083", "\U2084",
-                                "\U2085")
+  output$design_ratio <- renderUI({
     if (input$design_ratio_type == "equal_exp") {
-      if (input$design_K == 1) {
-        label_ratio_1      <-
-          "Allocation ratio for the experimental arm (\U1D45F\U2081):"
-      } else if (input$design_K == 2) {
-        label_ratio_1      <-
-          paste0("Allocation ratio for the experimental arms (\U1D45F",
-                 "\U2081 = \U1D45F\U2082):")
-      } else {
-        label_ratio_1      <-
-          paste0("Allocation ratio for the experimental arms (\U1D45F",
-                 "\U2081 = \U22EF = \U1D45F", subscripts[input$design_K], "):")
-      }
-      numericInput(inputId = "design_ratio_1",
-                   label   = label_ratio_1,
-                   value   = 1,
-                   min     = 0,
-                   max     = NA,
-                   step    = 0.25)
+      shiny::numericInput(
+        inputId = "design_ratio_1",
+        label   = paste0("Allocation ratio for the experimental arms ",
+                         "(arms 1, ..., ", input$design_K, ")"),
+        value   = 1,
+        min     = 0,
+        max     = NA,
+        step    = 0.25)
     } else if (input$design_ratio_type == "unequal") {
-      inputTagList         <-
-        tagList(numericInput(inputId = "design_ratio_1",
-                             label   =
-                               paste0("Allocation ratio for experimental arm 1 (\U1D45F\U2081):"),
-                             value   = 1,
-                             min     = 0,
-                             max     = NA,
-                             step    = 0.25))
-      if (input$design_K > 1) {
-        lapply(2:input$design_K, function(i) {
-          newInput           <-
-            numericInput(inputId = paste0("design_ratio_", i),
-                         label   = paste0("Allocation ratio for experimental ",
-                                          "arm ", i, " (\U1D45F",
-                                          subscripts[i], "):"),
-                         value   = 1,
-                         min     = 0,
-                         max     = NA,
-                         step    = 0.25)
-          inputTagList       <<- tagAppendChild(inputTagList, newInput)
-        })
-      }
+      inputTagList     <-
+        shiny::tagList(
+          shiny::numericInput(
+            inputId = "design_ratio_1",
+            label   = "Allocation ratio for experimental arm 1:",
+            value   = 1,
+            min     = 0,
+            max     = NA,
+            step    = 0.25)
+        )
+      lapply(2:input$design_K, function(i) {
+        newInput     <-
+          shiny::numericInput(
+            inputId = paste0("design_ratio_", i),
+            label   = paste0("Allocation ratio for experimental arm ", i, ":"),
+            value   = 1,
+            min     = 0,
+            max     = NA,
+            step    = 0.25)
+        inputTagList <<- tagAppendChild(inputTagList, newInput)
+      })
       inputTagList
     }
   })
 
-  output$outputWarning_design <- renderUI({
+  output$design_warning <- renderUI({
     if (any(all(input$design_K %in% c(4, 5),
                 input$design_correction %in% c("benjamini_hochberg", "hochberg",
                                                "holm", "step_down_dunnett")),
             all(input$design_K == 5, input$design_plots))) {
-      p(strong("WARNING:"), " Execution time may be long for chosen input ",
-        "parameters.")
+      shiny::p(shiny::strong("WARNING:"), " Execution time may be long for ",
+               "chosen input parameters.")
     }
   })
 
-  output$outputSelectInput_design_density <- renderUI({
+  output$design_density <- renderUI({
     if (input$design_plots) {
-      selectInput(inputId = "design_density",
-                  label   = "Plot quality:",
-                  choices = c("Very low" = 33, "Low" = 66,
-                              "Medium" = 100, "High" = 150, "Very high" = 200),
-                  selected = 100)  %>%
-        helper(type    = "markdown",
-               title   = "",
-               content = "design_density",
-               size    = "m",
-               colour  = "black")
+      shiny::selectInput(
+        inputId = "design_density",
+        label   = "Plot quality:",
+        choices = c("Very low" = 33, "Low" = 66, "Medium" = 100, "High" = 150,
+                    "Very high" = 200),
+        selected = 100)  %>%
+        shinyhelper::helper(
+          type    = "markdown",
+          title   = "",
+          content = "design_density",
+          size    = "m",
+          colour  = "black")
     }
   })
 
-  output$outputNumericInput_design_delta <- renderUI({
+  output$design_delta <- renderUI({
     if (input$design_plots) {
-      numericInput(inputId = "design_delta",
-                   label   = "Plot treatment effect shift (\U1D6FF):",
-                   value   = input$design_delta1 - input$design_delta0,
-                   min     = 0,
-                   max     = NA,
-                   step    = 0.1)  %>%
-        helper(type    = "markdown",
-               title   = "",
-               content = "design_delta",
-               size    = "m",
-               colour  = "black")
+      shiny::numericInput(
+        inputId = "design_delta",
+        label   = "Plot treatment effect shift:",
+        value   = input$design_delta1 - input$design_delta0,
+        min     = 0,
+        max     = NA,
+        step    = 0.1) %>%
+        shinyhelper::helper(
+          type    = "markdown",
+          title   = "",
+          content = "design_delta",
+          size    = "m",
+          colour  = "black")
     }
   })
 
-  observeEvent(input$plot_global_dblclick, {
-    brush <- input$plot_global_brush
+  shiny::observeEvent(input$design_reset, {
+    shinyjs::reset("box_design_parameters")
+  })
+
+  ##### Design: Plot zoom set-up ###############################################
+
+  shiny::observeEvent(input$equal_dblclick, {
+    brush            <- input$equal_brush
     if (!is.null(brush)) {
-      ranges_global$x <- c(brush$xmin, brush$xmax)
-      ranges_global$y <- c(brush$ymin, brush$ymax)
-
+      ranges_equal$x <- c(brush$xmin, brush$xmax)
+      ranges_equal$y <- c(brush$ymin, brush$ymax)
     } else {
-      ranges_global$x <- NULL
-      ranges_global$y <- NULL
+     ranges_equal$x  <- ranges_equal$y <- NULL
     }
   })
 
-  observeEvent(input$plot_LFC_dblclick, {
-    brush <- input$plot_LFC_brush
+  shiny::observeEvent(input$shifted_dblclick, {
+    brush              <- input$shifted_brush
     if (!is.null(brush)) {
-      ranges_LFC$x <- c(brush$xmin, brush$xmax)
-      ranges_LFC$y <- c(brush$ymin, brush$ymax)
-
+      ranges_shifted$x <- c(brush$xmin, brush$xmax)
+      ranges_shifted$y <- c(brush$ymin, brush$ymax)
     } else {
-      ranges_LFC$x <- NULL
-      ranges_LFC$y <- NULL
+      ranges_shifted$x <- ranges_shifted$y <- NULL
     }
   })
 
-  des <- eventReactive(input$design_update, {
+  ##### Design: des() ##########################################################
 
-    progress <- shiny::Progress$new()
+  des <- shiny::eventReactive(input$design_update, {
+    K                          <- input$design_K
+    progress                   <- shiny::Progress$new()
     on.exit(progress$close())
     progress$set(message = "Building outputs",
                  value   = 0)
-
     if (input$design_sigma_type == "equal_all") {
-      sigma <- rep(input$design_sigma, input$design_K + 1)
+      sigma                    <- rep(input$design_sigma, K + 1)
     } else if (input$design_sigma_type == "equal_exp") {
-      sigma <- c(input$design_sigma_0,
-                 rep(input$design_sigma_1, input$design_K))
+      sigma                    <- c(input$design_sigma_0,
+                                    rep(input$design_sigma_1, K))
     } else if (input$design_sigma_type == "unequal") {
-      sigma   <- NULL
-      for (i in 0:input$design_K) {
-        sigma <- c(sigma, input[[paste0("design_sigma_", i)]])
+      sigma                    <- numeric(K + 1)
+      for (i in 0:K) {
+        sigma[i + 1]           <- input[[paste0("design_sigma_", i)]]
       }
     }
     if (input$design_ratio_type == "equal_all") {
-      ratio   <- rep(1, input$design_K)
+      ratio                    <- rep(1, K)
     } else if (input$design_ratio_type == "equal_exp") {
-      ratio   <- rep(input$design_ratio_1, input$design_K)
+      ratio                    <- rep(input$design_ratio_1, K)
     } else if (input$design_ratio_type == "unequal") {
-      ratio   <- NULL
-      for (i in 1:input$design_K) {
-        ratio <- c(ratio, input[[paste0("design_ratio_", i)]])
+      ratio                    <- numeric(K)
+      for (i in 1:K) {
+        ratio[i]               <- input[[paste0("design_ratio_", i)]]
       }
     } else if (input$design_ratio_type == "root_K") {
-      ratio   <- rep(1/sqrt(input$design_K), input$design_K)
+      ratio                    <- rep(1/sqrt(K), K)
     } else {
-      ratio   <- input$design_ratio_type
+      ratio                    <- input$design_ratio_type
     }
-    design  <- multiarm::des_ma(K          = input$design_K,
-                                alpha      = input$design_alpha,
-                                beta       = 1 - input$design_beta,
-                                delta1     = input$design_delta1,
-                                delta0     = input$design_delta0,
-                                sigma      = sigma,
-                                ratio      = ratio,
-                                correction = input$design_correction,
-                                power      = input$design_power,
-                                integer    = input$design_integer)
-
+    design                     <-
+      multiarm::des_ma(K          = input$design_K,
+                       alpha      = input$design_alpha,
+                       beta       = 1 - input$design_beta,
+                       delta1     = input$design_delta1,
+                       delta0     = input$design_delta0,
+                       sigma      = sigma,
+                       ratio      = ratio,
+                       correction = input$design_correction,
+                       power      = input$design_power,
+                       integer    = input$design_integer)
     progress$inc(amount  = 0.25 + as.numeric(!input$design_plots),
                  message = "Rendering design summary")
-
-    rmarkdown::render("./design_summary.Rmd",
-                      output_format = "html_document",
-                      output_file = file.path(tempdir(), "design_summary.html"),
-                      params = list(K          = design$K,
-                                    alpha      = design$alpha,
-                                    beta       = design$beta,
-                                    delta1     = design$delta1,
-                                    delta0     = design$delta0,
-                                    sigma      = design$sigma,
-                                    ratio_type = input$design_ratio_type,
-                                    ratio_init = c(input$design_ratio_1,
-                                                   input$design_ratio_2,
-                                                   input$design_ratio_3,
-                                                   input$design_ratio_4,
-                                                   input$design_ratio_5),
-                                    ratio      = design$ratio,
-                                    correction = design$correction,
-                                    power      = design$power,
-                                    integer    = design$integer,
-                                    large_N    = design$N,
-                                    small_n    = design$n,
-                                    opchar     = design$opchar,
-                                    pi        = design$pi,
-                                    piO        = design$piO)
+    rmarkdown::render(
+      input         = "./design_summary.Rmd",
+      output_format = rmarkdown::html_document(),
+      output_file   = file.path(tempdir(), "design_summary.html"),
+      params        = list(K          = design$K,
+                           alpha      = design$alpha,
+                           beta       = design$beta,
+                           delta1     = design$delta1,
+                           delta0     = design$delta0,
+                           sigma      = design$sigma,
+                           ratio_type = input$design_ratio_type,
+                           ratio_init = c(input$design_ratio_1,
+                                          input$design_ratio_2,
+                                          input$design_ratio_3,
+                                          input$design_ratio_4,
+                                          input$design_ratio_5),
+                           ratio      = design$ratio,
+                           correction = design$correction,
+                           power      = design$power,
+                           integer    = design$integer,
+                           large_N    = design$N,
+                           small_n    = design$n,
+                           opchar     = design$opchar,
+                           pi         = design$pi,
+                           piO        = design$piO,
+                           plots      = input$design_plots,
+                           delta      = input$design_delta)
     )
-    xml2::write_html(rvest::html_node(xml2::read_html(paste0(tempdir(), "/design_summary.html")),
-                                      "body"),
-                     file = paste0(tempdir(), "/design_summary_modified.html"))
-
-    design$data_og <- design$opchar
-    design$data <- data.frame(design$opchar,
-                              row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
-                                            paste0("<i>LFC<sub>", 1:input$design_K,
-                                                   "</sub></i>")))
-    colnames(design$data) <-
+    xml2::write_html(
+      rvest::html_node(
+        xml2::read_html(
+          paste0(tempdir(), "/design_summary.html")
+        ),
+        "body"
+      ),
+      file = paste0(tempdir(), "/design_summary_modified.html")
+    )
+    design$data_og             <- design$opchar
+    design$data                <-
+      data.frame(design$opchar,
+                 row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
+                               paste0("<i>LFC<sub>", 1:input$design_K,
+                                      "</sub></i>")))
+    colnames(design$data)      <-
       c(paste0("<i>&tau;</i><sub>", 1:input$design_K, "</sub>"),
-        paste0("<i>P</i><sub>", c("dis", "con", 1:input$design_K),
-               "</sub>"),
+        paste0("<i>P</i><sub>", c("dis", "con", 1:input$design_K), "</sub>"),
         "<i>FWER</i>", "<i>FDR</i>")
-
-
     if (input$design_plots) {
+      alpha                    <- design$alpha
+      beta                     <- design$beta
+      delta                    <- input$design_delta
+      delta0                   <- design$delta0
+      delta1                   <- design$delta1
+      density                  <- as.numeric(input$design_density)
       progress$inc(amount  = 0.25,
                    message = "Rendering plots")
-      tau                <- matrix(0, as.numeric(input$design_density),
-                                   design$K)
-      tau[, 1]           <- c(seq(-design$delta1, -1e-6,
-                                length.out =
-                                  0.5*as.numeric(input$design_density)),
-                              seq(1e-6, 2*design$delta1,
-                                  length.out =
-                                    0.5*as.numeric(input$design_density)))
-      for (k in 2:design$K) {
-        tau[, k]         <- tau[, 1]
+      length_out               <- ceiling(0.5*as.numeric(input$design_density))
+      tau                      <- matrix(c(seq(-design$delta1, -1e-6,
+                                               length.out = length_out),
+                                           seq(1e-6, 2*design$delta1,
+                                               length.out = length_out)),
+                                         2*length_out, K)
+      opchar_equal             <- multiarm::opchar_ma(design, tau)$opchar
+      opchar_equal             <- tidyr::gather(opchar_equal, "type", "P",
+                                                `Pdis`:`FWER`)
+      opchar_equal$type        <- factor(opchar_equal$type,
+                                         levels = c(paste0("P", 1:K), "Pcon",
+                                                    "Pdis", "FWER"))
+      labels                   <- numeric(K + 3)
+      labels[1]                <- parse(text = "italic(FWER)/italic(FDR)")
+      for (i in 2:(K + 1)) {
+        labels[i]              <- parse(text = paste0("italic(P)[", i - 1, "]"))
       }
-      opchar_global      <- opchar_ma(design, tau)$opchar
-      opchar_global      <- tidyr::gather(opchar_global, "type", "P",
-                                          `Pdis`:`FWER`)
-      opchar_global$type <- factor(opchar_global$type,
-                                   levels = c(paste("P", 1:design$K, sep = ""),
-                                              "Pcon", "Pdis", "FWER"))
-      labels             <- numeric(design$K + 3L)
-      labels[1]          <- parse(text = "italic(FWER)/italic(FDR)")
-      for (i in 2:(design$K + 1L)) {
-        labels[i]        <- parse(text = paste0("italic(P)[", i - 1L, "]"))
-      }
-      labels[(design$K + 2L):(design$K + 3L)] <- c(parse(text = "italic(P)[con]"),
-                                                   parse(text = "italic(P)[dis]"))
-      colours <- ggthemes::ptol_pal()(3 + design$K)
-      alpha              <- design$alpha
-      beta               <- design$beta
-      delta0             <- design$delta0
-      delta1             <- design$delta1
-      design$plot_global <- ggplot2::ggplot() +
-        ggplot2::geom_line(data = dplyr::filter(opchar_global,
-                                                !(type %in% c("FWER"))),
+      labels[(K + 2):(K + 3)]  <- c(parse(text = "italic(P)[con]"),
+                                    parse(text = "italic(P)[dis]"))
+      colours                  <- ggthemes::ptol_pal()(3 + K)
+      design$equal             <- ggplot2::ggplot() +
+        ggplot2::geom_line(data = dplyr::filter(opchar_equal,
+                                                !(type %in% "FWER")),
                            ggplot2::aes(x   = tau1,
                                         y   = P,
                                         col = type)) +
-        ggplot2::geom_line(data = dplyr::filter(opchar_global,
-                                                (type %in% c("FWER")) &
-                                                  tau1 <= 0),
+        ggplot2::geom_line(data = dplyr::filter(opchar_equal,
+                                                (type %in% "FWER") &
+                                                  (tau1 <= 0)),
                            ggplot2::aes(x   = tau1,
                                         y   = P,
                                         col = type)) +
-        ggplot2::geom_line(data = dplyr::filter(opchar_global,
-                                                (type %in% c("FWER")) &
-                                                  tau1 > 0),
+        ggplot2::geom_line(data = dplyr::filter(opchar_equal,
+                                                (type %in% "FWER") &
+                                                  (tau1 > 0)),
                            ggplot2::aes(x   = tau1,
                                         y   = P,
                                         col = type)) +
@@ -765,58 +814,53 @@ server <- function(input, output, session) {
                             linetype   = 2) +
         ggplot2::geom_vline(xintercept = delta1,
                             linetype   = 2)
-      if (design$K == 2) {
-        design$plot_global <- design$plot_global +
+      if (K == 2) {
+        design$equal           <- design$equal +
           ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
-      } else if (design$K == 3) {
-        design$plot_global <- design$plot_global +
+      } else if (K == 3) {
+        design$equal           <- design$equal +
           ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3],
                                          sep = "")))
       } else {
-        design$plot_global <- design$plot_global +
-          ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(design$K)],
-                                          sep = "")))
+        design$equal           <- design$equal +
+          ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(K)], sep = "")))
       }
-
       progress$inc(amount  = 0.25,
                    message = "Rendering plots")
-
-      opchar_matrix    <- NULL
-      for (k in 1:design$K) {
-        tau                <- matrix(0, as.numeric(input$design_density),
-                                     design$K)
-        tau[, k]           <- seq(-design$delta1, 2*design$delta1,
-                                  length.out =
-                                    as.numeric(input$design_density))
-        for (l in (1:design$K)[-k]) {
-          tau[, l]     <- tau[, k] - input$design_delta
-        }
-        opchar_k       <- opchar_ma(design, tau)$opchar
-        opchar_matrix  <- rbind(opchar_matrix,
-                                as.matrix(opchar_k[, c(k, input$design_K + 2 + k)]))
-        progress$inc(amount  = 0.25/(design$K + 1),
+      opchar_matrix            <- NULL
+      tau_init                 <- matrix(seq(-delta1, 2*delta1,
+                                             length.out = density) - delta,
+                                         density, K)
+      for (k in 1:K) {
+        tau                    <- tau_init
+        tau[, k]               <- tau[, k] + delta
+        opchar_k               <- multiarm::opchar_ma(design, tau)$opchar
+        opchar_matrix          <- rbind(opchar_matrix,
+                                        as.matrix(opchar_k[, c(k, K + 2 + k)]))
+        progress$inc(amount  = 0.25/(K + 1),
                      message = "Rendering plots")
       }
-      opchar_LFC       <- tibble::as_tibble(opchar_matrix)
-      colnames(opchar_LFC) <- c("tauk", "P")
-      opchar_LFC       <-
-        dplyr::mutate(opchar_LFC, type = factor(rep(paste("P", 1:design$K, sep = ""),
-                                                    each = as.numeric(input$design_density))))
-      labels <- numeric(design$K)
-      for (i in 1:design$K) {
-        labels[i] <- parse(text = paste0("italic(P)[", i, "]"))
+      opchar_shifted           <- tibble::as_tibble(opchar_matrix)
+      colnames(opchar_shifted) <- c("tauk", "P")
+      opchar_shifted           <-
+        dplyr::mutate(opchar_shifted,
+                      type = factor(rep(paste("P", 1:K, sep = ""),
+                                        each = density)))
+      labels                   <- numeric(K)
+      for (i in 1:K) {
+        labels[i]              <- parse(text = paste0("italic(P)[", i, "]"))
       }
-      design$plot_LFC <- ggplot2::ggplot() +
-        ggplot2::geom_line(data = opchar_LFC,
-                           ggplot2::aes(x   = .data$tauk,
+      design$shifted           <- ggplot2::ggplot() +
+        ggplot2::geom_line(data = opchar_shifted,
+                           ggplot2::aes(x   = tauk,
                                         y   = P,
                                         col = type)) +
-        ggplot2::scale_colour_manual(values = colours[2:(design$K + 1)],
-                                      labels = labels) +
-        ggplot2::xlab(bquote(paste("... = ", tau[italic(k)-1], " + ", .(input$design_delta), " = ",
-                                   tau[italic(k)], " = ",
-                                   tau[italic(k)+1], " + ", .(input$design_delta), " = ... ",
-                                   sep = ""))) +
+        ggplot2::scale_colour_manual(values = colours[2:(K + 1)],
+                                     labels = labels) +
+        ggplot2::xlab(bquote(paste("... = ", tau[italic(k) - 1], " + ",
+                                   .(delta), " = ", tau[italic(k)], " = ",
+                                   tau[italic(k) + 1], " + ", .(delta),
+                                   " = ... ", sep = ""))) +
         ggplot2::ylab("Probability") +
         ggplot2::theme_bw() +
         ggplot2::theme(legend.position  = "bottom",
@@ -835,27 +879,30 @@ server <- function(input, output, session) {
         ggplot2::geom_vline(xintercept = delta1,
                             linetype   = 2)
     } else {
-      design$plot_global <- design$plot_LFC <- NULL
+      design$equal             <- design$shifted <- NULL
     }
     progress$inc(amount  = 0.25 + as.numeric(!input$design_plots),
                  message = "Outputting results")
     design
   })
 
-  output$design_ss_box <- renderValueBox({
+  ##### Design: Value boxes ####################################################
+
+  output$design_ss_box <- shinydashboard::renderValueBox({
     input$design_update
-    valueBox(value    = round(des()$N, 1),
-             subtitle = "Total required sample size",
-             icon     = icon(name = "users"),
-             color    = "light-blue"
+    shinydashboard::valueBox(
+      value    = round(des()$N, 1),
+      subtitle = "Total required sample size",
+      icon     = shiny::icon(name = "users"),
+      color    = "light-blue"
     )
   })
 
-  output$design_fwer_box <- renderValueBox({
+  output$design_fwer_box <- shinydashboard::renderValueBox({
     input$design_update
-    correction      <- isolate(input$design_correction)
+    correction      <- shiny::isolate(input$design_correction)
     if (!(correction %in% c("benjamini_hochberg", "none"))) {
-      if (des()$opchar$FWER[1] <= isolate(input$design_alpha) + 1e-4) {
+      if (des()$opchar$FWER[1] <= shiny::isolate(input$design_alpha) + 1e-4) {
         icon_choice <- "thumbs-up"
       } else {
         icon_choice <- "thumbs-down"
@@ -863,130 +910,155 @@ server <- function(input, output, session) {
     } else {
       icon_choice   <- ""
     }
-    valueBox(value    = round(des()$opchar$FWER[1], 3),
-             subtitle = "Maximum FWER",
-             icon     = icon(name = icon_choice),
-             color    = "light-blue"
+    shinydashboard::valueBox(
+      value    = round(des()$opchar$FWER[1], 3),
+      subtitle = "Maximum FWER",
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
     )
   })
 
-  output$design_power_box <- renderValueBox({
+  output$design_power_box <- shinydashboard::renderValueBox({
     input$design_update
     subtitle          <-
       c("conjunctive" = "Conjunctive power",
         "disjunctive" = "Disjunctive power",
-        "marginal"    = "Minimum marginal power")[isolate(input$design_power)]
+        "marginal"    =
+          "Minimum marginal power")[shiny::isolate(input$design_power)]
     K                 <- isolate(input$design_K)
     if (input$design_power == "conjunctive") {
-      value_power_box <- des()$opchar[2, 4]
+      value_power_box <- des()$opchar$Pcon[2]
     } else if (input$design_power == "disjunctive") {
-      value_power_box <- des()$opchar[2, 3]
+      value_power_box <- des()$opchar$Pdis[2]
     } else {
       value_power_box <-
         min(diag(as.matrix(des()$opchar[-(1:2), (K + 3):(2*K + 2)])))
     }
-    if (value_power_box >= isolate(input$design_beta) - 1e-3) {
+    if (value_power_box >= shiny::isolate(input$design_beta) - 1e-3) {
       icon_choice     <- "thumbs-up"
     } else {
       icon_choice     <- "thumbs-down"
     }
-    valueBox(value    = round(value_power_box, 3),
-             subtitle = subtitle,
-             icon     = icon(name = icon_choice),
-             color    = "light-blue"
+    shinydashboard::valueBox(
+      value    = round(value_power_box, 3),
+      subtitle = subtitle,
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
     )
   })
 
-  output$design_summary <- renderUI({
+  ##### Design: Summary ########################################################
+
+  output$design_summary <- shiny::renderUI({
     input$design_update
     N <- des()$N
-    print(tempdir())
-    withMathJax(includeHTML(path = file.path(tempdir(), "/design_summary_modified.html")))
+    shiny::withMathJax(
+      shiny::includeHTML(path = file.path(tempdir(),
+                                          "/design_summary_modified.html")
+      )
+    )
   })
 
+  ##### Design: Table ##########################################################
 
-  output$summary <- renderTable({
+  output$design_tab <- shiny::renderTable({
     input$design_update
     des()$data
-  }, rownames = T, sanitize.text.function = function(x) x, digits = 4,
-  options = list(searching  = F,
-                 scrollX    = T,
-                 autoWidth  = T,
-                 columnDefs = list(list(width = '50px')),
-                 paging = F))
+  }, rownames            = T,
+  sanitize.text.function = function(x) x,
+  digits                 = 4,
+  options                = list(searching  = F,
+                                scrollX    = T,
+                                autoWidth  = T,
+                                columnDefs = list(list(width = '50px')),
+                                paging     = F)
+  )
 
-  output$plot_global <- renderPlot({
+  ##### Design: Plots ##########################################################
+
+  output$equal <- shiny::renderPlot({
     input$design_update
-    if (isolate(input$design_plots)) {
-      des()$plot_global + ggplot2::coord_cartesian(xlim = ranges_global$x,
-                                                   ylim = ranges_global$y,
-                                                   expand = F)
+    if (shiny::isolate(input$design_plots)) {
+      des()$equal + ggplot2::coord_cartesian(xlim   = ranges_equal$x,
+                                             ylim   = ranges_equal$y,
+                                             expand = F)
     }
   })
 
-  output$plot_LFC <- renderPlot({
+  output$shifted <- shiny::renderPlot({
     input$design_update
-    if (isolate(input$design_plots)) {
-      des()$plot_LFC + ggplot2::coord_cartesian(xlim = ranges_LFC$x,
-                                                ylim = ranges_LFC$y,
-                                                expand = F)
+    if (shiny::isolate(input$design_plots)) {
+      des()$shifted + ggplot2::coord_cartesian(xlim   = ranges_shifted$x,
+                                               ylim   = ranges_shifted$y,
+                                               expand = F)
     }
   })
 
-  observeEvent(input$design_reset, {
-    shinyjs::reset("box_design_parameters")
-  })
+  ##### Design: Report #########################################################
 
-  output$design_report <- downloadHandler(
+  output$design_report <- shiny::downloadHandler(
     filename = function() {
-      paste(input$design_filename, sep = '.', switch(
-        input$design_format, pdf = 'pdf', html = 'html', word = 'docx'
-      ))
+      paste(input$design_filename, sep = '.',
+            switch(input$design_format,
+                   pdf  = "pdf",
+                   html = "html",
+                   word = "docx"
+            )
+      )
     },
-    content = function(file) {
-      src <- normalizePath('./design_report.Rmd')
-      owd <- setwd(tempdir())
+    content  = function(file) {
+      src    <- normalizePath("./design_report.Rmd")
+      owd    <- setwd(tempdir())
       on.exit(setwd(owd))
-      file.copy(src, 'design_report.Rmd', overwrite = T)
-      params <- list(K          = des()$K,
-                     alpha      = des()$alpha,
-                     beta       = des()$beta,
-                     delta1     = des()$delta1,
-                     delta0     = des()$delta0,
-                     sigma      = des()$sigma,
-                     ratio_type = input$design_ratio_type,
-                     ratio_init = c(input$design_ratio_1,
-                                    input$design_ratio_2,
-                                    input$design_ratio_3,
-                                    input$design_ratio_4,
-                                    input$design_ratio_5),
-                     ratio      = des()$ratio,
-                     correction = des()$correction,
-                     power      = des()$power,
-                     integer    = des()$integer,
-                     large_N    = des()$N,
-                     small_n    = des()$n,
-                     opchar     = des()$opchar,
-                     pi        = des()$pi,
-                     piO        = des()$piO,
-                     plots       = input$design_plots,
-                     plot_global = des()$plot_global,
-                     plot_LFC = des()$plot_LFC,
-                     data = des()$data_og)
-      out <- render("design_report.Rmd", switch(
-        input$design_format,
-        pdf = pdf_document(), html = html_document(), word = word_document()
-      ), params = params, envir = new.env(parent = globalenv()))
+      file.copy(src, "design_report.Rmd", overwrite = T)
+      params <- list(K            = des()$K,
+                     alpha        = des()$alpha,
+                     beta         = des()$beta,
+                     delta1       = des()$delta1,
+                     delta0       = des()$delta0,
+                     sigma        = des()$sigma,
+                     ratio_type   = input$design_ratio_type,
+                     ratio_init   = c(input$design_ratio_1,
+                                      input$design_ratio_2,
+                                      input$design_ratio_3,
+                                      input$design_ratio_4,
+                                      input$design_ratio_5),
+                     ratio        = des()$ratio,
+                     correction   = des()$correction,
+                     power        = des()$power,
+                     integer      = des()$integer,
+                     large_N      = des()$N,
+                     small_n      = des()$n,
+                     opchar       = des()$opchar,
+                     pi           = des()$pi,
+                     piO          = des()$piO,
+                     plots        = input$design_plots,
+                     equal        = des()$equal,
+                     shifted      = des()$shifted,
+                     data         = des()$data_og)
+      out    <- rmarkdown::render(
+          "design_report.Rmd",
+          switch(input$design_format,
+                 pdf  = pdf_document(),
+                 html = html_document(),
+                 word = word_document()
+          ),
+          params = params,
+          envir  = new.env(parent = globalenv()))
       file.rename(out, file)
     }
   )
 
-  output$design_debug <- renderPrint({
-    sessionInfo()
+  ##### Design: Session Info ###################################################
+
+  output$design_debug <- shiny::renderPrint({
+    utils::sessionInfo()
   })
+
+  ##### Close set-up ###########################################################
 
   session$onSessionEnded(stopApp)
 
 }
 
-shinyApp(ui, server)
+shiny::shinyApp(ui, server)

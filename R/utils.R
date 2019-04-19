@@ -7,11 +7,7 @@ determinant_ma      <- function(n, K, sigma) {
 }
 
 max_eigenvalue_ma   <- function(n, K, sigma) {
-  if (K == 1) {
-    max(eigen(matrix(sigma[1]^2/n[1] + sigma[-1]^2/n[-1], 1, 1) + diag())$values)
-  } else {
-    max(eigen(matrix(sigma[1]^2/n[1], K, K) + diag(sigma[-1]^2/n[-1]))$values)
-  }
+  max(eigen(matrix(sigma[1]^2/n[1], K, K) + diag(sigma[-1]^2/n[-1]))$values)
 }
 
 opchar_ma_single    <- function(tau, K, sigma, n, CovZ, u) {

@@ -7,8 +7,8 @@ output: md_document
 
 __multiarm__ requires values to be specified for the standard deviations,
 $\sigma_0,\dots,\sigma_K$, of the responses accrued in the control arm and each
-of the experimental arms. Here, you can specify your chosen assumption about the
-standard deviations: that they are equal across all arms, equal across the
+of the experimental arms.Specify your chosen assumption about the standard
+deviations here: that they are equal across all arms, equal across the
 experimental arms, or unequal across all arms. Depending on your choice,
 suitable input boxes will then appear for you to specify the actual values of
 the standard deviations.

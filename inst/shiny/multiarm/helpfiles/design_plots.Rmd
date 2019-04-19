@@ -5,5 +5,5 @@ output: md_document
 
 # Plot power curves
 
-__multiarm__ can produce a selection of informative power curve plots. Specify
-your choice on whether to produce these plots for the identified design here.
+__multiarm__ can produce a selection of power curve plots. Specify your choice
+on whether to produce these plots for the identified design here.

@@ -27,9 +27,7 @@
 #' Eight key functions are provided: \code{\link{an_ma}},
 #' \code{\link{build_ma}}, \code{\link{des_int_ma}}, \code{\link{des_ma}},
 #' \code{\link{gui_ma}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, and \code{\link{sim_ma}}. Outputs from
-#' all but \code{\link{gui_ma}} and \code{\link{plot.multiarm_des_ma}} are also
-#' supported by S3 \code{\link{print}} and \code{\link{summary}} generics.
+#' \code{\link{plot.multiarm_des_ma}}, and \code{\link{sim_ma}}.
 #'
 #' \itemize{
 #' \item \code{\link{an_ma}}: Analyses summary statistics from a supplied

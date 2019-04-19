@@ -56,6 +56,5 @@ opchar_root_K <- opchar_ma(des_root_K, rbind(c(0, 0),
 \seealso{
 \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},
 \code{\link{des_int_ma}}, \code{\link{gui_ma}},
-\code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}, and their
-associated S3 \code{\link{print}} and \code{\link{summary}} generics.
+\code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
 }

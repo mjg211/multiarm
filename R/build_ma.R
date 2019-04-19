@@ -69,8 +69,7 @@
 #' des_K_n <- build_ma(n = rep(100, 4))
 #' @seealso  \code{\link{an_ma}}, \code{\link{des_ma}},
 #' \code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}, and their
-#' associated S3 \code{\link{print}} and \code{\link{summary}} generics.
+#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
 #' @export
 build_ma <- function(n = rep(61, 3), alpha = 0.05, beta = 0.2, delta1 = 0.5,
                      delta0 = 0, sigma = rep(1, K + 1), correction = "dunnett",

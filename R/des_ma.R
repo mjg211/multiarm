@@ -89,8 +89,7 @@
 #'                      power      = "disjunctive")
 #' @seealso \code{\link{an_ma}}, \code{\link{build_ma}},
 #' \code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}, and their
-#' associated S3 \code{\link{print}} and \code{\link{summary}} generics.
+#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
 #' @export
 des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
                    sigma = rep(1, K + 1), ratio = rep(1, K),
@@ -99,7 +98,7 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
 
   ##### Check input variables ##################################################
 
-  K            <- check_integer_range(K, "K", c(1, Inf), 1)
+  K <- check_integer_range(K, "K", c(1, Inf), 1)
   check_real_range_strict(alpha, "alpha", c(0, 1), 1)
   check_real_range_strict(beta, "beta", c(0, 1), 1)
   check_delta0_delta1(delta0, delta1, "delta0", "delta1")

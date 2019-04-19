@@ -17,9 +17,9 @@ supported multiple comparison corrections. Available functions allow for
 sample size determination (including for *A*-, *D*-, and *E*-optimal
 designs), trial simulation, analytical operating characteristic
 calculation (including the conjunctive power, disjunctive power,
-family-wise error rate, and false discovery rate), and the production of
-several informative plots. An R Shiny graphical user interface is also
-provided to ease design determination.
+family-wise error-rate, and false discovery rate), and the production of
+several plots. An R Shiny graphical user interface is also provided to
+ease design determination.
 
 ## Getting started
 
@@ -40,9 +40,7 @@ For further help, please contact Michael Grayling at
 
 Eight key functions are provided: `an_ma()`, `build_ma()`,
 `des_int_ma()`, `des_ma()`, `gui_ma()`, `opchar_ma()`,
-`plot.multiarm_des_ma()`, and `sim_ma()`. Outputs from all but
-`gui_ma()` and `plot.multiarm_des_ma()` are also supported by S3
-`print()` and `summary()` generics.
+`plot.multiarm_des_ma()`, and `sim_ma()`.
 
   - `an_ma()`: Analyses summary statistics from a supplied fixed-sample
     multi-arm clinical trial design, in order to determine which null
@@ -99,7 +97,7 @@ Then, the total required sample size is
 
 ``` r
 des$N
-#> [1] 67.4357
+#> [1] 67.49446
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -111,11 +109,11 @@ des$opchar
 #> # A tibble: 5 x 10
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3   FWER    FDR
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
-#> 1     0     0     0 0.0500 0.00109 0.0196 0.0196 0.0196 0.0500 0.0500
+#> 1     0     0     0 0.0499 0.00108 0.0196 0.0196 0.0196 0.0499 0.0499
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0     
-#> 3     1     0     0 0.800  0.00330 0.800  0.0196 0.0196 0.0359 0.0187
-#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.0187
-#> 5     0     0     1 0.800  0.00330 0.0196 0.0196 0.800  0.0359 0.0187
+#> 3     1     0     0 0.801  0.00328 0.800  0.0196 0.0196 0.0358 0.0187
+#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0358 0.0187
+#> 5     0     0     1 0.800  0.00328 0.0196 0.0196 0.800  0.0358 0.0186
 ```
 
 Useful plots can then be produced with `plot.multiarm_des_ma()` as
@@ -123,6 +121,6 @@ follows
 
 ``` r
 multiarm:::plot.multiarm_des_ma(des)
-#> NULL
-#> NULL
 ```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" /><img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" />

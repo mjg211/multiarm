@@ -22,9 +22,9 @@ fixed-sample multi-arm clinical trials utilising one of several supported
 multiple comparison corrections. Available functions allow for sample size
 determination (including for $A$-, $D$-, and $E$-optimal designs), trial
 simulation, analytical operating characteristic calculation (including the
-conjunctive power, disjunctive power, family-wise error rate, and false
-discovery rate), and the production of several informative plots. An R Shiny
-graphical user interface is also provided to ease design determination.
+conjunctive power, disjunctive power, family-wise error-rate, and false
+discovery rate), and the production of several plots. An R Shiny graphical user
+interface is also provided to ease design determination.
 
 This vignette will proceed by first precisely detailing the type of trial design
 __multiarm__ supports. Each of the available functions will then be described,
@@ -91,21 +91,22 @@ $\boldsymbol{x}=(x_1,\dots,x_n)^\top$.
 
 Finally, to determine whether to reject each null hypothesis, the $p_k$ are
 compared to a set of significance thresholds, which are specified based on a
-chosen multiple comparison correction (see below), in combination with a nominated
-significance level $\alpha\in(0,1)$.
+chosen multiple comparison correction (see below), in combination with a
+nominated significance level $\alpha\in(0,1)$.
 
 With the above, the principal goal of __multiarm__ is to provide a set of
 functions that
 
 (a) helps choose the significance thresholds against which the $p_k$ are
-compared, typically to control the family-wise error rate (FWER, see Section 2.2);
+compared, typically to control the family-wise error-rate (FWER, see Section
+2.2);
 (b) helps make choices on appropriate values for the $n_k$, $k\in\{0,\dots,K\}$,
 to achieve some desired level of statistical power (see Section 2.3);
 (c) helps evaluate the statistical characteristics of a chosen design.
 
 The forthcoming sections now describe how exactly this is achieved.
 
-## 2.2. Multiple comparison procedures
+## 2.2. Multiple comparison corrections
 
 The most simple possible solution for selecting the significance thresholds
 against which to compare the $p_k$, is to compare each to the chosen
@@ -120,14 +121,18 @@ one null hypothesis). For this reason, in general one may wish to make use of a
 multiple comparison correction (MCC). Currently, __multiarm__ supports the use of
 a variety of such MCCs, which aim to control either 
 
-(a) the FWER, the probability of incorrectly rejecting at least one null hypothesis
-(with these techniques sub-divided into single-step, step-down, and step-up procedures) or;
-(b) the false discovery rate (FDR), the expected proportion of rejected null hypotheses that are false.
+(a) the FWER, the probability of incorrectly rejecting at least one null
+hypothesis
+(with these techniques sub-divided into single-step, step-down, and step-up
+procedures) or;
+(b) the false discovery rate (FDR), the expected proportion of rejected null
+hypotheses that are false.
 
 ### 2.2.1. Single-step family-wise error-rate control
 
 These procedures test each of the $H_k$ against a common significance level,
-$\pi$ say, rejecting $H_k$ if $p_k \le \pi$. The currently supported single-step procedures are
+$\pi$ say, rejecting $H_k$ if $p_k \le \pi$. The currently supported single-step
+procedures are:
 
 - __No MCC:__ Noted already above, this sets $\pi = \alpha$. It can be chosen
 by setting `correction = "none"`.
@@ -144,124 +149,306 @@ vector of zeroes. It can be chosen by setting `correction = "dunnett"`.
 Note that with the exception of the first method, "No MCC", all of the above
 specify a $\pi$ such that the maximum probability of incorrectly rejecting
 at least one of the null hypotheses $H_k$, $k\in\{1,\dots,K\}$, over all
-possible values of $\boldsymbol{\tau}\in\mathbb{R}^K$ is at most
-$\alpha$. This is referred to as *strong control* of the FWER.
+possible values of $\boldsymbol{\tau}\in\mathbb{R}^K$ is at most $\alpha$. This
+is referred to as *strong control* of the FWER.
 
-### 2.2.2. Step-down family-wise error rate control
+### 2.2.2. Step-down family-wise error-rate control
 
 These procedures work by first ranking the $p$-values from smallest to largest.
-We will refer to these ranked $p$-values by $p_{(1)},\dots,p_{(K)}$, with associated
-hypotheses $H_{(1)},\dots,H_{(K)}$. The $p_{(k)}$ are compared to a vector of significance levels $\boldsymbol{\pi}=(\pi_1,\dots,\pi_K)\in(0,1)^K$. Precisely, the maximal index $k$ such that
-$p_{(k)}>\pi_k$ is identified, and then $H_{(1)},\dots,H_{(k-1)}$ are rejected
-and $H_{(k)},\dots,H_{(K)}$ are not rejected. If $k=1$ then we do not reject any of the null hypotheses, and if no such $k$ exists then we reject all of the null hypotheses. The currently supported step-down procedures are
+We will refer to these ranked $p$-values by $p_{(1)},\dots,p_{(K)}$, with
+associated hypotheses $H_{(1)},\dots,H_{(K)}$. The $p_{(k)}$ are compared to a
+vector of significance levels $\boldsymbol{\pi}=(\pi_1,\dots,\pi_K)\in(0,1)^K$.
+Precisely, the maximal index $k$ such that $p_{(k)}>\pi_k$ is identified, and
+then $H_{(1)},\dots,H_{(k-1)}$ are rejected and $H_{(k)},\dots,H_{(K)}$ are not
+rejected. If $k=1$ then we do not reject any of the null hypotheses, and if no
+such $k$ exists then we reject all of the null hypotheses. The currently
+supported step-down procedures are
 
-- __Holm's correction:__ This sets $\pi_k=\alpha/(K+1-k)$. It can be chosen by setting
-`correction = "holm"`.
-- __Step-down Dunnett correction:__ This can only currently be used when $\sigma_1^2/n_1=\dots=\sigma_K^2/n_K$. In this case, it sets $\pi_k== 1 - \Phi\{z_{Dk}\}$,
-where $z_{Dk}$ is the solution to
+- __Holm's correction:__ This sets $\pi_k=\alpha/(K+1-k)$. It can be chosen by
+setting `correction = "holm"`.
+- __Step-down Dunnett correction:__ This can only currently be used when $\sigma_1^2/n_1=\dots=\sigma_K^2/n_K$. In this case, it sets
+$\pi_k== 1 - \Phi\{z_{Dk}\}$, where $z_{Dk}$ is the solution to
 $$ \alpha = 1 - \Phi_{K+1-k}\{(z_{Dk},\dots,z_{Dk})^\top,\boldsymbol{0}_{K+1-k},\text{Cov}(\boldsymbol{Z}_{K+1-k})\}. $$
 It can be chosen by setting `correction = "step_down_dunnett"`.
 
 Note that both of the above methods provide strong control of the FWER.
 
-### 2.2.3. Step-up family-wise error rate control
+### 2.2.3. Step-up family-wise error-rate control
 
-These procedures also work by first ranking the $p$-values from smallest to largest,
-and utilise a vector of significance levels $\boldsymbol{\pi}$. However, here, the largest $k$ such that $p_{(k)} \le \pi_k$ is identified. Then, we reject the hypotheses $H_{(1)},\dots,H_{(k)}$, and do not reject $H_{(k+1)},\dots,H_{(K)}$. Currently, one such method is supported
+These procedures also work by first ranking the $p$-values from smallest to
+largest, and utilise a vector of significance levels $\boldsymbol{\pi}$.
+However, here, the largest $k$ such that $p_{(k)} \le \pi_k$ is identified.
+Then, we reject the hypotheses $H_{(1)},\dots,H_{(k)}$, and do not reject $H_{(k+1)},\dots,H_{(K)}$. Currently, one such method is supported
 
-- __Hochberg's correction:__ This sets $\pi_k=\alpha/(K+1-k)$. It can be chosen by setting
-`correction = "hochberg"`.
+- __Hochberg's correction:__ This sets $\pi_k=\alpha/(K+1-k)$. It can be chosen
+by setting `correction = "hochberg"`.
 
 This method also provides strong control of the FWER.
 
 ### 2.2.3. False discovery rate control
 
-Whilst (most of) the above methods control the FWER in the strong sense, it
-may be of interest instead to control the FDR. Currently, one method
-that will control the FDR to at most $\alpha$ over all possible $\boldsymbol{\tau}\in\mathbb{R}^K$ is support
+Whilst (most of) the above methods control the FWER in the strong sense, it may
+be of interest instead to control the FDR. Currently, one method that will
+control the FDR to at most $\alpha$ over all possible
+$\boldsymbol{\tau}\in\mathbb{R}^K$ is supported:
 
-- __Benjamini-Hochberg correction:__ Ascending $p$-values, $p_{(1)},\dots,p_{(K)}$ are compared
-to $\pi_k=k\alpha/K$. The maximum $k$ for which $p_{(k)}\le\pi_k$ is found, then
-$H_{(1)},\dots,H_{(k)}$ are rejected, and $H_{(k+1)},\dots,H_{(K)}$ are not.
+- __Benjamini-Hochberg correction:__ Ascending $p$-values,
+$p_{(1)},\dots,p_{(K)}$ are compared to $\pi_k=k\alpha/K$. The maximum $k$ for
+which $p_{(k)}\le\pi_k$ is found, then $H_{(1)},\dots,H_{(k)}$ are rejected, and $H_{(k+1)},\dots,H_{(K)}$ are not.
 
 ## 2.3. Power and sample size determination
 
-Specify interesting and uninteresting treatment effects, $\delta_1\in\mathbb{R}^+$
-and $\delta_0\in(-\infty,\delta_1)$. Then, package supports evaluation of a variety of
-types of power, and determination of sample size to control each of these types of power.
-For this, first useful to think of $\boldsymbol{n}=N(\rho_0,\dots,\rho_K)=N\boldsymbol{\rho}$
-for $\boldsymbol{\rho}\in(0,1)^{K+1}$. For now, we will  assume that $N\in\mathbb{N}\backslash\{1,\dots,2K\}$,
-ignoring requirement that each group size must be an integer. That is, enforce
-at least two patients in each group
+Powering a multi-arm trial is complex. Consequently, __multiarm__ supports
+design determination for a variety of types of power, and will evaluate each of
+the supported types of power by default.
 
-- Conjunctive power: Probability reject all of the null hypotheses, $\mathbb{P}(Reject H_k for k\in\{1,\dots,K} \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n})=P_\text{con}(\boldsymbol{\tau})$.
-- Disjunctive power: Probability reject at least one null hypothesis, $\mathbb{P}(Reject H_k for some k \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n})=P_\text{dis}(\boldsymbol{\tau})$.
-- Marginal power: Probability reject $H_k$ for each $k$, $\mathbb{P}(Reject H_k \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n})=P_k(\boldsymbol{\tau})$.
+In all, it requires values for
+*interesting* and *uninteresting* treatment effects to be specified, $\delta_1\in\mathbb{R}^+$ and $\delta_0\in(-\infty,\delta_1)$ respectively.
+With this, the following definitions are used:
 
-Can compute required sample size to control either the disjunctive power, conjunctive power,
-or minimal marginal power, defined as $\min_{k\in\{1,\dots,K\}}P_k(\boldsymbol{\tau})$.
-Each to level $1-\beta$. The disjunctive power and conjunctive power are controlled under the global alternative hypothesis $H_A$ where. In contrast the marginal power is evaluated for
-each $k$ under its LFC, given by.
+- The *global null hypothesis*, $H_G$, is given by:
+$$\tau_1=\cdots=\tau_K=0.$$
+- The *global alternative hypothesis*, $H_A$, is given by:
+$$\tau_1=\cdots=\tau_K=\delta_1.$$
+- The *least favourable configuration* for experimental arm $k=1,\dots,K$,
+$LFC_k$, is given by:
+$$\tau_k=\delta_1,\ \tau_1=\cdots=\tau_{k-1}=\tau_{k+1}=\cdots=\tau_K=\delta_0.$$
+For brevity, we will refer to the $\boldsymbol{\tau}$ implied by $LFC_k$ as
+$\boldsymbol{\tau} = \boldsymbol{\theta}_k$.
 
-First type supposes that the rho is fixed. Alternatively, these can be optimised
-according to a variety of criteria, as outlined in next section.
+And then, the following types of power can be calculated:
 
-## 2.5. *A*-, *D*-, and *E*-optimal design
+- __Conjunctive power:__ The probability all of the null hypotheses are
+rejected:
+$$P_\text{con}(\boldsymbol{\tau}) = \mathbb{P}(\text{Reject }H_k\text{ for }k\in\{1,\dots,K\} \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n}).$$
+- __Disjunctive power:__ The probability at least one null hypothesis is
+rejected:
+$$P_\text{dis}(\boldsymbol{\tau}) = \mathbb{P}(\text{Reject }H_k\text{ for some }k\in\{1,\dots,K\} \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n}).$$
+- __Marginal power__: The probability a particular null hypothesis is rejected: $$P_k(\boldsymbol{\tau}) = \mathbb{P}(\text{Reject }H_k \mid \boldsymbol{\tau},\boldsymbol{\sigma},\boldsymbol{n}).$$
 
-Simple rule would be equal allocaiton, also has been advocated on grounds of power that
-use this $\sqrt{K}$ rule through which . However, also long been interest in
-optimising the design. Currently, multiarm supports determination for a variety
-of different criteria. That is, rho will first be determined, before subsequent
-sample size calculation for the identified rho is performed. The at present available
-optimlaity criteria are
+In particular, the sample size required by a design to control each of these
+types of power to a specified level $1-\beta$ (chosen using the argument `beta`)
+under specific scenarios is then supported. That is, the option `power` can be
+used to control each of the following types of power, in the following settings:
+
+- __Conjunctive power under the global alternative hypothesis:__ Ensure that $P_\text{con}\{(\delta_1,\dots,\delta_1)^\top\} \ge 1 - \beta$. It can be chosen
+by setting `power = "conjunctive"`.
+- __Disjunctive power under the global alternative hypothesis:__ Ensure that $P_\text{dis}\{(\delta_1,\dots,\delta_1)^\top\} \ge 1 - \beta$.
+It can be chosen by setting `power = "disjunctive"`.
+- __Minimum marginal power under the least favourable configurations:__ Ensure
+that $\min_{k\in\{1,\dots,K\}}P_k(\boldsymbol{\theta}_k) \ge 1 - \beta$. It can
+be chosen by setting `power = "marginal"`.
+
+## 2.5. Allocation ratios
+
+All of the calculations discussed above are subject to the specification of
+$\boldsymbol{n}=(n_0,\dots,n_K)$. Currently, __multiarm__ supports the
+determination of values for $\boldsymbol{n}$ by identifying a suitable $n_0$,
+and then setting $n_k=r_kn_k$ for $k\in\{1,\dots,K\}$, with $\boldsymbol{r}=(r_1,\dots,r_K)\in(0,\infty)^K$.
+
+In turn, it allows $\boldsymbol{r}$ to be specified (via the argument `ratio`)
+in a variety of ways. It can be specified explicitly as a numeric vector, or
+alternatively can be determined in an optimal manner. Currently, __multiarm__
+supports the determination of $\boldsymbol{r}$ for the following optimality
+criteria:
+
+- *A*-optimality: Minimize the trace of the inverse of the information matrix of
+the design. It can be chosen by setting `ratio = "A"`.
+- *D*-optimality: Maximize the determinant of the information matrix of the
+design. It can be chosen by setting `ratio = "D"`.
+- *E*-optimality: Maximize the minimum eigenvalue of the information matrix. It
+can be chosen by setting `ratio = "E"`.
 
 # 3. Functions
 
 ## 3.1. `des_ma()`
 
-
+`des_ma()` is the primary function within __multiarm__. It is used to determine
+fixed-sample multi-arm clinical trial designs attaining a desired level of a
+specified type of power.
 
 ## 3.2. `des_int_ma()`
 
-
+Whilst `des_ma()` supports the identification of optimised allocation ratios,
+its methodology is flawed for this purpose in two ways. Firstly, by default it
+treats the parameters $n_0,\dots,n_K$ as continuous variables, even though in
+practice they must be integers. And secondly, it relies on asymptotic theory
+that may not be reliable in small sample settings. `des_int_ma()` seeks to
+address these limitations by searching for the truly optimal allocation of
+a given number of patients across the treatment arms.
 
 ## 3.3. `build_ma()`
 
-
+`des_ma()` and `des_int_ma()` search for a design based upon the chosen input
+parameters. However, in certain circumstances there may be a specific design
+that is of interest. `build_ma()` can be used to construct such a design,
+specifically for subsequent use with the other commands available in
+__multiarm__.
 
 ## 3.4. `plot.multiarm_des_ma()`
 
-
+__multiarm__ can produce power plots curves for the outputs from `des_ma()`,
+`des_int_ma()`, and `build_ma()`, via the S3 `plot.multiarm_des_ma()`.
 
 ## 3.5. `opchar_ma()`
 
-
+Whilst `des_ma()`, `des_int_ma()`, and `build_ma()` return a small summary of
+the statistical operating characteristics of a design, it may occassionally be
+of interest to evaluate the operating characteristics of a design in a wider
+range of settings. `opchar_ma()` is designed for this purpose.
 
 ## 3.6. `sim_ma()`
 
-
+Each of the functions other than `sim_ma()` in __multiarm__ rely upon analytical
+operating characteristic evaluation. However, in certain circumstances, most
+likely when either (a) $K$ is large or (b) analytical evaluations need to be
+validated, recourse to simulation is useful. `sim_ma()` is designed to be useful
+in these settings.
 
 ## 3.7. `an_ma()`
 
+The primary focus of __multiarm__ is currently to faciliate the design of
+fixed-sample multi-arm clinical trials. However, given the complexity of some of
+the supported MCCs, `an_ma()` is included to help analyse the results from a
+trial as well.
 
+## 3.8.`gui_ma()`
 
-## 3.8. `print()` and `summary()` functions
-
-
-
-## 3.9.`gui_ma()`
-
-
+__multiarm__ is supported by an R shiny graphical user interface (GUI). This GUI
+can be initialised with the command `gui_ma()`.
 
 # 4. Examples
 
 ## 4.1. Example 1
 
+We demonstrate the basic functionality provided in __multiarm__. First, identify
+a design using `des_ma()` (with the default parameters):
 
+```{r}
+library(multiarm)
+des <- des_ma(integer = T)
+```
+
+Note that the argument `integer` has been used because we will make a call to 
+`sim_ma()` later on.
+
+We can then plot power curves with `plot.multiarm_des_ma()` as follows:
+
+```{r}
+plot(des)
+```
+
+`des_ma()` contains a summary of the operating characteristics of the identified
+design:
+
+```{r}
+des$opchar
+```
+
+We can validate these using `sim_ma()` with:
+
+```{r}
+sim_ma(des,
+       tau = rbind(c(  0,   0),
+                   c(0.5, 0.5),
+                   c(0.5,   0),
+                   c(  0, 0.5)))$sim
+```
 
 ## 4.2. Example 2
 
+Now, lets make use of some of the additional functionality from __multiarm__.
 
+First, let's find a design for a scenario with $K=3$, using Holm's correction,
+desiring to control the disjunctive power, choosing the allocation ratios
+for $D$-optimality, in a scenario where the standard deviations differ across
+the arms:
+
+```{r}
+des <- des_ma(K          = 3,
+              sigma      = c(0.5, 1, 1.5, 2),
+              ratio      = "D",
+              correction = "holm",
+              power      = "disjunctive",
+              integer    = T)
+```
+
+Thus the total required sample size by the design is:
+
+```{r}
+des$N
+```
+
+And, the allocation ratios are:
+
+```{r}
+des$ratio
+```
+
+Now, lets compare this to the truly $D$-optimal allocation that can be
+identified via `des_int_ma()`:
+
+```{r}
+des_int <- des_int_ma(K          = 3,
+                      N          = 140,
+                      sigma      = c(0.5, 1, 1.5, 2),
+                      ratio      = "D",
+                      correction = "holm",
+                      power      = "disjunctive")
+```
+
+Here, the allocation ratios are:
+
+```{r}
+des_int$ratio
+```
+
+Thus, they are identical in this setting to those identified via `des_ma()`.
+
+Next, note that the operating characeristics of the truly optimal design are:
+
+```{r}
+des_int$opchar
+```
+
+We can validate these with:
+
+```{r}
+sim_ma(des_int,
+       tau = rbind(c(  0,   0,   0),
+                   c(0.5, 0.5, 0.5),
+                   c(0.5,   0,   0),
+                   c(  0, 0.5,   0),
+                   c(  0,   0, 0.5)))$sim
+```
+
+Or recreate them with `opchar_ma()` via:
+
+```{r}
+opchar_ma(des_int,
+          tau = rbind(c(  0,   0,   0),
+                      c(0.5, 0.5, 0.5),
+                      c(0.5,   0,   0),
+                      c(  0, 0.5,   0),
+                      c(  0,   0, 0.5)))$opchar
+```
+
+Finally, let's analyse some $p$-values returned via this design:
+
+```{r}
+an_ma(des_int,
+      pval = rbind(c( 0.01,  0.01,  0.01),
+                   c( 0.02,  0.02,  0.02),
+                   c( 0.01, 0.015,  0.02),
+                   c(0.001,  0.03,  0.02),
+                   c( 0.01,  0.06, 0.002)))$an
+```
+
+And, as earlier, we can produce power-curve plots with:
+
+```{r}
+plot(des_int)
+```
 
 # 5. Miscellaneous
 
@@ -276,7 +463,7 @@ using the package.
 
 ## 5.2. Citing multiarm
 
-The latest details on how to cite __multiarm__ can be found using `citation()`
+The latest details on how to cite __multiarm__ can be found using `citation()`:
 
 ```{r}
 citation("multiarm")

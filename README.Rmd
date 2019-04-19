@@ -26,9 +26,9 @@ fixed-sample multi-arm clinical trials utilising one of several supported
 multiple comparison corrections. Available functions allow for sample size
 determination (including for *A*-, *D*-, and *E*-optimal designs), trial
 simulation, analytical operating characteristic calculation (including the
-conjunctive power, disjunctive power, family-wise error rate, and false
-discovery rate), and the production of several informative plots. An R Shiny
-graphical user interface is also provided to ease design determination.
+conjunctive power, disjunctive power, family-wise error-rate, and false
+discovery rate), and the production of several plots. An R Shiny graphical user
+interface is also provided to ease design determination.
 
 ## Getting started
 
@@ -48,8 +48,7 @@ contact Michael Grayling at michael.grayling@newcastle.ac.uk.
 
 Eight key functions are provided: `an_ma()`, `build_ma()`, `des_int_ma()`,
 `des_ma()`, `gui_ma()`, `opchar_ma()`, `plot.multiarm_des_ma()`, and
-`sim_ma()`. Outputs from all but `gui_ma()` and `plot.multiarm_des_ma()` are
-also supported by S3 `print()` and `summary()` generics.
+`sim_ma()`.
 
 - `an_ma()`: Analyses summary statistics from a supplied fixed-sample multi-arm
 clinical trial design, in order to determine which null hypotheses to reject.

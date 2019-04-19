@@ -1,4 +1,4 @@
-summary_an_ma      <- function(des, pval) {
+summary_an_ma                 <- function(des, pval) {
   K <- des$K
   message("  ", rep("-", 79))
   message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
@@ -55,8 +55,8 @@ summary_an_ma      <- function(des, pval) {
   }
 }
 
-summary_build_ma   <- function(K, n, alpha, beta, delta1, delta0, sigma,
-                               correction, power) {
+summary_build_ma              <- function(K, n, alpha, beta, delta1, delta0,
+                                          sigma, correction, power) {
   message("  ", rep("-", 60))
   message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
           "design")
@@ -191,8 +191,8 @@ summary_build_ma   <- function(K, n, alpha, beta, delta1, delta0, sigma,
   }
 }
 
-summary_des_int_ma <- function(K, N, alpha, beta, delta1, delta0, sigma, ratio,
-                               correction) {
+summary_des_int_ma            <- function(K, N, alpha, beta, delta1, delta0,
+                                          sigma, ratio, correction) {
   message("  ", rep("-", 80))
   message("  ", K, "-experimental treatment optimal constrained fixed-sample ",
           "multi-arm trial design")
@@ -288,8 +288,8 @@ summary_des_int_ma <- function(K, N, alpha, beta, delta1, delta0, sigma, ratio,
           "and experimental arms to N = ", N, ".")
 }
 
-summary_des_ma     <- function(K, alpha, beta, delta1, delta0, sigma, ratio,
-                               correction, power, integer) {
+summary_des_ma                <- function(K, alpha, beta, delta1, delta0, sigma,
+                                          ratio, correction, power, integer) {
   message("  ", rep("-", 60))
   message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
           "design")
@@ -436,7 +436,7 @@ summary_des_ma     <- function(K, alpha, beta, delta1, delta0, sigma, ratio,
   }
 }
 
-summary_opchar_ma  <- function(des, tau) {
+summary_opchar_ma             <- function(des, tau) {
   K <- des$K
   sigma <- des$sigma
   message("  ", rep("-", 79))
@@ -540,7 +540,102 @@ summary_opchar_ma  <- function(des, tau) {
   }
 }
 
-summary_sim_ma     <- function(des, tau, replicates) {
+summary_plot_multiarm_des_ma  <- function(des, delta_min, delta_max, delta,
+                                          density) {
+  K     <- des$K
+  sigma <- des$sigma
+  message("  ", rep("-", 79))
+  message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
+          "operating characteristics")
+  message("  ", rep("-", 79))
+  message("  The hypotheses to be tested will be:\n")
+  if (K == 2L) {
+    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
+            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, H",
+            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc("mu"), uc_sub(2),
+            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
+  } else {
+    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
+            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, ..., H",
+            uc_sub(K), ": ", uc("tau"), uc_sub(K), " = ", uc("mu"), uc_sub(K),
+            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
+  }
+  message("\n  For all error-rate calculations, the standard deviation of the ",
+          "patient responses in\n  each arm will be assumed to be known:\n")
+  if (length(unique(sigma)) == 1L) {
+    if (K == 2L) {
+      message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
+              " = ", round(sigma[1], 4), ".")
+    } else {
+      message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
+              uc_sub(K), " = ", round(sigma[1], 4), ".")
+    }
+  } else {
+    if (K == 2L) {
+      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4), ", ",
+              uc("sigma"), uc_sub(1), " = ", round(sigma[2], 4), ".")
+    } else {
+      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4),
+              ", ..., ", uc("sigma"), uc_sub(K), " = ", round(sigma[K + 1], 4),
+              ".")
+    }
+  }
+  message("")
+  message("  The group size in each arm will be:\n")
+  if (length(unique(des$n)) == 1L) {
+    if (K == 2L) {
+      message("    n", uc_sub(0), " = n", uc_sub(1), " = n", uc_sub(2), " = ",
+              round(des$n[1], 4), ".")
+    } else if (K %in% c(3L, 4L, 5L, 7L)) {
+      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(K),
+              " = ", round(des$n[1], 4), ".")
+    } else {
+      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(K),
+              " = ", round(des$n[1], 4), ".")
+    }
+  } else {
+    if (K == 2L) {
+      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
+              " = ", round(des$n[2], 4), ", n", uc_sub(2), " = ",
+              round(des$n[3], 4), ".")
+    } else {
+      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
+              " = ", round(des$n[2], 4), ", ..., n", uc_sub(K), " = ",
+              round(des$n[K + 1L], 4), ".")
+    }
+  }
+  message("")
+  if (des$correction == "none") {
+    message("  No multiplity correction will be applied. Each hypothesis will ",
+            "be tested at\n  significance level ", uc("alpha"), " = ",
+            round(des$alpha, 4), ".")
+  } else if (des$correction == "benjamini_hochberg") {
+    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
+            round(des$alpha, 4), " using the Benjamini-Hochberg procedure.")
+  } else {
+    if (des$correction == "bonferroni") {
+      segment <- "Bonferroni's\n  correction."
+    } else if (des$correction == "dunnett") {
+      segment <- "Dunnett's\n  correction."
+    } else if (des$correction == "hochberg") {
+      segment <- "Hochberg's\n  correction."
+    }else if (des$correction == "holm") {
+      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "sidak") {
+      segment <- "\u0160id\u00e1k's\n  correction."
+    } else if (des$correction == "step_down_dunnett") {
+      segment <- "the step-down\n  Dunnett correction."
+    }
+    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
+            round(des$alpha, 4), " will be achieved using ", segment)
+  }
+  message("")
+  message("  The operating characteristics will be evaluated over the range ",
+          delta_min, " to ", delta_max, ", producing each line curve using ",
+          density, " points and with a treatment effect shift of ", delta)
+}
+
+summary_sim_ma                <- function(des, tau, replicates) {
   K <- des$K
   sigma <- des$sigma
   message("  ", rep("-", 64))
@@ -645,7 +740,7 @@ summary_sim_ma     <- function(des, tau, replicates) {
   message("\n  ", replicates, " simulations will be used for each scenario.")
 }
 
-uc                 <- function(char) {
+uc                            <- function(char) {
   lookup <- matrix(c("alpha",    "\u03B1",
                      "beta",     "\u03B2",
                      "gamma",    "\u03B3",
@@ -704,7 +799,7 @@ uc                 <- function(char) {
   lookup[which(lookup[, 1] == char), 2]
 }
 
-uc_sub             <- function(n) {
+uc_sub                        <- function(n) {
   codes  <- c("\u2080", "\u2081", "\u2082", "\u2083", "\u2084", "\u2085",
               "\u2086", "\u2087", "\u2088", "\u2089")
   if (n < 10) {

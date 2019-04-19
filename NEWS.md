@@ -1,6 +1,6 @@
 # News: multiarm
 
-## Version 0.9
+## Versions 0.9.#
 
 - Package launched with support for the design (`build_ma()`, `des_ma()`,
 `des_int_ma()`), assessment (`opchar_ma()`), analysis (`an_ma()`), simulation

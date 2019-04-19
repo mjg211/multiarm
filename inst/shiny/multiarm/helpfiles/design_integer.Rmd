@@ -6,5 +6,5 @@ output: md_document
 # Require integer sample sizes
 
 __multiarm__ requires a choice to be made about whether the identified sample
-size required in each arm should be forced to be an integer (a whole number) or
-not. Specify your choice here.
+size required in each arm should be forced to be an integer (a whole number).
+Specify your choice here.

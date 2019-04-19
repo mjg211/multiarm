@@ -5,8 +5,8 @@
 \title{Plot operating characteristics of a fixed-sample multi-arm clinical trial}
 \usage{
 \method{plot}{multiarm_des_ma}(x = des_ma(), delta_min = -x$delta1,
-  delta_max = 2$delta1, delta = delta_max - delta_min, density = 100,
-  output = F, summary = F, ...)
+  delta_max = 2 * x$delta1, delta = delta_max - delta_min,
+  density = 100, output = F, summary = F, ...)
 }
 \arguments{
 \item{x}{A \code{\link{list}} of class \code{"multiarm_des_ma"}, as
@@ -69,6 +69,5 @@ plot(des_root_K)
 \seealso{
 \code{\link{build_ma}}, \code{\link{des_ma}},
 \code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
-\code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}, and their
-associated S3 \code{\link{print}} and \code{\link{summary}} generics.
+\code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
 }

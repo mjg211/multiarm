@@ -48,11 +48,10 @@
 #' plot(des_root_K)
 #' @seealso \code{\link{build_ma}}, \code{\link{des_ma}},
 #' \code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}, and their
-#' associated S3 \code{\link{print}} and \code{\link{summary}} generics.
+#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
 #' @export
 plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
-                                 delta_max = 2$delta1,
+                                 delta_max = 2*x$delta1,
                                  delta = delta_max - delta_min, density = 100,
                                  output = F, summary = F, ...) {
 
@@ -89,54 +88,55 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
   ##### Print summary ##########################################################
 
   if (summary) {
-    #summary_plot_multiarm_des_ma(des, delta_min, delta_max, delta, density)
+    summary_plot_multiarm_des_ma(des, delta_min, delta_max, delta, density)
     message("")
   }
 
   ##### Perform main computations ##############################################
 
-  plots            <- list()
-  tau              <- matrix(0, nrow = density, ncol = des$K)
+  plots              <- list()
+  tau                <- matrix(0, nrow = density, ncol = des$K)
   if (all(delta_min < 0, delta_max > 0)) {
-    tau[, 1]       <- c(seq(delta_min, -1e-6, length.out = 0.5*density),
-                        seq(1e-6, delta_max, length.out = 0.5*density))
+    tau[, 1]         <- c(seq(delta_min, -1e-6, length.out = 0.5*density),
+                          seq(1e-6, delta_max, length.out = 0.5*density))
   } else {
-    tau[, 1]       <- seq(delta_min, delta_max, length.out = density)
+    tau[, 1]         <- seq(delta_min, delta_max, length.out = density)
   }
   for (k in 2:des$K) {
-    tau[, k]       <- tau[, 1]
+    tau[, k]         <- tau[, 1]
   }
-  opchar_global <- opchar_ma(des, tau)$opchar
-  opchar_global <- tidyr::gather(opchar_global, "type", "P",
-                                 .data$`Pdis`:.data$`FWER`)
-  opchar_global$type <- factor(opchar_global$type,
+  opchar_equal       <- opchar_ma(des, tau)$opchar
+  opchar_equal       <- tidyr::gather(opchar_equal, "type", "P",
+                                      .data$`Pdis`:.data$`FWER`)
+  opchar_equal$type  <- factor(opchar_equal$type,
                                levels = c(paste("P", 1:des$K, sep = ""),
                                           "Pcon", "Pdis", "FWER"))
-  labels <- numeric(des$K + 3L)
-  labels[1] <- parse(text = paste("italic(FWER)", "/", "italic(FDR)", sep = ""))
+  labels             <- numeric(des$K + 3L)
+  labels[1]          <- parse(text = paste("italic(FWER)", "/", "italic(FDR)",
+                                           sep = ""))
   for (i in 2:(des$K + 1L)) {
-    labels[i] <- parse(text = paste("italic(P)[", i - 1L, "]", sep = ""))
+    labels[i]        <- parse(text = paste("italic(P)[", i - 1L, "]", sep = ""))
   }
   labels[(des$K + 2L):(des$K + 3L)] <- c(parse(text = "italic(P)[con]"),
-                                 parse(text = "italic(P)[dis]"))
-  colours <- ggthemes::ptol_pal()(3 + des$K)
-  alpha <- des$alpha
-  beta  <- des$beta
-  delta0 <- des$delta0
-  delta1 <- des$delta1
-  plots$plot_global <- ggplot2::ggplot() +
-    ggplot2::geom_line(data = dplyr::filter(opchar_global,
+                                         parse(text = "italic(P)[dis]"))
+  colours            <- ggthemes::ptol_pal()(3 + des$K)
+  alpha              <- des$alpha
+  beta               <- des$beta
+  delta0             <- des$delta0
+  delta1             <- des$delta1
+  plots$plot_equal   <- ggplot2::ggplot() +
+    ggplot2::geom_line(data = dplyr::filter(opchar_equal,
                                             !(type %in% c("FWER"))),
                        ggplot2::aes(x   = tau1,
                                     y   = P,
                                     col = type)) +
-    ggplot2::geom_line(data = dplyr::filter(opchar_global,
+    ggplot2::geom_line(data = dplyr::filter(opchar_equal,
                                             (type %in% c("FWER")) &
                                               tau1 <= 0),
                        ggplot2::aes(x   = tau1,
                                     y   = P,
                                     col = type)) +
-    ggplot2::geom_line(data = dplyr::filter(opchar_global,
+    ggplot2::geom_line(data = dplyr::filter(opchar_equal,
                                             (type %in% c("FWER")) &
                                               tau1 > 0),
                        ggplot2::aes(x   = tau1,
@@ -157,39 +157,40 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
     ggplot2::geom_vline(xintercept = delta1,
                         linetype   = 2)
   if (des$K == 2) {
-    plots$plot_global <- plots$plot_global +
+    plots$plot_equal <- plots$plot_equal +
       ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
   } else if (des$K == 3) {
-    plots$plot_global <- plots$plot_global +
+    plots$plot_equal <- plots$plot_equal +
       ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3], sep = "")))
   } else {
-    plots$plot_global <- plots$plot_global +
+    plots$plot_equal <- plots$plot_equal +
       ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(design$K)], sep = "")))
   }
-  print(plots$plot_global)
+  print(plots$plot_equal)
 
-  opchar_matrix    <- NULL
+  opchar_matrix      <- NULL
   for (k in 1:des$K) {
-    tau            <- matrix(0, nrow = density, ncol = des$K)
-    tau[, k]       <- seq(delta_min, delta_max, length.out = density)
+    tau              <- matrix(0, nrow = density, ncol = des$K)
+    tau[, k]         <- seq(delta_min, delta_max, length.out = density)
     for (l in (1:des$K)[-k]) {
-      tau[, l]     <- tau[, k] - delta
+      tau[, l]       <- tau[, k] - delta
     }
-    opchar_k       <- opchar_ma(des, tau)$opchar
-    opchar_matrix  <- rbind(opchar_matrix,
-                            as.matrix(opchar_k[, c(k, des$K + 2 + k)]))
+    opchar_k         <- opchar_ma(des, tau)$opchar
+    opchar_matrix    <- rbind(opchar_matrix,
+                              as.matrix(opchar_k[, c(k, des$K + 2 + k)]))
   }
-  opchar_LFC       <- tibble::as_tibble(opchar_matrix)
-  colnames(opchar_LFC) <- c("tauk", "P")
-  opchar_LFC       <-
-    dplyr::mutate(opchar_LFC, type = factor(rep(paste("P", 1:des$K, sep = ""),
-                                                each = density)))
-  labels <- numeric(des$K)
+  opchar_shifted     <- tibble::as_tibble(opchar_matrix)
+  colnames(opchar_shifted) <- c("tauk", "P")
+  opchar_shifted     <-
+    dplyr::mutate(opchar_shifted,
+                  type = factor(rep(paste("P", 1:des$K, sep = ""),
+                                    each = density)))
+  labels             <- numeric(des$K)
   for (i in 1:des$K) {
-    labels[i] <- parse(text = paste("italic(P)[", i, "]", sep = ""))
+    labels[i]        <- parse(text = paste("italic(P)[", i, "]", sep = ""))
   }
-  plots$plot_LFC <- ggplot2::ggplot() +
-    ggplot2::geom_line(data = opchar_LFC,
+  plots$plot_shifted <- ggplot2::ggplot() +
+    ggplot2::geom_line(data = opchar_shifted,
                        ggplot2::aes(x   = .data$tauk,
                                     y   = P,
                                     col = type)) +
@@ -210,7 +211,7 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                         linetype   = 2) +
     ggplot2::geom_vline(xintercept = delta1,
                         linetype   = 2)
-  print(plots$plot_LFC)
+  print(plots$plot_shifted)
 
   ##### Outputting #############################################################
 
