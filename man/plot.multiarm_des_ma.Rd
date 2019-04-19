@@ -38,6 +38,8 @@ to \code{F}.}
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
 \code{F}.}
+
+\item{...}{Not currently used.}
 }
 \value{
 If \code{output = T}, a list containing the following elements
@@ -52,19 +54,21 @@ plots.
 fixed-sample multi-arm clinical trial design.
 }
 \examples{
+\dontrun{
 # The design for the default parameters
 des        <- des_ma()
 plot(des)
 # An A-optimal design, returning the avaiable outputs from
 # plot.multiarm_des_ma()
 des_A      <- des_ma(ratio = "A")
-plots      <- plot(des_A, output = T)
+plots      <- plot(des_A, output = TRUE)
 # Using the root-K allocation rule, modifying the desired type of power, and
 # choosing an alternative multiple comparison correction
 des_root_K <- des_ma(ratio      = rep(1/sqrt(2), 2),
                      correction = "holm",
                      power      = "disjunctive")
 plot(des_root_K)
+}
 }
 \seealso{
 \code{\link{build_ma}}, \code{\link{des_ma}},

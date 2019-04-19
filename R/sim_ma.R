@@ -30,6 +30,7 @@
 #' \item Each of the input variables, subject to possible internal modification.
 #' }
 #' @examples
+#' \dontrun{
 #' # The estimated operating characteristics for the default parameters
 #' sim   <- sim_ma()
 #' # An A-optimal design, specifying tau explicitly
@@ -38,6 +39,7 @@
 #'                              c(0.5, 0.5),
 #'                              c(0.5, 0),
 #'                              c(0, 0.5)))
+#' }
 #' @seealso \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},
 #' \code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
 #' \code{\link{plot.multiarm_des_ma}}.

@@ -45,6 +45,7 @@ fixed-sample multi-arm clinical trial design, for given values of the true
 treatment effects, using simulation.
 }
 \examples{
+\dontrun{
 # The estimated operating characteristics for the default parameters
 sim   <- sim_ma()
 # An A-optimal design, specifying tau explicitly
@@ -53,6 +54,7 @@ sim_A <- sim_ma(des_A, rbind(c(0, 0),
                              c(0.5, 0.5),
                              c(0.5, 0),
                              c(0, 0.5)))
+}
 }
 \seealso{
 \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},

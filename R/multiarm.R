@@ -58,3 +58,7 @@
 #' @docType package
 #' @name multiarm
 NULL
+
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(".data")
+}

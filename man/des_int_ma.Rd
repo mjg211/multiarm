@@ -93,12 +93,14 @@ vector of allocation ratios,
 allocation ratios for fixed-sample multi-arm clinical trial designs.
 }
 \examples{
+\dontrun{
 # The design for the default parameters
 des     <- des_int_ma()
 # An A-optimal design
 des_A   <- des_int_ma(ratio = "A")
 # Modifying the number of experimental treatments and the total sample size
 des_K_N <- des_int_ma(K = 3, N = 100)
+}
 }
 \seealso{
 \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},

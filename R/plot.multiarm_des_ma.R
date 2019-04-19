@@ -26,6 +26,7 @@
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
 #' \code{F}.
+#' @param ... Not currently used.
 #' @return If \code{output = T}, a list containing the following elements
 #' \itemize{
 #' \item A \code{\link{list}} in the slot \code{$plots} containing the produced
@@ -33,19 +34,21 @@
 #' \item Each of the input variables, subject to possible internal modification.
 #' }
 #' @examples
+#' \dontrun{
 #' # The design for the default parameters
 #' des        <- des_ma()
 #' plot(des)
 #' # An A-optimal design, returning the avaiable outputs from
 #' # plot.multiarm_des_ma()
 #' des_A      <- des_ma(ratio = "A")
-#' plots      <- plot(des_A, output = T)
+#' plots      <- plot(des_A, output = TRUE)
 #' # Using the root-K allocation rule, modifying the desired type of power, and
 #' # choosing an alternative multiple comparison correction
 #' des_root_K <- des_ma(ratio      = rep(1/sqrt(2), 2),
 #'                      correction = "holm",
 #'                      power      = "disjunctive")
 #' plot(des_root_K)
+#' }
 #' @seealso \code{\link{build_ma}}, \code{\link{des_ma}},
 #' \code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
 #' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
@@ -125,23 +128,23 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
   delta0             <- des$delta0
   delta1             <- des$delta1
   plots$plot_equal   <- ggplot2::ggplot() +
-    ggplot2::geom_line(data = dplyr::filter(opchar_equal,
-                                            !(type %in% c("FWER"))),
-                       ggplot2::aes(x   = tau1,
-                                    y   = P,
-                                    col = type)) +
-    ggplot2::geom_line(data = dplyr::filter(opchar_equal,
-                                            (type %in% c("FWER")) &
-                                              tau1 <= 0),
-                       ggplot2::aes(x   = tau1,
-                                    y   = P,
-                                    col = type)) +
-    ggplot2::geom_line(data = dplyr::filter(opchar_equal,
-                                            (type %in% c("FWER")) &
-                                              tau1 > 0),
-                       ggplot2::aes(x   = tau1,
-                                    y   = P,
-                                    col = type)) +
+    ggplot2::geom_line(data = dplyr::filter(.data = opchar_equal,
+                                            !(.data$type %in% c("FWER"))),
+                       ggplot2::aes(x   = .data$tau1,
+                                    y   = .data$P,
+                                    col = .data$type)) +
+    ggplot2::geom_line(data = dplyr::filter(.data = opchar_equal,
+                                            (.data$type %in% c("FWER")) &
+                                              .data$tau1 <= 0),
+                       ggplot2::aes(x   = .data$tau1,
+                                    y   = .data$P,
+                                    col = .data$type)) +
+    ggplot2::geom_line(data = dplyr::filter(.data = opchar_equal,
+                                            (.data$type %in% c("FWER")) &
+                                              .data$tau1 > 0),
+                       ggplot2::aes(x   = .data$tau1,
+                                    y   = .data$P,
+                                    col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours, labels = labels) +
     ggplot2::ylab("Probability/Rate") +
     ggplot2::theme_bw() +
@@ -192,8 +195,8 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
   plots$plot_shifted <- ggplot2::ggplot() +
     ggplot2::geom_line(data = opchar_shifted,
                        ggplot2::aes(x   = .data$tauk,
-                                    y   = P,
-                                    col = type)) +
+                                    y   = .data$P,
+                                    col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours[2:(des$K + 1)], labels = labels) +
     ggplot2::xlab(bquote(paste("... = ", tau[italic(k)-1], " + ", .(delta), " = ",
                                 tau[italic(k)], " = ",

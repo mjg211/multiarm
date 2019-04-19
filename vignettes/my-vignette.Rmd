@@ -388,7 +388,7 @@ des$ratio
 Now, lets compare this to the truly $D$-optimal allocation that can be
 identified via `des_int_ma()`:
 
-```{r}
+```{r, cache = T}
 des_int <- des_int_ma(K          = 3,
                       N          = 140,
                       sigma      = c(0.5, 1, 1.5, 2),
@@ -413,7 +413,7 @@ des_int$opchar
 
 We can validate these with:
 
-```{r}
+```{r, cache = T}
 sim_ma(des_int,
        tau = rbind(c(  0,   0,   0),
                    c(0.5, 0.5, 0.5),
