@@ -19,7 +19,6 @@ params:
   pi:         NA
   piO:        NA
   plots:      NA
-  delta:      NA
 ---
 
 ```{r setup, include = F}
@@ -64,7 +63,6 @@ effects respectively.
   pi         <- params$pi
   piO        <- params$piO
   plots      <- params$plots
-  delta      <- params$delta
 ```
   
 ```{r, echo = F, results = "asis"}
@@ -121,14 +119,8 @@ if (integer) {
 
 if (plots) {
   plot_text           <- "will"
-  punc_text_1         <- ","
-  delta_text          <- paste0("using a treatment effect shift of $\\delta =",
-                                "\\boldsymbol{", delta, "}$ where required")
-  punc_text_2         <- "."
 } else {
   plot_text           <- "will not"
-  punc_text_1         <- "."
-  delta_text          <- punc_text_2 <- ""
 }
 ```
 
@@ -147,7 +139,7 @@ $\delta_0 = \boldsymbol{`r round(delta0, 3)`}$ respectively.
 - The target allocation to each of the experimental arms will be:
 __`r ratio_text`__.
 - The sample size in each arm __`r integer_text`__ be required to be an integer.
-- Plots __`r plot_text`__ be produced`r punc_text_1` __`r delta_text`__`r punc_text_2`
+- Plots __`r plot_text`__ be produced.
 
 #### Outputs
 
