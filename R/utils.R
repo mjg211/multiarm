@@ -178,6 +178,7 @@ power_fdr_ma_single <- function(EZ, K, CovZ, u, components) {
   two_to_K                      <- 2L^K
   P                             <- numeric(two_to_K)
   for (i in 2:two_to_K) {
+    print(i)
     P[i]                        <- mvtnorm::pmvnorm(components$ls[[i]],
                                                     components$us[[i]],
                                                     EZ, sigma = CovZ)[1]
