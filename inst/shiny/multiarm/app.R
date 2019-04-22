@@ -1,6 +1,7 @@
 ##### Load required packages ###################################################
 
 library(multiarm)
+options(shiny.sanitize.errors = T)
 
 ##### UI #######################################################################
 ui <- shinydashboard::dashboardPage(
@@ -223,7 +224,6 @@ ui <- shinydashboard::dashboardPage(
                 size    = "m",
                 colour  = "black"),
             shiny::uiOutput("design_density"),
-            shiny::uiOutput("design_delta"),
             shiny::hr(),
             shiny::actionButton(
               inputId = "design_reset",
@@ -437,28 +437,28 @@ server <- function(input, output, session) {
   shiny::observeEvent(c(input$design_sigma_1, input$design_sigma_2,
                         input$design_sigma_3, input$design_sigma_4,
                         input$design_sigma_5), {
-    vals <- c(input$design_sigma_1, input$design_sigma_2, input$design_sigma_3,
-              input$design_sigma_4, input$design_sigma_5)
-    for (i in 1:5) {
-      shinyFeedback::feedbackDanger(
-        inputId   = paste0("design_sigma_", i),
-        condition = (vals[i] <= 0),
-        text      = "Must be strictly positive")
-    }
-  })
+                          vals <- c(input$design_sigma_1, input$design_sigma_2, input$design_sigma_3,
+                                    input$design_sigma_4, input$design_sigma_5)
+                          for (i in 1:5) {
+                            shinyFeedback::feedbackDanger(
+                              inputId   = paste0("design_sigma_", i),
+                              condition = (vals[i] <= 0),
+                              text      = "Must be strictly positive")
+                          }
+                        })
 
   shiny::observeEvent(c(input$design_ratio_1, input$design_ratio_2,
                         input$design_ratio_3, input$design_ratio_4,
                         input$design_ratio_5), {
-    vals <- c(input$design_ratio_1, input$design_ratio_2, input$design_ratio_3,
-              input$design_ratio_4, input$design_ratio_5)
-    for (i in 1:5) {
-      shinyFeedback::feedbackDanger(
-        inputId   = paste0("design_ratio_", i),
-        condition = (vals[i] <= 0),
-        text      = "Must be strictly positive")
-    }
-  })
+                          vals <- c(input$design_ratio_1, input$design_ratio_2, input$design_ratio_3,
+                                    input$design_ratio_4, input$design_ratio_5)
+                          for (i in 1:5) {
+                            shinyFeedback::feedbackDanger(
+                              inputId   = paste0("design_ratio_", i),
+                              condition = (vals[i] <= 0),
+                              text      = "Must be strictly positive")
+                          }
+                        })
 
   shiny::observeEvent(input$design_filename, {
     shinyFeedback::feedbackWarning(
@@ -467,12 +467,6 @@ server <- function(input, output, session) {
                         c('/', '\\', '?', "%", "*", ":", "|", "<", ">")),
       text      = paste0('It is generally inadvisable to use the characters /',
                          ', \\, ?, %, *, :, |, ", <, and > in a filename'))
-  })
-
-  shiny::observeEvent(input$design_delta, {
-    shinyFeedback::feedbackDanger(inputId   = "design_delta",
-                   condition = (input$design_delta <= 0),
-                   text      = "\U1D6FF must be strictly positive")
   })
 
   ##### Design: Dynamic UI elements ############################################
@@ -484,7 +478,7 @@ server <- function(input, output, session) {
       value   = 0,
       min     = NA,
       max     = input$design_delta1,
-      step    = 0.1)  %>%
+      step    = 0.1) %>%
       shinyhelper:: helper(
         type    = "markdown",
         title   = "",
@@ -602,29 +596,11 @@ server <- function(input, output, session) {
         label   = "Plot quality:",
         choices = c("Very low" = 33, "Low" = 66, "Medium" = 100, "High" = 150,
                     "Very high" = 200),
-        selected = 100)  %>%
+        selected = 100) %>%
         shinyhelper::helper(
           type    = "markdown",
           title   = "",
           content = "design_density",
-          size    = "m",
-          colour  = "black")
-    }
-  })
-
-  output$design_delta <- renderUI({
-    if (input$design_plots) {
-      shiny::numericInput(
-        inputId = "design_delta",
-        label   = "Plot treatment effect shift:",
-        value   = input$design_delta1 - input$design_delta0,
-        min     = 0,
-        max     = NA,
-        step    = 0.1) %>%
-        shinyhelper::helper(
-          type    = "markdown",
-          title   = "",
-          content = "design_delta",
           size    = "m",
           colour  = "black")
     }
@@ -642,7 +618,7 @@ server <- function(input, output, session) {
       ranges_equal$x <- c(brush$xmin, brush$xmax)
       ranges_equal$y <- c(brush$ymin, brush$ymax)
     } else {
-     ranges_equal$x  <- ranges_equal$y <- NULL
+      ranges_equal$x  <- ranges_equal$y <- NULL
     }
   })
 
@@ -703,7 +679,7 @@ server <- function(input, output, session) {
     progress$inc(amount  = 0.25 + as.numeric(!input$design_plots),
                  message = "Rendering design summary")
     rmarkdown::render(
-      input         = "./design_summary.Rmd",
+      input         = "design_summary.Rmd",
       output_format = rmarkdown::html_document(),
       output_file   = file.path(tempdir(), "design_summary.html"),
       params        = list(K          = design$K,
@@ -727,8 +703,7 @@ server <- function(input, output, session) {
                            opchar     = design$opchar,
                            pi         = design$pi,
                            piO        = design$piO,
-                           plots      = input$design_plots,
-                           delta      = input$design_delta)
+                           plots      = input$design_plots)
     )
     xml2::write_html(
       rvest::html_node(
@@ -752,9 +727,9 @@ server <- function(input, output, session) {
     if (input$design_plots) {
       alpha                    <- design$alpha
       beta                     <- design$beta
-      delta                    <- input$design_delta
       delta0                   <- design$delta0
       delta1                   <- design$delta1
+      delta                    <- delta1 - delta0
       density                  <- as.numeric(input$design_density)
       progress$inc(amount  = 0.25,
                    message = "Rendering plots")
@@ -879,7 +854,7 @@ server <- function(input, output, session) {
         ggplot2::geom_vline(xintercept = delta1,
                             linetype   = 2)
     } else {
-      design$equal             <- design$shifted <- NULL
+      design$equal             <- design$shifted <- design$delta <- NULL
     }
     progress$inc(amount  = 0.25 + as.numeric(!input$design_plots),
                  message = "Outputting results")
@@ -1007,10 +982,8 @@ server <- function(input, output, session) {
       )
     },
     content  = function(file) {
-      src    <- normalizePath("./design_report.Rmd")
-      owd    <- setwd(tempdir())
-      on.exit(setwd(owd))
-      file.copy(src, "design_report.Rmd", overwrite = T)
+      tempReport <- file.path(tempdir(), "design_report.Rmd")
+      file.copy("design_report.Rmd", tempReport, overwrite = T)
       params <- list(K            = des()$K,
                      alpha        = des()$alpha,
                      beta         = des()$beta,
@@ -1036,16 +1009,18 @@ server <- function(input, output, session) {
                      equal        = des()$equal,
                      shifted      = des()$shifted,
                      data         = des()$data_og)
-      out    <- rmarkdown::render(
-          "design_report.Rmd",
-          switch(input$design_format,
-                 pdf  = pdf_document(),
-                 html = html_document(),
-                 word = word_document()
-          ),
-          params = params,
-          envir  = new.env(parent = globalenv()))
-      file.rename(out, file)
+      if (input$design_format == "pdf") {
+        format <- "pdf_document"
+      } else if (input$design_format == "html") {
+        format <- "html_document"
+      } else {
+        format <- "word_document"
+      }
+      rmarkdown::render(tempReport, output_format = format,
+                        output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
     }
   )
 
