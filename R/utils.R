@@ -89,11 +89,11 @@ outcomes_ma_step    <- function(EZ, K, correction, CovZ, uO, components) {
     for (i in 1:rows_outcomes) {
       sum_i                          <- sum(outcomes[i, K + seq_K])
       if (correction %in% c("holm", "step_down_dunnett")) {
-        As[[i]]                      <- matrix(0L, K + sum_i -
-                                                     as.numeric(sum_i == K), K)
+        As[[i]]                      <- matrix(0L, K - 1 + sum_i +
+                                                     as.numeric(sum_i < K), K)
       } else if (correction %in% c("benjamini_hochberg", "hochberg")) {
         As[[i]]                      <-
-          matrix(0L, K - 1 + as.numeric(sum_i > 0) + as.numeric(sum_i < K), K)
+          matrix(0L, K - 1 + (K - sum_i) + as.numeric(sum_i > 0), K)
       }
       for (k in seq_K[-K]) {
         As[[i]][k, which(outcomes[i, seq_K] == k)]             <- 1L
@@ -106,7 +106,7 @@ outcomes_ma_step    <- function(EZ, K, correction, CovZ, uO, components) {
           }
         }
         if (sum_i < K) {
-          As[[i]][K + sum_i*as.numeric(sum_i > 0),
+          As[[i]][K + sum_i,
                   which(outcomes[i, seq_K] == sum_i + 1)]      <- -1L
           ls[[i]]                    <- c(numeric(K - 1L), uO[seq_len(sum_i)],
                                           -uO[sum_i + 1L])
@@ -114,16 +114,22 @@ outcomes_ma_step    <- function(EZ, K, correction, CovZ, uO, components) {
           ls[[i]]                    <- c(numeric(K - 1L), uO)
         }
       } else if (correction %in% c("benjamini_hochberg", "hochberg")) {
-        if (sum_i > 0) {
-          As[[i]][K, which(outcomes[i, seq_K] == sum_i)]       <- 1L
-        }
         if (sum_i < K) {
-          As[[i]][K + as.numeric(sum_i > 0),
-                  which(outcomes[i, seq_K] == sum_i + 1L)]     <- -1L
-          ls[[i]]                    <- c(numeric(K - 1L), uO[sum_i],
-                                          -uO[sum_i + 1L])
+          for (k in (sum_i + 1):K) {
+            As[[i]][K - 1 + k - sum_i, which(outcomes[i, seq_K] == k)] <- -1L
+          }
+        }
+        if (sum_i > 0) {
+          As[[i]][K + (K - sum_i),
+                  which(outcomes[i, seq_K] == sum_i)]          <- 1L
+          if (sum_i < K) {
+            ls[[i]]                  <- c(numeric(K - 1L), -uO[(sum_i + 1L):K],
+                                          uO[sum_i])
+          } else {
+            ls[[i]]                  <- c(numeric(K - 1L), uO[K])
+          }
         } else {
-          ls[[i]]                    <- c(numeric(K - 1L), uO[K])
+          ls[[i]]                    <- c(numeric(K - 1L), -uO)
         }
       }
       means[[i]]                     <- as.numeric(As[[i]]%*%EZ)
@@ -292,12 +298,12 @@ sim_ma_internal     <- function(tau, n, sigma, correction, sigma_z, t_test,
         stats::pnorm((X_bar[-1] - X_bar[1])/denominator, lower.tail = F)
     }
     if (correction %in% c("bonferroni", "dunnett", "none", "sidak")) {
-      rej_mat[i, ]                     <- (pvals < pi)
+      rej_mat[i, ]                     <- (pvals <= pi)
     } else if (correction %in% c("holm", "step_down_dunnett")) {
       order_pvals                      <- order(pvals)
       k                                <- check <- 1
       while (all(k <= K, check == 1)) {
-        if (pvals[order_pvals[k]] < piO[k]) {
+        if (pvals[order_pvals[k]] <= piO[k]) {
           rej_mat[i, order_pvals[k]]   <- rej_mat[i, order_pvals[k]] + 1
           k                            <- k + 1
         } else {
@@ -307,7 +313,7 @@ sim_ma_internal     <- function(tau, n, sigma, correction, sigma_z, t_test,
     } else if (correction %in% c("benjamini_hochberg", "hochberg")) {
       order_pvals                      <- order(pvals)
       for (k in K:1) {
-        if (pvals[order_pvals[k]] < piO[k]) {
+        if (pvals[order_pvals[k]] <= piO[k]) {
           rej_mat[i, order_pvals[1:k]] <- rep(1, k)
           break
         }
