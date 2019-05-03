@@ -210,7 +210,7 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
       power_index                   <- 1
     } else if (correction %in% c("holm", "step_down_dunnett")) {
       power_index                   <- which(div_by == max(div_by))[1]
-    } else if (correction %in% c("hochberg")) {
+    } else if (correction %in% c("benjamini_hochberg", "hochberg")) {
       power_index                   <- which(div_by == min(div_by))[1]
     }
     tau_power[-power_index]         <- delta0
