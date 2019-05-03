@@ -293,21 +293,18 @@ sim_ma_internal     <- function(tau, n, sigma, correction, sigma_z, t_test,
     }
     if (correction %in% c("bonferroni", "dunnett", "none", "sidak")) {
       rej_mat[i, ]                     <- (pvals < pi)
-    }
-    else if (correction %in% c("holm", "step_down_dunnett")) {
+    } else if (correction %in% c("holm", "step_down_dunnett")) {
       order_pvals                      <- order(pvals)
       k                                <- check <- 1
       while (all(k <= K, check == 1)) {
         if (pvals[order_pvals[k]] < piO[k]) {
           rej_mat[i, order_pvals[k]]   <- rej_mat[i, order_pvals[k]] + 1
           k                            <- k + 1
-        }
-        else {
+        } else {
           check                        <- 0
         }
       }
-    }
-    else if (correction %in% c("benjamini_hochberg", "hochberg")) {
+    } else if (correction %in% c("benjamini_hochberg", "hochberg")) {
       order_pvals                      <- order(pvals)
       for (k in K:1) {
         if (pvals[order_pvals[k]] < piO[k]) {
