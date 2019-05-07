@@ -45,7 +45,7 @@
 #' # Using the root-K allocation rule, modifying the desired type of power, and
 #' # choosing an alternative multiple comparison correction
 #' des_root_K <- des_ma(ratio      = rep(1/sqrt(2), 2),
-#'                      correction = "holm",
+#'                      correction = "holm_bonferroni",
 #'                      power      = "disjunctive")
 #' plot(des_root_K)
 #' }

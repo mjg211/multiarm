@@ -36,6 +36,7 @@ ui <- shinydashboard::dashboardPage(
   ),
   ##### Dashboard: Body ########################################################
   shinydashboard::dashboardBody(
+    #tags$head(includeScript("google-analytics.js")),
     shinydashboard::tabItems(
       ##### Tab: Home ##########################################################
       shinydashboard::tabItem(
@@ -103,7 +104,8 @@ ui <- shinydashboard::dashboardPage(
                      "Step-wise"   =
                        list("Benjamini-Hochberg" = "benjamini_hochberg",
                             "Hochberg"           = "hochberg",
-                            "Holm"               = "holm",
+                            "Holm-Bonferroni"    = "holm_bonferroni",
+                            "Holm-Sidak"         = "holm_sidak",
                             "Step-down Dunnett"  = "step_down_dunnett")),
               selected = "dunnett") %>%
               shinyhelper::helper(
@@ -582,7 +584,9 @@ server <- function(input, output, session) {
   output$design_warning <- renderUI({
     if (any(all(input$design_K %in% c(4, 5),
                 input$design_correction %in% c("benjamini_hochberg", "hochberg",
-                                               "holm", "step_down_dunnett")),
+                                               "holm_bonferroni",
+                                               "holm_sidak",
+                                               "step_down_dunnett")),
             all(input$design_K == 5, input$design_plots))) {
       shiny::p(shiny::strong("WARNING:"), " Execution time may be long for ",
                "chosen input parameters.")

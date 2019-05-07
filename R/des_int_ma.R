@@ -33,9 +33,9 @@
 #' \emph{E}-optimality criteria. Defaults to \code{"D"}.
 #' @param correction A \code{\link{character}} string indicating the chosen
 #' multiple comparison correction. Can be any of \code{"benjamini_hochberg"},
-#' \code{"bonferroni"}, \code{"dunnett"}, \code{"hochberg"}, \code{"holm"},
-#' \code{"none"}, \code{"sidak"}, and \code{"step_down_dunnett"}.
-#' Defaults to \code{"dunnett"}.
+#' \code{"bonferroni"}, \code{"dunnett"}, \code{"hochberg"},
+#' \code{"holm_bonferroni"}, \code{"holm_sidak"}, \code{"none"}, \code{"sidak"},
+#' and \code{"step_down_dunnett"}. Defaults to \code{"dunnett"}.
 #' @param power A \code{\link{character}} string indicating the chosen type of
 #' power to design the trial for. Can be one of \code{"conjunctive"},
 #' \code{"disjunctive"}, and \code{"marginal"}. Defaults to \code{"marginal"}.
@@ -98,13 +98,10 @@ des_int_ma <- function(K = 2, N = 183, alpha = 0.05, beta = 0.2, delta1 = 0.5,
   check_belong(ratio, "ratio", c("A", "D", "E"), 1)
   check_belong(correction, "correction",
                c("benjamini_hochberg", "bonferroni", "dunnett", "hochberg",
-                 "holm", "none", "sidak", "step_down_dunnett"), 1)
+                 "holm_bonferroni", "holm_sidak", "none", "sidak",
+                 "step_down_dunnett"), 1)
   check_belong(power, "power", c("conjunctive", "disjunctive", "marginal"), 1)
   check_logical(summary, "summary")
-  if (all(K == 1, correction != "none")) {
-    correction <- "none"
-    warning("correction has been reset to \"none\", given the choice K = 1")
-  }
 
   ##### Print summary ##########################################################
 
@@ -173,49 +170,21 @@ des_int_ma <- function(K = 2, N = 183, alpha = 0.05, beta = 0.2, delta1 = 0.5,
   poss_n                                     <- do.call(rbind, poss_n)
   n                                          <- poss_n[which.min(poss_n[, Kp2]),
                                                        seq_Kp1]
-  pi                                <- piO <- NA
-  CovTau                            <- covariance_ma(K, n, sigma)
-  diag_sqrt_I                     <- diag(1/sqrt(diag(CovTau)))
-  CovZ                              <- diag_sqrt_I%*%CovTau%*%diag_sqrt_I
-  if (correction == "benjamini_hochberg") {
-    piO                           <- (1:K)*alpha/K
-  } else if (correction == "bonferroni") {
-    pi                            <- alpha/K
-  } else if (correction == "dunnett") {
-    pi                            <-
-      stats::pnorm(mvtnorm::qmvnorm(1 - alpha, sigma = CovZ)$quantile,
-                   lower.tail = F)
-  } else if (correction %in% c("hochberg", "holm")) {
-    piO                           <- alpha/(K:1)
-  } else if (correction == "none") {
-    pi                            <- alpha
-  } else if (correction == "sidak") {
-    pi                            <- 1 - (1 - alpha)^(1/K)
-  } else if (correction == "step_down_dunnett") {
-    Ksq                           <- K^2
-    if (length(unique(CovZ[(1:Ksq)[-seq(1, Ksq, K + 1)]])) > 1) {
-      stop("The step-down Dunnett correction is only supported for scenarios ",
-           "with a shared covariance between the test statistics")
-    }
-    corr                          <- CovZ[2, 1]
-    one_min_alpha                 <- 1 - alpha
-    piO                           <-
-      sapply(1:K,
-             function(k) {
-               dim                <- K - (k - 1L)
-               stats::pnorm(mvtnorm::qmvnorm(one_min_alpha,
-                                             sigma =
-                                               matrix(corr, dim, dim) +
-                                               (1 - corr)*diag(dim))$quantile,
-                            lower.tail = F) })
-  }
-  u                                 <- stats::qnorm(1 - pi)
-  uO                                <- stats::qnorm(1 - piO)
+  CovTau                                     <- covariance_ma(K, rho, sigma)
+  diag_sqrt_I                                <- diag(1/sqrt(diag(CovTau)))
+  CovZ                                       <-
+    diag_sqrt_I%*%CovTau%*%diag_sqrt_I
+  pi_u                                       <- pi_ma(K, alpha, correction,
+                                                      CovZ)
+  pi                                         <- pi_u$pi
+  piO                                        <- pi_u$piO
+  u                                          <- pi_u$u
+  uO                                         <- pi_u$uO
   tau                                        <-
     rbind(rep(0, K), rep(delta1, K), matrix(delta0, K, K) +
                                        (delta1 - delta0)*diag(K))
-  if (correction %in% c("benjamini_hochberg", "hochberg", "holm",
-                        "step_down_dunnett")) {
+  if (correction %in% c("benjamini_hochberg", "hochberg", "holm_bonferroni",
+                        "holm_sidak", "step_down_dunnett")) {
     opchar                                   <-
       opchar_ma_step(tau, K, sigma, correction, n, CovZ, uO)
   } else {

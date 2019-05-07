@@ -33,7 +33,7 @@
 #' # Using the root-K allocation rule, modifying the desired type of power and
 #' # chosen multiple comparison correction, and specifying tau explicitly
 #' des_root_K    <- des_ma(ratio      = rep(1/sqrt(2), 2),
-#'                         correction = "holm",
+#'                         correction = "holm_bonferroni",
 #'                         power      = "disjunctive")
 #' opchar_root_K <- opchar_ma(des_root_K, rbind(c(0, 0),
 #'                                              c(0.5, 0.5),

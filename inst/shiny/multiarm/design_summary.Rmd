@@ -78,8 +78,10 @@ if (correction == "bonferroni") {
   correction_text     <- "the Benjamini-Hochberg correction"
 } else if (correction == "hochberg") {
   correction_text     <- "Hochberg's correction"
-} else if (correction == "holm") {
-  correction_text     <- "Holm's correction"
+} else if (correction == "holm_bonferroni") {
+  correction_text     <- "the Holm-Bonferroni correction"
+} else if (correction == "holm_sidak") {
+  correction_text     <- "the Holm-Sidak correction"
 } else if (correction == "step_down_dunnett") {
   correction_text     <- "the step-down version of Dunnett's correction"
 }
@@ -145,8 +147,8 @@ __`r ratio_text`__.
 
 ```{r, echo = F, results = "asis"}
 FWER                  <- round(opchar$FWER[1], 3)
-if (correction %in% c("benjamini_hochberg", "hochberg", "holm",
-                      "step_down_dunnett")) {
+if (correction %in% c("benjamini_hochberg", "hochberg", "holm_bonferroni",
+                      "holm_sidak", "step_down_dunnett")) {
   punc_text_3         <- "s"
   pi_text             <- paste0("(", paste(round(piO, 3), collapse = ", "), ")")
 } else {

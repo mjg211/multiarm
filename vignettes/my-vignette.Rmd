@@ -164,8 +164,9 @@ rejected. If $k=1$ then we do not reject any of the null hypotheses, and if no
 such $k$ exists then we reject all of the null hypotheses. The currently
 supported step-down procedures are
 
-- __Holm's correction:__ This sets $\pi_k=\alpha/(K+1-k)$. It can be chosen by
-setting `correction = "holm"`.
+- __Holm-Bonferroni correction:__ This sets $\pi_k=\alpha/(K+1-k)$. It can be chosen by setting `correction = "holm_bonferroni"`.
+- __Holm-Sidak correction:__ This sets $\pi_k = 1 - (1 - \alpha)^{1/(K+1-k)}$.
+It can be chosen by setting `correction = "holm_sidak"`.
 - __Step-down Dunnett correction:__ This can only currently be used when $\sigma_1^2/n_1=\dots=\sigma_K^2/n_K$. In this case, it sets
 $\pi_k== 1 - \Phi\{z_{Dk}\}$, where $z_{Dk}$ is the solution to
 $$ \alpha = 1 - \Phi_{K+1-k}\{(z_{Dk},\dots,z_{Dk})^\top,\boldsymbol{0}_{K+1-k},\text{Cov}(\boldsymbol{Z}_{K+1-k})\}. $$
@@ -359,16 +360,13 @@ sim_ma(des,
 
 Now, lets make use of some of the additional functionality from __multiarm__.
 
-First, let's find a design for a scenario with $K=3$, using Holm's correction,
-desiring to control the disjunctive power, choosing the allocation ratios
-for $D$-optimality, in a scenario where the standard deviations differ across
-the arms:
+First, let's find a design for a scenario with $K=3$, using the Holm-Bonferroni correction, desiring to control the disjunctive power, choosing the allocation ratios for $D$-optimality, in a scenario where the standard deviations differ across the arms:
 
 ```{r}
 des <- des_ma(K          = 3,
               sigma      = c(0.5, 1, 1.5, 2),
               ratio      = "D",
-              correction = "holm",
+              correction = "holm_bonferroni",
               power      = "disjunctive",
               integer    = T)
 ```
@@ -393,7 +391,7 @@ des_int <- des_int_ma(K          = 3,
                       N          = 140,
                       sigma      = c(0.5, 1, 1.5, 2),
                       ratio      = "D",
-                      correction = "holm",
+                      correction = "holm_bonferroni",
                       power      = "disjunctive")
 ```
 

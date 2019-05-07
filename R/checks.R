@@ -55,7 +55,8 @@ check_multiarm_des_ma   <- function(des, int = F) {
   check_ratio(des$ratio, des$K, des$n, "des$ratio", "des$K", "des$n")
   check_belong(des$correction, "des$correction",
                c("benjamini_hochberg", "bonferroni", "dunnett", "hochberg",
-                 "holm", "none", "sidak", "step_down_dunnett"), 1)
+                 "holm_bonferroni", "holm_sidak", "none", "sidak",
+                 "step_down_dunnett"), 1)
   check_belong(des$power, "des$power",
                c("conjunctive", "disjunctive", "marginal"), 1)
   check_CovZ(des$CovZ, des$K, des$sigma, des$n, "des$CovZ", "des$K",

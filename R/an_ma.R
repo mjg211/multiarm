@@ -18,10 +18,10 @@
 #' Defaults to \code{des$alpha}
 #' @param correction A \code{\link{character}} string indicating the chosen
 #' multiple comparison correction. Can be any of \code{"benjamini_hochberg"},
-#' \code{"bonferroni"}, \code{"dunnett"}, \code{"hochberg"}, \code{"holm"},
-#' \code{"none"}, \code{"sidak"}, and \code{"step_down_dunnett"}.
-#' Defaults to \code{"dunnett"} (i.e., \code{correction} can be used to
-#' modify/update \code{des} if desired). Defaults to \code{des$correction}.
+#' \code{"bonferroni"}, \code{"dunnett"}, \code{"hochberg"},
+#' \code{"holm_bonferroni"}, \code{"holm_sidak"}, \code{"none"}, \code{"sidak"},
+#' and \code{"step_down_dunnett"}. Defaults to \code{"des$correction"} (i.e.,
+#' \code{correction} can be used to modify/update \code{des} if desired).
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
 #' \code{F}.
@@ -47,7 +47,7 @@
 #' # chosen multiple comparison correction, and a selection of possible
 #' # p-values
 #' des_root_K <- des_ma(ratio      = rep(1/sqrt(2), 2),
-#'                      correction = "holm",
+#'                      correction = "holm_bonferroni",
 #'                      power      = "disjunctive")
 #' an_root_K  <- an_ma(des_root_K, rbind(c(0.01, 0.01),
 #'                                       c(0.025, 0.025),
@@ -68,7 +68,8 @@ an_ma <- function(des = des_ma(), pval = rep(0.5*des$alpha, des$K),
   check_real_range_strict(alpha, "alpha", c(0, 1), 1)
   check_belong(correction, "correction",
                c("benjamini_hochberg", "bonferroni", "dunnett", "hochberg",
-                 "holm", "none", "sidak", "step_down_dunnett"), 1)
+                 "holm_bonferroni", "holm_sidak", "none", "sidak",
+                 "step_down_dunnett"), 1)
   check_logical(summary, "summary")
 
   ##### Update des #############################################################
@@ -80,46 +81,20 @@ an_ma <- function(des = des_ma(), pval = rep(0.5*des$alpha, des$K),
     diag_sqrt_I                      <- diag(1/sqrt(diag(CovTau)))
     des$CovZ                         <-
       diag_sqrt_I%*%CovTau%*%diag_sqrt_I
-    des$pi                           <- des$piO <- NA
-    if (correction == "benjamini_hochberg") {
-      des$piO                        <- (1:des$K)*des$alpha/des$K
-    } else if (correction == "bonferroni") {
-      des$pi                         <- des$alpha/des$K
-    } else if (correction == "dunnett") {
-      des$pi                         <-
-        stats::pnorm(mvtnorm::qmvnorm(1 - des$alpha, sigma = des$CovZ)$quantile,
-                     lower.tail = F)
-    } else if (correction %in% c("hochberg", "holm")) {
-      des$piO                        <- des$alpha/(des$K:1)
-    } else if (correction == "none") {
-      des$pi                         <- des$alpha
-    } else if (correction == "sidak") {
-      des$pi                         <- 1 - (1 - des$alpha)^(1/des$K)
-    } else if (correction == "step_down_dunnett") {
-      Ksq                            <- des$K^2
-      if (length(unique(des$CovZ[(1:Ksq)[-seq(1, Ksq, des$K + 1)]])) > 1) {
-        stop("The step-down Dunnett correction is only supported for scenarios",
-             " with a shared covariance between the test statistics")
-      }
-      corr                           <- des$CovZ[2, 1]
-      one_min_alpha                  <- 1 - des$alpha
-      des$piO                        <-
-        sapply(1:des$K, function(k) {
-          dim <- des$K - (k - 1L)
-          stats::pnorm(mvtnorm::qmvnorm(one_min_alpha,
-                                        sigma = matrix(corr, dim, dim) +
-                                          (1 - corr)*diag(dim))$quantile,
-                       lower.tail = F) })
-    }
-    des$u                            <- stats::qnorm(1 - des$pi)
-    des$uO                           <- stats::qnorm(1 - des$piO)
+    pi_u                             <- pi_ma(des$K, des$alpha, des$correction,
+                                              des$CovZ)
+    des$pi                           <- pi_u$pi
+    des$piO                          <- pi_u$piO
+    des$u                            <- pi_u$u
+    des$uO                           <- pi_u$uO
     tau                              <- rbind(rep(0, des$K),
                                               rep(des$delta1, des$K),
                                               matrix(des$delta0, des$K,
                                                      des$K) +
                                                 (des$delta1 - des$delta0)*
                                                   diag(des$K))
-    if (des$correction %in% c("benjamini_hochberg", "hochberg", "holm",
+    if (des$correction %in% c("benjamini_hochberg", "hochberg",
+                              "holm_bonferroni", "holm_sidak",
                               "step_down_dunnett")) {
       des$opchar                     <- opchar_ma_step(tau, des$K, des$sigma,
                                                        des$correction, des$n,
@@ -148,7 +123,8 @@ an_ma <- function(des = des_ma(), pval = rep(0.5*des$alpha, des$K),
     if (des$correction %in% c("bonferroni", "dunnett", "none", "sidak")) {
       reject[i, ]                    <- (pval[i, ] < des$pi)
     }
-    else if (des$correction %in% c("holm", "step_down_dunnett")) {
+    else if (des$correction %in% c("holm_bonferroni", "holm_sidak",
+                                   "step_down_dunnett")) {
       order_pval                     <- order(pval[i, ])
       k                              <- check <- 1
       while (all(k <= des$K, check == 1)) {

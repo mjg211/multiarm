@@ -88,7 +88,8 @@ outcomes_ma_step    <- function(EZ, K, correction, CovZ, uO, components) {
     As                               <- ls <- means <- covariances <- list()
     for (i in 1:rows_outcomes) {
       sum_i                          <- sum(outcomes[i, K + seq_K])
-      if (correction %in% c("holm", "step_down_dunnett")) {
+      if (correction %in% c("holm_bonferroni", "holm_sidak",
+                            "step_down_dunnett")) {
         As[[i]]                      <- matrix(0L, K - 1 + sum_i +
                                                      as.numeric(sum_i < K), K)
       } else if (correction %in% c("benjamini_hochberg", "hochberg")) {
@@ -99,7 +100,8 @@ outcomes_ma_step    <- function(EZ, K, correction, CovZ, uO, components) {
         As[[i]][k, which(outcomes[i, seq_K] == k)]             <- 1L
         As[[i]][k, which(outcomes[i, seq_K] == k + 1)]         <- -1L
       }
-      if (correction %in% c("holm", "step_down_dunnett")) {
+      if (correction %in% c("holm_bonferroni", "holm_sidak",
+                            "step_down_dunnett")) {
         if (sum_i > 0) {
           for (k in 1:sum_i) {
             As[[i]][K - 1 + k, which(outcomes[i, seq_K] == k)] <- 1L
@@ -145,6 +147,47 @@ outcomes_ma_step    <- function(EZ, K, correction, CovZ, uO, components) {
     components$means                 <- means
     components
   }
+}
+
+pi_ma <- function(K, alpha, correction, CovZ) {
+  pi                <- piO <- NA
+  if (correction == "benjamini_hochberg") {
+    piO             <- (1:K)*alpha/K
+  } else if (correction == "bonferroni") {
+    pi              <- alpha/K
+  } else if (correction == "dunnett") {
+    pi              <-
+      stats::pnorm(mvtnorm::qmvnorm(1 - alpha, sigma = CovZ)$quantile,
+                   lower.tail = F)
+  } else if (correction %in% c("hochberg", "holm_bonferroni")) {
+    piO             <- alpha/(K:1)
+  } else if (correction == "holm_sidak") {
+    piO             <- 1 - (1 - alpha)^(1/(K:1))
+  } else if (correction == "none") {
+    pi              <- alpha
+  } else if (correction == "sidak") {
+    pi              <- 1 - (1 - alpha)^(1/K)
+  } else if (correction == "step_down_dunnett") {
+    Ksq             <- K^2
+    if (length(unique(CovZ[(1:Ksq)[-seq(1, Ksq, K + 1)]])) > 1) {
+      stop("The step-down Dunnett correction is only supported for scenarios ",
+           "with a shared covariance between the test statistics")
+    }
+    corr            <- CovZ[2, 1]
+    one_min_alpha   <- 1 - alpha
+    piO             <-
+      sapply(1:K,
+             function(k) {
+               dim  <- K - (k - 1L)
+               stats::pnorm(mvtnorm::qmvnorm(one_min_alpha,
+                                             sigma =
+                                               matrix(corr, dim, dim) +
+                                               (1 - corr)*diag(dim))$quantile,
+                            lower.tail = F) })
+  }
+  u                 <- stats::qnorm(1 - pi)
+  uO                <- stats::qnorm(1 - piO)
+  list(pi = pi, piO = piO, u = u, uO = uO)
 }
 
 power_all_ma_single <- function(EZ, K, CovZ, u) {
@@ -299,7 +342,8 @@ sim_ma_internal     <- function(tau, n, sigma, correction, sigma_z, t_test,
     }
     if (correction %in% c("bonferroni", "dunnett", "none", "sidak")) {
       rej_mat[i, ]                     <- (pvals <= pi)
-    } else if (correction %in% c("holm", "step_down_dunnett")) {
+    } else if (correction %in% c("holm_bonferroni", "holm_sidak",
+                                 "step_down_dunnett")) {
       order_pvals                      <- order(pvals)
       k                                <- check <- 1
       while (all(k <= K, check == 1)) {

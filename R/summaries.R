@@ -31,8 +31,10 @@ summary_an_ma                 <- function(des, pval) {
       segment <- "Dunnett's\n  correction."
     } else if (des$correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    }else if (des$correction == "holm") {
-      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "holm_bonferroni") {
+      segment <- "the\n  Holm-Bonferroni procedure."
+    } else if (des$correction == "holm_sidak") {
+      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (des$correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
     } else if (des$correction == "step_down_dunnett") {
@@ -88,8 +90,10 @@ summary_build_ma              <- function(K, n, alpha, beta, delta1, delta0,
       segment <- "Dunnett's\n  correction."
     } else if (correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    }else if (correction == "holm") {
-      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "holm_bonferroni") {
+      segment <- "the\n  Holm-Bonferroni procedure."
+    } else if (des$correction == "holm_sidak") {
+      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
     } else if (correction == "step_down_dunnett") {
@@ -225,8 +229,10 @@ summary_des_int_ma            <- function(K, N, alpha, beta, delta1, delta0,
       segment <- "Dunnett's\n  correction."
     } else if (correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    }else if (correction == "holm") {
-      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "holm_bonferroni") {
+      segment <- "the\n  Holm-Bonferroni procedure."
+    } else if (des$correction == "holm_sidak") {
+      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
     } else if (correction == "step_down_dunnett") {
@@ -321,8 +327,10 @@ summary_des_ma                <- function(K, alpha, beta, delta1, delta0, sigma,
       segment <- "Dunnett's\n  correction."
     } else if (correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    }else if (correction == "holm") {
-      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "holm_bonferroni") {
+      segment <- "the\n  Holm-Bonferroni procedure."
+    } else if (des$correction == "holm_sidak") {
+      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
     } else if (correction == "step_down_dunnett") {
@@ -514,8 +522,10 @@ summary_opchar_ma             <- function(des, tau) {
       segment <- "Dunnett's\n  correction."
     } else if (des$correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    }else if (des$correction == "holm") {
-      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "holm_bonferroni") {
+      segment <- "the\n  Holm-Bonferroni procedure."
+    } else if (des$correction == "holm_sidak") {
+      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (des$correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
     } else if (des$correction == "step_down_dunnett") {
@@ -619,8 +629,10 @@ summary_plot_multiarm_des_ma  <- function(des, delta_min, delta_max, delta,
       segment <- "Dunnett's\n  correction."
     } else if (des$correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    }else if (des$correction == "holm") {
-      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "holm_bonferroni") {
+      segment <- "the\n  Holm-Bonferroni procedure."
+    } else if (des$correction == "holm_sidak") {
+      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (des$correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
     } else if (des$correction == "step_down_dunnett") {
@@ -713,8 +725,10 @@ summary_sim_ma                <- function(des, tau, replicates) {
       segment <- "Dunnett's\n  correction."
     } else if (des$correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    }else if (des$correction == "holm") {
-      segment <- "the\n  Bonferroni-Holm procedure."
+    } else if (des$correction == "holm_bonferroni") {
+      segment <- "the\n  Holm-Bonferroni procedure."
+    } else if (des$correction == "holm_sidak") {
+      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (des$correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
     } else if (des$correction == "step_down_dunnett") {
