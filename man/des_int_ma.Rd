@@ -2,7 +2,8 @@
 % Please edit documentation in R/des_int_ma.R
 \name{des_int_ma}
 \alias{des_int_ma}
-\title{Design an optimal fixed-sample multi-arm clinical trial}
+\title{Design an optimal fixed-sample multi-arm clinical trial for a normally
+distributed primary outcome}
 \usage{
 des_int_ma(K = 2, N = 183, alpha = 0.05, beta = 0.2,
   delta1 = 0.5, delta0 = 0, sigma = rep(1, K + 1), ratio = "D",
@@ -47,9 +48,10 @@ allocation ratios to the experimental arms. Can be any of \code{"A"},
 
 \item{correction}{A \code{\link{character}} string indicating the chosen
 multiple comparison correction. Can be any of \code{"benjamini_hochberg"},
-\code{"bonferroni"}, \code{"dunnett"}, \code{"hochberg"}, \code{"holm"},
-\code{"none"}, \code{"sidak"}, and \code{"step_down_dunnett"}.
-Defaults to \code{"dunnett"}.}
+\code{"benjamini_yekutieli"}, \code{"bonferroni"}, \code{"dunnett"},
+\code{"hochberg"}, \code{"holm_bonferroni"}, \code{"holm_sidak"},
+\code{"none"}, \code{"sidak"}, and \code{"step_down_dunnett"}. Defaults to
+\code{"dunnett"}.}
 
 \item{power}{A \code{\link{character}} string indicating the chosen type of
 power to design the trial for. Can be one of \code{"conjunctive"},
@@ -68,29 +70,32 @@ operating characteristics of the identified design.
 \item A \code{\link{numeric}} vector in the slot \code{$n} specifying
 \ifelse{html}{\out{<b><i>n</i></b>}}{\eqn{\bold{n}}}, the vector of sample
 sizes required in each arm.
-\item A \code{\link{numeric}} in the slot \code{$pi} specifying the critical
+\item A \code{\link{numeric}} in the slot \code{$gamma} specifying the critical
 threshold for \emph{p}-values,
-\ifelse{html}{\out{<i>&pi;</i></b>}}{\eqn{\pi}}, below which null hypotheses
-would be rejected. Will be \code{\link{NA}} if \code{correction} is not a
-single-step testing procedure.
-\item A \code{\link{numeric}} vector in the slot \code{$piO} specifying the
-critical thresholds for ordered \emph{p}-values,
-\ifelse{html}{\out{<b><i>&pi;</i></b>}}{\eqn{\bold{\pi}}}, to use with the
-chosen step-wise testing procedure. Will be \code{\link{NA}} if
+\ifelse{html}{\out{<i>&gamma;</i></b>}}{\eqn{\gamma}}, below which null
+hypotheses would be rejected. Will be \code{\link{NA}} if \code{correction}
+is not a single-step testing procedure.
+\item A \code{\link{numeric}} vector in the slot \code{$gammaO} specifying
+the critical thresholds for ordered \emph{p}-values,
+\ifelse{html}{\out{<b><i>&gamma;</i></b>}}{\eqn{\bold{\gamma}}}, to use with
+the chosen step-wise testing procedure. Will be \code{\link{NA}} if
 \code{correction} is not a step-wise testing procedure.
 \item A \code{\link{matrix}} in the slot \code{$CovZ} specifying the
 covariance matrix,
 \ifelse{html}{\out{Cov(<b><i>Z</i></b>)}}{\eqn{Cov(\bold{Z})}}, of the
 standardised test statistics.
-\item A \code{\link{numeric}} vector in the slot \code{$rho} specifying the
+\item A \code{\link{numeric}} vector in the slot \code{$ratio} specifying the
 vector of allocation ratios,
-\ifelse{html}{\out{<b><i>&rho;</i></b>}}{\eqn{\bold{\rho}}}.
+\ifelse{html}{\out{<b><i>r</i></b>}}{\eqn{\bold{r}}}.
 \item Each of the input variables, subject to possible internal modification.
 }
 }
 \description{
 \code{des_int_ma()} determines \emph{A}-, \emph{D}-, and \emph{E}-optimal
-allocation ratios for fixed-sample multi-arm clinical trial designs.
+allocation ratios for fixed-sample multi-arm clinical trial designs assuming
+the primary outcome variable is normally distributed. It determines these
+optimal designs using an exhaustive search over possible allocations of a
+given number of patients across the treatment arms.
 }
 \examples{
 \dontrun{

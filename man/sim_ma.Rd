@@ -3,7 +3,7 @@
 \name{sim_ma}
 \alias{sim_ma}
 \title{Empirically determine the operating characteristics of a fixed-sample
-multi-arm clinical trial}
+multi-arm clinical trial for a normally distributed primary outcome}
 \usage{
 sim_ma(des = des_ma(integer = T), tau, replicates = 1e+05,
   summary = F)
@@ -12,8 +12,8 @@ sim_ma(des = des_ma(integer = T), tau, replicates = 1e+05,
 \item{des}{A \code{\link{list}} of class \code{"multiarm_des_ma"}, as
 returned by \code{\link{build_ma}}, \code{\link{des_ma}}, or
 \code{\link{des_int_ma}} (i.e., a fixed-sample multi-arm clinical trial
-design). \strong{Note:} The sample sizes in all arms must be whole numbers.
-Defaults to \code{des_ma(integer = T)}.}
+design for a normally distributed outcome). \strong{Note:} The sample sizes
+in all arms must be whole numbers. Defaults to \code{des_ma(integer = T)}.}
 
 \item{tau}{A \code{\link{matrix}} whose rows indicate values of
 \ifelse{html}{\out{<b><i>&tau;</i></b>}}{\eqn{\bold{\tau}}} at which to
@@ -31,8 +31,7 @@ of the function's progress should be printed to the console. Defaults to
 \code{F}.}
 }
 \value{
-A \code{\link{list}} of class \code{"multiarm_sim_ma"} containing the
-following elements
+A \code{\link{list}} containing the following elements
 \itemize{
 \item A \code{\link{tibble}} in the slot \code{$sim} giving the estimated
 operating characteristics.
@@ -41,8 +40,9 @@ operating characteristics.
 }
 \description{
 \code{sim_ma()} determines the operating characteristics of a specified
-fixed-sample multi-arm clinical trial design, for given values of the true
-treatment effects, using simulation.
+fixed-sample multi-arm clinical trial design assuming the primary outcome is
+normally distributed, for given values of the true treatment effects, using
+simulation.
 }
 \examples{
 \dontrun{
@@ -58,6 +58,6 @@ sim_A <- sim_ma(des_A, rbind(c(0, 0),
 }
 \seealso{
 \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},
-\code{\link{des_int_ma}}, \code{\link{gui_ma}}, \code{\link{opchar_ma}},
+\code{\link{des_int_ma}}, \code{\link{opchar_ma}},
 \code{\link{plot.multiarm_des_ma}}.
 }

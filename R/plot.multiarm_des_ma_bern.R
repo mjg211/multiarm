@@ -1,20 +1,20 @@
 #' Plot operating characteristics of a fixed-sample multi-arm clinical trial
-#' for a normally distributed primary outcome
+#' for a Bernoulli distributed primary outcome
 #'
-#' \code{plot.multiarm_des_ma()} produces power curve plots for a specified
+#' \code{plot.multiarm_des_ma_bern()} produces power curve plots for a specified
 #' fixed-sample multi-arm clinical trial design assuming the primary outcome is
-#' normally distributed.
+#' Bernoulli distributed.
 #'
-#' @param x A \code{\link{list}} of class \code{"multiarm_des_ma"}, as
-#' returned by \code{\link{build_ma}}, \code{\link{des_ma}}, or
-#' \code{\link{des_int_ma}} (i.e., a fixed-sample multi-arm clinical trial
-#' design for a normally distributed outcome). Defaults to \code{des_ma()}.
+#' @param x A \code{\link{list}} of class \code{"multiarm_des_ma_bern"}, as
+#' returned by \code{\link{build_ma_bern}} or \code{\link{des_ma_bern}} (i.e., a
+#' fixed-sample multi-arm clinical trial design for a Bernoulli distributed
+#' outcome). Defaults to \code{des_ma_bern()}.
 #' @param delta_min A \code{\link{numeric}} specifying the chosen minimum value
 #' for the treatment effects to include on the produced plots. Defaults to
-#' \code{-x$delta1}.
+#' \code{-x$pi0}.
 #' @param delta_max A \code{\link{numeric}} specifying the chosen maximum
 #' value for the treatment effects to include on the produced plots. Defaults to
-#' \code{2*x$delta1}.
+#' \code{1 - x$pi0}.
 #' @param delta A \code{\link{numeric}} specifying the chosen treatment effect
 #' shift to use in the 'shifted treatment effects plot'. Defaults to
 #' \code{x$delta1 - x$delta0}.
@@ -38,42 +38,44 @@
 #' @examples
 #' \dontrun{
 #' # The design for the default parameters
-#' des        <- des_ma()
+#' des        <- des_ma_bern()
 #' plot(des)
 #' # An A-optimal design, returning the avaiable outputs from
-#' # plot.multiarm_des_ma()
-#' des_A      <- des_ma(ratio = "A")
+#' # plot.multiarm_des_ma_bern()
+#' des_A      <- des_ma_bern(ratio = "A")
 #' plots      <- plot(des_A, output = TRUE)
 #' # Using the root-K allocation rule, modifying the desired type of power, and
 #' # choosing an alternative multiple comparison correction
-#' des_root_K <- des_ma(ratio      = rep(1/sqrt(2), 2),
-#'                      correction = "holm_bonferroni",
-#'                      power      = "disjunctive")
+#' des_root_K <- des_ma_bern(ratio      = rep(1/sqrt(2), 2),
+#'                           correction = "holm_bonferroni",
+#'                           power      = "disjunctive")
 #' plot(des_root_K)
 #' }
-#' @seealso \code{\link{build_ma}}, \code{\link{des_ma}},
-#' \code{\link{des_int_ma}}, \code{\link{gui}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
+#' @seealso \code{\link{build_ma_bern}}, \code{\link{des_ma_bern}},
+#' \code{\link{gui}}, \code{\link{opchar_ma_bern}},
+#' \code{\link{plot.multiarm_des_ma_bern}}, \code{\link{sim_ma_bern}}.
 #' @export
-plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
-                                 delta_max = 2*x$delta1,
-                                 delta = x$delta1 - x$delta0, density = 100,
-                                 output = F, summary = F, ...) {
+plot.multiarm_des_ma_bern <- function(x = des_ma_bern(),
+                                      delta_min = -x$pi0 + 1e-6,
+                                      delta_max = 1 - x$pi0 - 1e-6,
+                                      delta = x$delta1 - x$delta0,
+                                      density = 100, output = F, summary = F,
+                                      ...) {
 
   ##### Check input variables ##################################################
 
   if (missing(x)) {
-    des <- x <- des_ma()
+    des <- x <- des_ma_bern()
   } else {
     des <- x
-    check_multiarm_des_ma(des)
+    check_multiarm_des_ma_bern(des)
   }
-  check_real_range_strict(delta_min, "delta_min", c(-Inf, Inf), 1)
-  check_real_range_strict(delta_max, "delta_max", c(-Inf, Inf), 1)
+  check_real_range_strict(delta_min, "delta_min", c(-x$pi0, 1 - x$pi0), 1)
+  check_real_range_strict(delta_max, "delta_max", c(-x$pi0, 1 - x$pi0), 1)
   if (delta_min >= delta_max) {
     stop("delta_min must be strictly less than delta_max")
   }
-  check_real_range_strict(delta, "delta", c(0, Inf), 1)
+  check_real_range_strict(delta, "delta", c(0, 1 - x$pi0), 1)
   check_integer_range(density, "density", c(0, Inf), 1)
   check_logical(output, "output")
   check_logical(summary, "summary")
@@ -82,7 +84,7 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
 
   if (summary) {
     summary_plot_multiarm_des_ma(des, delta_min, delta_max, delta, density,
-                                 "normal")
+                                 "bernoulli")
     message("")
   }
 
@@ -90,17 +92,21 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
 
   seq_K                    <- 1:des$K
   plots                    <- list()
-  tau                      <- matrix(0, nrow = density, ncol = des$K)
+  pi                       <- cbind(rep(des$pi0, density),
+                                    matrix(0, nrow = density, ncol = des$K))
   if (all(delta_min < 0, delta_max > 0)) {
-    tau[, 1]               <- c(seq(delta_min, -1e-6, length.out = 0.5*density),
-                                seq(1e-6, delta_max, length.out = 0.5*density))
+    pi[, 2]                <- des$pi0 + c(seq(delta_min, -1e-6,
+                                              length.out = 0.5*density),
+                                          seq(1e-6, delta_max,
+                                              length.out = 0.5*density))
   } else {
-    tau[, 1]               <- seq(delta_min, delta_max, length.out = density)
+    pi[, 2]                <- des$pi0 + seq(delta_min, delta_max,
+                                            length.out = density)
   }
-  for (k in 2:des$K) {
-    tau[, k]               <- tau[, 1]
+  for (k in 3:(des$K + 1)) {
+    pi[, k]                <- pi[, 2]
   }
-  opchar_equal             <- opchar_ma(des, tau)$opchar
+  opchar_equal             <- opchar_ma_bern(des, pi)$opchar
   opchar_equal             <- tidyr::gather(opchar_equal, "type", "P",
                                             .data$`Pdis`:.data$`Spec`)
   opchar_equal$type        <- factor(opchar_equal$type,
@@ -119,13 +125,14 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
   colours_power            <- ggthemes::ptol_pal()(2 + des$K)
   alpha                    <- des$alpha
   beta                     <- des$beta
+  pi0                      <- des$pi0
   delta0                   <- des$delta0
   delta1                   <- des$delta1
   plots$plot_equal_power   <- ggplot2::ggplot() +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal, type %in% c("Pdis", "Pcon",
                                                      paste0("P", seq_K))),
-      ggplot2::aes(x   = .data$tau1,
+      ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours_power,
@@ -139,20 +146,22 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                         linetype   = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = 0,
+    ggplot2::geom_vline(xintercept = pi0,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = delta1,
+    ggplot2::geom_vline(xintercept = pi0 + delta1,
                         linetype   = 2)
   if (des$K == 2) {
     plots$plot_equal_power <- plots$plot_equal_power +
-      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ",
+                                     pi[2], sep = "")))
   } else if (des$K == 3) {
     plots$plot_equal_power <- plots$plot_equal_power +
-      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3],
-                                     sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ",
+                                     pi[2], " = ", pi[3], sep = "")))
   } else {
     plots$plot_equal_power <- plots$plot_equal_power +
-      ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(des$K)], sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ... = ",
+                                 pi[.(des$K)], sep = "")))
   }
   print(plots$plot_equal_power)
 
@@ -170,16 +179,16 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
       data = dplyr::filter(opchar_equal,
                            (type %in% c(paste0("FWERI", seq_K),
                                         paste0("FWERII", seq_K), "PHER")) &
-                             (tau1 <= 0)),
-      ggplot2::aes(x   = .data$tau1,
+                             (pi1 <= pi0)),
+      ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,
                            (type %in% c(paste0("FWERI", seq_K),
                                         paste0("FWERII", seq_K), "PHER")) &
-                             (tau1 > 0)),
-      ggplot2::aes(x   = .data$tau1,
+                             (pi1 > pi0)),
+      ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours_er, labels = labels_er) +
@@ -192,20 +201,22 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                         linetype   = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = delta0,
+    ggplot2::geom_vline(xintercept = pi0,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = delta1,
+    ggplot2::geom_vline(xintercept = pi0 + delta1,
                         linetype   = 2)
   if (des$K == 2) {
     plots$plot_equal_er    <- plots$plot_equal_er +
-      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ",
+                                 pi[2], sep = "")))
   } else if (des$K == 3) {
     plots$plot_equal_er    <- plots$plot_equal_er +
-      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3],
-                                     sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ",
+                                 pi[2], " = ", pi[3], sep = "")))
   } else {
     plots$plot_equal_er    <- plots$plot_equal_er +
-      ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(des$K)], sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ... = ",
+                                 pi[.(des$K)], sep = "")))
   }
   print(plots$plot_equal_er)
 
@@ -219,17 +230,17 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,
                            (type %in% c("FDR", "pFDR", "FNDR", "Sens",
-                                        "Spec")) & (tau1 <= 0)),
-      ggplot2::aes(x   = .data$tau1,
+                                        "Spec")) & (pi1 <= pi0)),
+      ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +
-      ggplot2::geom_line(
-        data = dplyr::filter(opchar_equal,
-                             (type %in% c("FDR", "pFDR", "FNDR", "Sens",
-                                          "Spec")) & (tau1 > 0)),
-        ggplot2::aes(x   = .data$tau1,
-                     y   = .data$P,
-                     col = .data$type)) +
+    ggplot2::geom_line(
+      data = dplyr::filter(opchar_equal,
+                           (type %in% c("FDR", "pFDR", "FNDR", "Sens",
+                                        "Spec")) & (pi1 > pi0)),
+      ggplot2::aes(x   = .data$pi1,
+                   y   = .data$P,
+                   col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours_other,
                                  labels = labels_other) +
     ggplot2::ylab("Rate") +
@@ -241,52 +252,60 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                         linetype   = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = delta0,
+    ggplot2::geom_vline(xintercept = pi0,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = delta1,
+    ggplot2::geom_vline(xintercept = pi0 + delta1,
                         linetype   = 2)
   if (des$K == 2) {
     plots$plot_equal_other <- plots$plot_equal_other +
-      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ",
+                                 pi[2], sep = "")))
   } else if (des$K == 3) {
     plots$plot_equal_other <- plots$plot_equal_other +
-      ggplot2::xlab(expression(paste(tau[1], " = ", tau[2], " = ", tau[3],
-                                     sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ",
+                                 pi[2], " = ", pi[3], sep = "")))
   } else {
     plots$plot_equal_other <- plots$plot_equal_other +
-      ggplot2::xlab(bquote(paste(tau[1], " = ... = ", tau[.(des$K)], sep = "")))
+      ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ", pi[1], " = ... = ",
+                                 pi[.(des$K)], sep = "")))
   }
   print(plots$plot_equal_other)
 
   opchar_matrix            <- NULL
   for (k in 1:des$K) {
-    tau                    <- matrix(0, nrow = density, ncol = des$K)
-    tau[, k]               <- seq(delta_min, delta_max, length.out = density)
+    pi                     <- cbind(rep(pi0, density),
+                                    matrix(0, nrow = density, ncol = des$K))
+    pi[, k + 1]            <- pi0 + seq(delta_min, delta_max,
+                                        length.out = density)
     for (l in (1:des$K)[-k]) {
-      tau[, l]             <- tau[, k] - delta
+      pi[, l + 1]          <- pi[, k + 1] - delta
     }
-    opchar_k               <- opchar_ma(des, tau)$opchar
+    pi                     <- pi[as.logical(apply(pi >= 0, 1, prod)), ]
+    opchar_k               <- opchar_ma_bern(des, pi)$opchar
     opchar_matrix          <- rbind(opchar_matrix,
-                                    as.matrix(opchar_k[, c(k, des$K + 2 + k)]))
+                                    as.matrix(opchar_k[, c(k + 1,
+                                                           des$K + 3 + k)]))
   }
   opchar_shifted           <- tibble::as_tibble(opchar_matrix)
-  colnames(opchar_shifted) <- c("tauk", "P")
+  colnames(opchar_shifted) <- c("pik", "P")
   opchar_shifted           <-
     dplyr::mutate(opchar_shifted,
-                  type = factor(rep(paste0("P", 1:des$K), each = density)))
+                  type = factor(rep(paste0("P", 1:des$K),
+                                    each = nrow(opchar_shifted)/des$K)))
   labels_shifted           <- numeric(des$K)
   for (i in 1:des$K) {
     labels_shifted[i]      <- parse(text = paste("italic(P)[", i, "]", sep = ""))
   }
   plots$plot_shifted       <- ggplot2::ggplot() +
     ggplot2::geom_line(data = opchar_shifted,
-                       ggplot2::aes(x   = .data$tauk,
+                       ggplot2::aes(x   = .data$pik,
                                     y   = .data$P,
                                     col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours_power[-(1:2)],
                                  labels = labels_shifted) +
-    ggplot2::xlab(bquote(paste("... = ", tau[italic(k)-1], " + ", .(delta),
-                               " = ", tau[italic(k)], " = ", tau[italic(k)+1],
+    ggplot2::xlab(bquote(paste(pi[0], " = ", .(pi0), ", ... = ",
+                               pi[italic(k)-1], " + ", .(delta), " = ",
+                               pi[italic(k)], " = ", pi[italic(k)+1],
                                " + ", .(delta), " = ... ", sep = ""))) +
     ggplot2::ylab("Probability") +
     ggplot2::theme_bw() +
@@ -297,9 +316,9 @@ plot.multiarm_des_ma <- function(x = des_ma(), delta_min = -x$delta1,
                         linetype   = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = delta0,
+    ggplot2::geom_vline(xintercept = pi0,
                         linetype   = 2) +
-    ggplot2::geom_vline(xintercept = delta1,
+    ggplot2::geom_vline(xintercept = pi0 + delta1,
                         linetype   = 2)
   print(plots$plot_shifted)
 

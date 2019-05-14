@@ -1,12 +1,12 @@
-#' Design a fixed-sample multi-arm clinical trial for a normally distributed
+#' Design a fixed-sample multi-arm clinical trial for a Bernoulli distributed
 #' primary outcome
 #'
-#' \code{des_ma()} determines fixed-sample multi-arm clinical trial designs
-#' assuming the primary outcome variable is normally distributed. It supports a
+#' \code{des_ma_bern()} determines fixed-sample multi-arm clinical trial designs
+#' assuming the primary outcome variable is Bernoulli distributed. It supports a
 #' variety of multiple comparison corrections, along with the determination of
 #' \emph{A}-, \emph{D}-, and \emph{E}-optimal allocation ratios. In all
-#' instances, \code{des_ma()} computes the relevant required sample size in each
-#' arm, and returns information on key operating characteristics.
+#' instances, \code{des_ma_bern()} computes the relevant required sample size in
+#' each arm, and returns information on key operating characteristics.
 #'
 #' @param K A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>K</i>}}{\eqn{K}}, the number of experimental treatment
@@ -17,22 +17,21 @@
 #' @param beta A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&beta;</i>}}{\eqn{\beta}}, used in the definition of
 #' the desired power. Defaults to 0.2.
+#' @param pi0 A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>&pi;</i><sub>0</sub>}}{\eqn{\pi_0}}, the
+#' response rate in the control arm. Defaults to 0.3.
 #' @param delta1 A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&delta;</i><sub>1</sub>}}{\eqn{\delta_1}}, the
-#' 'interesting' treatment effect. Defaults to 0.5.
+#' 'interesting' treatment effect. Defaults to 0.2.
 #' @param delta0 A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&delta;</i><sub>0</sub>}}{\eqn{\delta_0}}, the
 #' 'uninteresting' treatment effect. Defaults to 0.
-#' @param sigma A \code{\link{numeric}} vector indicating the chosen value for
-#' \ifelse{html}{\out{<b><i>&sigma;</i></b>}}{\eqn{\bold{\sigma}}}, the vector
-#' of the standard deviations of the responses in each arm. Defaults to
-#' \code{rep(1, K + 1)}.
 #' @param ratio Either a \code{\link{numeric}} vector or a
 #' \code{\link{character}} string indicating the chosen value for
 #' \ifelse{html}{\out{<b><i>r</i></b>}}{\eqn{\bold{r}}}, the vector of
 #' allocation ratios to the experimental arms. Can be specified explicitly
 #' as a \code{\link{numeric}} vector, or can be specified as \code{"A"},
-#' \code{"D"}, or \code{"E"} to instruct \code{des_ma()} to compute the
+#' \code{"D"}, or \code{"E"} to instruct \code{des_ma_bern()} to compute the
 #' \emph{A}-, \emph{D}-, or \emph{E}-optimal value for
 #' \ifelse{html}{\out{<b><i>r</i></b>}}{\eqn{\bold{r}}}. Defaults to
 #' \code{rep(1, K)}.
@@ -49,11 +48,15 @@
 #' computed values in \ifelse{html}{\out{<b><i>n</i></b>}}{\eqn{\bold{n}}}, the
 #' vector of sample sizes required in each arm, should be forced to be whole
 #' numbers. Defaults to \code{F}.
+#' @param ratio_scenario A \code{\link{character}} string indicating the chosen
+#' response rate scenario for which to optimise the allocation ratios. Can be
+#' one of \code{"HG"} and \code{"HA"}. Only used if \code{ratio} is a
+#' \code{\link{character}} string. Defaults to \code{"HG"}.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
 #' \code{F}.
-#' @return A \code{\link{list}} of class \code{"multiarm_des_ma"} containing the
-#' following elements
+#' @return A \code{\link{list}} of class \code{"multiarm_des_ma_bern"}
+#' containing the following elements
 #' \itemize{
 #' \item A \code{\link{tibble}} in the slot \code{$opchar} summarising the
 #' operating characteristics of the identified design.
@@ -73,58 +76,61 @@
 #' \ifelse{html}{\out{<b><i>&gamma;</i></b>}}{\eqn{\bold{\gamma}}}, to use with
 #' the chosen step-wise testing procedure. Will be \code{\link{NA}} if
 #' \code{correction} is not a step-wise testing procedure.
-#' \item A \code{\link{matrix}} in the slot \code{$CovZ} specifying the
-#' covariance matrix,
-#' \ifelse{html}{\out{Cov(<b><i>Z</i></b>)}}{\eqn{Cov(\bold{Z})}}, of the
-#' standardised test statistics.
 #' \item Each of the input variables, subject to possible internal modification.
 #' }
 #' @examples
 #' # The design for the default parameters
-#' des        <- des_ma()
+#' des        <- des_ma_bern()
 #' # An A-optimal design
-#' des_A      <- des_ma(ratio = "A")
+#' des_A      <- des_ma_bern(ratio = "A")
 #' # Using the root-K allocation rule, modifying the desired type of power, and
 #' # choosing an alternative multiple comparison correction
-#' des_root_K <- des_ma(ratio      = rep(1/sqrt(2), 2),
-#'                      correction = "holm_bonferroni",
-#'                      power      = "disjunctive")
-#' @seealso \code{\link{an_ma}}, \code{\link{build_ma}},
-#' \code{\link{des_int_ma}}, \code{\link{gui}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
+#' des_root_K <- des_ma_bern(ratio      = rep(1/sqrt(2), 2),
+#'                           correction = "holm_bonferroni",
+#'                           power      = "disjunctive")
+#' @seealso \code{\link{an_ma_bern}}, \code{\link{build_ma_bern}},
+#' \code{\link{gui}}, \code{\link{opchar_ma_bern}},
+#' \code{\link{plot.multiarm_des_ma_bern}}, \code{\link{sim_ma_bern}}.
 #' @export
-des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
-                   sigma = rep(1, K + 1), ratio = rep(1, K),
-                   correction = "dunnett", power = "marginal", integer = F,
-                   summary = F) {
+des_ma_bern <- function(K = 2, alpha = 0.05, beta = 0.2, pi0 = 0.3,
+                        delta1 = 0.2, delta0 = 0, ratio = rep(1, K),
+                        correction = "dunnett", power = "marginal", integer = F,
+                        ratio_scenario = "HG", summary = F) {
 
   ##### Check input variables ##################################################
 
   K <- check_integer_range(K, "K", c(1, Inf), 1)
   check_real_range_strict(alpha, "alpha", c(0, 1), 1)
   check_real_range_strict(beta, "beta", c(0, 1), 1)
-  check_delta0_delta1(delta0, delta1, "delta0", "delta1")
-  check_sigma(sigma, K, "sigma", "K")
+  check_real_range_strict(pi0, "pi0", c(0, 1), 1)
+  check_delta0_delta1(delta0, delta1, "delta0", "delta1", pi0, "pi0")
   check_ratio(ratio, K, name_ratio = "ratio", name_K = "K")
   check_belong(correction, "correction",
                c("benjamini_hochberg", "benjamini_yekutieli", "bonferroni",
                  "dunnett", "hochberg", "holm_bonferroni", "holm_sidak", "none",
                  "sidak", "step_down_dunnett"), 1)
   check_belong(power, "power", c("conjunctive", "disjunctive", "marginal"), 1)
+  check_belong(ratio_scenario, "ratio_scenario", c("HG", "HA"), 1)
   check_logical(integer, "integer")
   check_logical(summary, "summary")
 
   ##### Print summary ##########################################################
 
   if (summary) {
-    summary_des_ma(K, alpha, beta, delta1, delta0, sigma, ratio, correction,
-                   power, integer)
+    summary_des_ma_bern(K, alpha, beta, pi0, delta1, delta0, ratio, correction,
+                        power, integer, ratio_scenario)
     message("")
   }
 
   ##### Perform main computations ##############################################
 
   rho_init                          <- rho <- ratio
+  if (ratio_scenario == "HG") {
+    sigma                           <- rep(sqrt(pi0*(1 - pi0)), K + 1)
+  } else if (ratio_scenario == "HA") {
+    sigma                           <-
+      c(sqrt(pi0*(1 - pi0)), rep(sqrt((pi0 + delta1)*(1 - pi0 - delta1)), K))
+  }
   if (is.character(rho)) {
     if (summary) {
       message("  Identifying the ", rho, "-optimal allocation ratio",
@@ -162,6 +168,10 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
   if (summary) {
     message("  Identifying the rejection rules", uc("two_elip"))
   }
+  if (ratio_scenario == "HG") {
+    sigma                           <-
+      c(sqrt(pi0*(1 - pi0)), rep(sqrt((pi0 + delta1)*(1 - pi0 - delta1)), K))
+  }
   CovZ                              <- covariance_ma(K, rho, sigma, T)
   gamma_u                           <- gamma_ma(K, alpha, correction, CovZ)
   gamma                             <- gamma_u$gamma
@@ -198,8 +208,20 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
   }
   if (all(power == "marginal",
           correction %in% c("bonferroni", "dunnett", "none", "sidak"))) {
+    if (correction == "dunnett") {
+      sigma_power                   <- sigma
+      sigma_power[-c(1, which.max(div_by))] <-
+        sqrt((pi0 + delta0)*(1 - pi0 - delta0))
+      CovZ_power                    <- covariance_ma(K, rho, sigma_power, T)
+      gamma_u                       <- gamma_ma(K, alpha, correction,
+                                                CovZ_power)
+      gamma_power                   <- gamma_u$gamma
+      u_power                       <- gamma_u$u
+    } else {
+      u_power                       <- u
+    }
     N                               <-
-      ((u + stats::qnorm(1 - beta))*max(div_by)/delta1)^2
+      ((u_power + stats::qnorm(1 - beta))*max(div_by)/delta1)^2
   } else {
     Nmax                            <-
       3*((stats::qnorm(1 - alpha/K) + stats::qnorm(1 - beta))*
@@ -208,7 +230,7 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
       stats::uniroot(f = power_ma, interval = c(1e-16, Nmax), K = K,
                      beta = beta, correction = correction, power = power,
                      CovZ = CovZ, u = u, uO = uO, EZ_div_sqrt_N = EZ_div_sqrt_N,
-                     type = "normal", power_index = power_index,
+                     type = "bernoulli", power_index = power_index,
                      components = components)$root
   }
   if (summary) {
@@ -216,9 +238,11 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
     message("  Preparing for outputting", uc("two_elip"))
   }
   n                                 <- N*rho
-  tau                               <- rbind(rep(0, K), rep(delta1, K),
-                                             matrix(delta0, K, K) +
-                                               (delta1 - delta0)*diag(K))
+  pi                                <- rbind(rep(pi0, K + 1),
+                                             c(pi0, rep(pi0 + delta1, K)),
+                                             cbind(rep(pi0, K),
+                                                   matrix(pi0 + delta0, K, K) +
+                                                     (delta1 - delta0)*diag(K)))
   if (integer) {
     n                               <- ceiling(n)
     N                               <- sum(n)
@@ -232,11 +256,11 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
   }
   if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli", "hochberg",
                         "holm_bonferroni", "holm_sidak", "step_down_dunnett")) {
-    opchar                          <- opchar_ma_step(tau, K, sigma, correction,
-                                                      n, CovZ, uO)
+    opchar                          <-
+      opchar_ma_step_bern(pi, K, alpha, correction, n, uO)
   } else {
-    opchar                          <- opchar_ma_single(tau, K, sigma, n, CovZ,
-                                                        u)
+    opchar                          <-
+      opchar_ma_single_bern(pi, K, alpha, correction, n, u)
   }
 
   ##### Outputting #############################################################
@@ -244,24 +268,24 @@ des_ma <- function(K = 2, alpha = 0.05, beta = 0.2, delta1 = 0.5, delta0 = 0,
   if (summary) {
     message(uc("two_elip"), "outputting.")
   }
-  output        <- list(alpha      = alpha,
-                        beta       = beta,
-                        correction = correction,
-                        CovZ       = CovZ,
-                        delta0     = delta0,
-                        delta1     = delta1,
-                        gamma      = gamma,
-                        gammaO     = gammaO,
-                        integer    = integer,
-                        K          = K,
-                        N          = N,
-                        n          = n,
-                        opchar     = opchar,
-                        power      = power,
-                        ratio      = n[-1]/n[1],
-                        sigma      = sigma,
-                        summary    = summary)
-  class(output) <- c(class(output), "multiarm_des_ma")
+  output        <- list(alpha          = alpha,
+                        beta           = beta,
+                        correction     = correction,
+                        delta0         = delta0,
+                        delta1         = delta1,
+                        gamma          = gamma,
+                        gammaO         = gammaO,
+                        integer        = integer,
+                        K              = K,
+                        N              = N,
+                        n              = n,
+                        opchar         = opchar,
+                        pi0            = pi0,
+                        power          = power,
+                        ratio          = n[-1]/n[1],
+                        ratio_scenario = ratio_scenario,
+                        summary        = summary)
+  class(output) <- c(class(output), "multiarm_des_ma_bern")
   output
 
 }

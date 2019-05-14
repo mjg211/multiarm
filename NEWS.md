@@ -1,5 +1,12 @@
 # News: multiarm
 
+## Versions 0.10.#
+
+- Corresponding support added for trials with Bernoulli outcomes
+(`an_ma_bern()`, `build_ma_bern()`, `des_ma_bern()`, `opchar_ma()`,
+`plot.multiarm_des_ma_bern()`, `sim_ma_bern()`).
+- `gui_ma()` renamed `gui()` to reflect use for multiple types of outcome.
+
 ## Versions 0.9.#
 
 - Package launched with support for the design (`build_ma()`, `des_ma()`,

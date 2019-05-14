@@ -1,18 +1,18 @@
 Package: multiarm
 Type: Package
-Title: Design and analysis of fixed-sample multi-arm clinical trials
-Version: 0.9.1
+Title: Design and analysis of multi-arm clinical trials
+Version: 0.10.0
 Authors@R: c(person(given = "Michael J.", family = "Grayling",
                     email = "michael.grayling@newcastle.ac.uk",
                     role = c("aut", "cre")))
-Description: Provides functionality to assist with the design and analysis of
-    fixed-sample multi-arm clinical trials utilising one of several supported
-    multiple comparison corrections. Available functions allow for sample size
-    determination (including for A-, D-, and E-optimal designs), trial
-    simulation, analytical operating characteristic calculation (including the
-    conjunctive power, disjunctive power, family-wise error-rate, and false
-    discovery rate), and the production of several plots. An R Shiny graphical
-    user interface is also provided to ease design determination.
+Description: multiarm provides functions to assist with the design and analysis
+    of multi-arm clinical trials. Available functions allow for sample size
+    determination when utilising a variety of multiple comparison corrections
+    (including for *A*-, *D*-, and *E*-optimal designs), trial simulation,
+    analytical operating characteristic calculation (including the conjunctive
+    power, disjunctive power, family-wise error-rate, and false discovery rate),
+    and the production of several plots. An R Shiny graphical user interface is
+    also provided to aid design determination.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

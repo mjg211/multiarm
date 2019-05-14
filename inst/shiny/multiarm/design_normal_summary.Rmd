@@ -16,8 +16,8 @@ params:
   large_N:    NA
   small_n:    NA
   opchar:     NA
-  pi:         NA
-  piO:        NA
+  gamma:      NA
+  gammaO:     NA
   plots:      NA
 ---
 
@@ -60,8 +60,8 @@ effects respectively.
   N          <- params$large_N
   n          <- params$small_n
   opchar     <- params$opchar
-  pi         <- params$pi
-  piO        <- params$piO
+  gamma         <- params$gamma
+  gammaO        <- params$gammaO
   plots      <- params$plots
 ```
   
@@ -76,6 +76,8 @@ if (correction == "bonferroni") {
   correction_text     <- "Sidak's correction"
 } else if (correction == "benjamini_hochberg") {
   correction_text     <- "the Benjamini-Hochberg correction"
+} else if (correction == "benjamini_yekutieli") {
+  correction_text     <- "the Benjamini-Yekutieli correction"
 } else if (correction == "hochberg") {
   correction_text     <- "Hochberg's correction"
 } else if (correction == "holm_bonferroni") {
@@ -91,7 +93,7 @@ if (power == "marginal") {
   power_scenario_text <-
     "each of their respective least favourable configurations"
 } else {
-  power_scenario_text <- "the global alternative hypothesis."
+  power_scenario_text <- "the global alternative hypothesis"
   if (power == "conjunctive") {
     power_type_text   <- "conjunctive power"
   } else if (power == "disjunctive") {
@@ -105,10 +107,10 @@ if (ratio_type == "equal_all") {
   ratio_text          <- paste0(ratio_init[1], " times that of the control arm")
 } else if (ratio_type == "unequal") {
   ratio_text          <- paste0(paste(ratio_init[1:K], collapse = ", "),
-                                " times that of the control arm.")
+                                " times that of the control arm")
 } else if (ratio_type == "root_K") {
   ratio_text          <- paste0(round(1/sqrt(K), 3),
-                                " times that of the control arm.")
+                                " times that of the control arm")
 } else {
   ratio_text          <- paste0("chosen for ", ratio_type, "-optimality")
 }
@@ -146,14 +148,14 @@ __`r ratio_text`__.
 #### Outputs
 
 ```{r, echo = F, results = "asis"}
-FWER                  <- round(opchar$FWER[1], 3)
-if (correction %in% c("benjamini_hochberg", "hochberg", "holm_bonferroni",
-                      "holm_sidak", "step_down_dunnett")) {
+FWER                  <- round(opchar$FWERI1[1], 3)
+if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli", "hochberg",
+                      "holm_bonferroni", "holm_sidak", "step_down_dunnett")) {
   punc_text_3         <- "s"
-  pi_text             <- paste0("(", paste(round(piO, 3), collapse = ", "), ")")
+  gamma_text             <- paste0("(", paste(round(gammaO, 3), collapse = ", "), ")")
 } else {
   punc_text_3         <- ""
-  pi_text             <- round(pi, 3)
+  gamma_text             <- round(gamma, 3)
 }
 
 if (power == "marginal") {
@@ -179,5 +181,5 @@ $(r_1,\dots,r_K) = \boldsymbol{(`r paste(round(ratio, 3), collapse = ", ")`)}$.
 - The maximum familywise error-rate is: $\boldsymbol{`r FWER`}$.
 - The __`r power_type_text`__ is: $\boldsymbol{`r power_value`}$.
 - The following critical threshold`r punc_text_3` should be used with the chosen
-multiple comparison correction: $\boldsymbol{`r pi_text`}$.
+multiple comparison correction: $\boldsymbol{`r gamma_text`}$.
 

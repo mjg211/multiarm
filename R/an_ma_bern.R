@@ -1,14 +1,14 @@
-#' Analyse results from a fixed-sample multi-arm clinical trial for a normally
+#' Analyse results from a fixed-sample multi-arm clinical trial for a Bernoulli
 #' distributed primary outcome
 #'
-#' \code{an_ma()} analyses results from a specified fixed-sample multi-arm
-#' clinical trial design for a normally distributed primary outcome variable,
+#' \code{an_ma_bern()} analyses results from a specified fixed-sample multi-arm
+#' clinical trial design for a Bernoulli distributed primary outcome variable,
 #' to determine which null hypotheses to reject.
 #'
-#' @param des A \code{\link{list}} of class \code{"multiarm_des_ma"}, as
-#' returned by \code{\link{build_ma}}, \code{\link{des_ma}}, or
-#' \code{\link{des_int_ma}} (i.e., a fixed-sample multi-arm clinical trial
-#' design for a normally distributed outcome). Defaults to \code{des_ma()}.
+#' @param des A \code{\link{list}} of class \code{"multiarm_des_ma_bern"}, as
+#' returned by \code{\link{build_ma_bern}} or \code{\link{des_ma_bern}} (i.e., a
+#' fixed-sample multi-arm clinical trial design for a Bernoulli distributed
+#' outcome). Defaults to \code{des_ma_bern()}.
 #' @param pval A \code{\link{matrix}} (or \code{\link{numeric}} vector that can
 #' be coerced in to \code{\link{matrix}} form) whose rows indicate the values of
 #' \ifelse{html}{\out{<b><i>p</i></b>}}{\eqn{\bold{p}}} for which to determine
@@ -37,41 +37,47 @@
 #' }
 #' @examples
 #' # The results for the default parameters
-#' an         <- an_ma()
+#' an         <- an_ma_bern()
 #' # An A-optimal design and a selection of possible p-values.
-#' des_A      <- des_ma(ratio = "A")
-#' an_A       <- an_ma(des_A, rbind(c(0.01, 0.01),
-#'                                  c(0.025, 0.025),
-#'                                  c(0.04, 0.04),
-#'                                  c(0.05, 0.05),
-#'                                  c(0.01, 0.06)))
-#' # Using the root-K allocation rule, modifying the desired type of power and
-#' # chosen multiple comparison correction, and a selection of possible
-#' # p-values
-#' des_root_K <- des_ma(ratio      = rep(1/sqrt(2), 2),
-#'                      correction = "holm_bonferroni",
-#'                      power      = "disjunctive")
-#' an_root_K  <- an_ma(des_root_K, rbind(c(0.01, 0.01),
+#' des_A      <- des_ma_bern(ratio = "A")
+#' an_A       <- an_ma_bern(des_A, rbind(c(0.01, 0.01),
 #'                                       c(0.025, 0.025),
 #'                                       c(0.04, 0.04),
 #'                                       c(0.05, 0.05),
 #'                                       c(0.01, 0.06)))
-#' @seealso \code{\link{build_ma}}, \code{\link{des_ma}},
-#' \code{\link{des_int_ma}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
+#' # Using the root-K allocation rule, modifying the desired type of power and
+#' # chosen multiple comparison correction, and a selection of possible
+#' # p-values
+#' des_root_K <- des_ma_bern(ratio      = rep(1/sqrt(2), 2),
+#'                           correction = "holm_bonferroni",
+#'                           power      = "disjunctive")
+#' an_root_K  <- an_ma_bern(des_root_K, rbind(c(0.01, 0.01),
+#'                                            c(0.025, 0.025),
+#'                                            c(0.04, 0.04),
+#'                                            c(0.05, 0.05),
+#'                                            c(0.01, 0.06)))
+#' @seealso \code{\link{build_ma_bern}}, \code{\link{des_ma_bern}},
+#' \code{\link{opchar_ma_bern}}, \code{\link{plot.multiarm_des_ma_bern}},
+#' \code{\link{sim_ma_bern}}.
 #' @export
-an_ma <- function(des = des_ma(), pval = rep(0.5*des$alpha, des$K),
-                  alpha = des$alpha, correction = des$correction, summary = F) {
+an_ma_bern <- function(des = des_ma_bern(), pval = rep(0.5*des$alpha, des$K),
+                       alpha = des$alpha, correction = des$correction,
+                       sigmas, summary = F) {
 
   ##### Check input variables ##################################################
 
-  check_multiarm_des_ma(des)
+  check_multiarm_des_ma_bern(des)
   pval <- check_pval(pval, des$K, "pval", "des$K")
   check_real_range_strict(alpha, "alpha", c(0, 1), 1)
   check_belong(correction, "correction",
                c("benjamini_hochberg", "benjamini_yekutieli", "bonferroni",
                  "dunnett", "hochberg", "holm_bonferroni", "holm_sidak", "none",
                  "sidak", "step_down_dunnett"), 1)
+  if (missing(sigmas)) {
+    sigmas <- matrix(sqrt(des$pi0*(1 - des$pi0)), nrow(pval), des$K + 1)
+  } else {
+    check_sigmas(sigmas, pval)
+  }
   check_logical(summary, "summary")
 
   ##### Update des #############################################################
@@ -79,35 +85,37 @@ an_ma <- function(des = des_ma(), pval = rep(0.5*des$alpha, des$K),
   if (any(correction != des$correction, alpha != des$alpha)) {
     des$correction                   <- correction
     des$alpha                        <- alpha
-    des$CovZ                         <- covariance_ma(des$K, des$n, des$sigma,
-                                                      T)
+    sigma                            <-
+      c(sqrt(des$pi0*(1 - des$pi0)),
+        rep(sqrt((des$pi0 + des$delta1)*(1 - des$pi0 - des$delta1)), des$K))
+    CovZ                             <- covariance_ma(des$K, des$n, sigma, T)
     gamma_u                          <- gamma_ma(des$K, des$alpha,
-                                                 des$correction, des$CovZ)
+                                                 des$correction, CovZ)
     des$gamma                        <- gamma_u$gamma
     des$gammaO                       <- gamma_u$gammaO
-    tau                              <- rbind(rep(0, des$K),
-                                              rep(des$delta1, des$K),
-                                              matrix(des$delta0, des$K,
-                                                     des$K) +
-                                                (des$delta1 - des$delta0)*
-                                                  diag(des$K))
-    if (des$correction %in% c("benjamini_hochberg", "benjamini_yekutieli",
-                              "hochberg", "holm_bonferroni", "holm_sidak",
-                              "step_down_dunnett")) {
-      des$opchar                     <- opchar_ma_step(tau, des$K, des$sigma,
-                                                       des$correction, des$n,
-                                                       des$CovZ, gamma_u$uO)
+    pi                               <-
+      rbind(rep(des$pi0, des$K + 1), c(des$pi0,
+                                       rep(des$pi0 + des$delta1, des$K)),
+            cbind(rep(des$pi0, des$K),
+                  matrix(des$pi0 + des$delta0, des$K, des$K) +
+                    (des$delta1 - des$delta0)*diag(des$K)))
+    if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli",
+                          "hochberg", "holm_bonferroni", "holm_sidak",
+                          "step_down_dunnett")) {
+      opchar                          <-
+        opchar_ma_step_bern(pi, des$K, des$alpha, des$correction, des$n,
+                            gamma_u$uO)
     } else {
-      des$opchar                     <- opchar_ma_single(tau, des$K, des$sigma,
-                                                         des$n, des$CovZ,
-                                                         gamma_u$u)
+      opchar                          <-
+        opchar_ma_single_bern(des$pi, des$K, des$alpha, des$correction, des$n,
+                              gamma_u$u)
     }
   }
 
   ##### Print summary ##########################################################
 
   if (summary) {
-    summary_an_ma(des, pval, "normal")
+    summary_an_ma(des, pval, "bernoulli")
     message("")
   }
 
@@ -118,15 +126,41 @@ an_ma <- function(des = des_ma(), pval = rep(0.5*des$alpha, des$K),
   }
   nrow_pval                          <- nrow(pval)
   reject                             <- matrix(0L, nrow_pval, des$K)
+  gamma                              <- des$gamma
+  gammaO                             <- des$gammaO
+  seq_K                              <- 1:des$K
+  Kp1                                <- des$K + 1L
+  one_min_alpha                      <- 1 - des$alpha
   for (i in 1:nrow_pval) {
     if (des$correction %in% c("bonferroni", "dunnett", "none", "sidak")) {
-      reject[i, ]                    <- (pval[i, ] < des$gamma)
+      if (des$correction == "dunnett") {
+        gamma                        <-
+          stats::pnorm(mvtnorm::qmvnorm(one_min_alpha,
+                                        sigma = covariance_ma(des$K, des$n,
+                                                              sigmas[i, ],
+                                                              T))$quantile,
+                       lower.tail = F)
+      }
+      reject[i, ]                    <- (pval[i, ] < gamma)
     } else if (des$correction %in% c("holm_bonferroni", "holm_sidak",
                                      "step_down_dunnett")) {
+      if (des$correction == "step_down_dunnett") {
+        corr                         <- covariance_ma(des$K, des$n, sigmas[i, ],
+                                                      T)[2, 1]
+        gammaO                       <-
+          sapply(seq_K,
+                 function(k) {
+                   dim               <- Kp1 - k
+                   stats::pnorm(
+                     mvtnorm::qmvnorm(one_min_alpha,
+                                      sigma = matrix(corr, dim, dim) +
+                                        (1 - corr)*diag(dim))$quantile,
+                     lower.tail = F) })
+      }
       order_pval                     <- order(pval[i, ])
       k                              <- check <- 1
       while (all(k <= des$K, check == 1)) {
-        if (pval[i, order_pval[k]] < des$gammaO[k]) {
+        if (pval[i, order_pval[k]] < gammaO[k]) {
           reject[i, order_pval[k]]   <- reject[i, order_pval[k]] + 1
           k                          <- k + 1
         }
@@ -164,6 +198,7 @@ an_ma <- function(des = des_ma(), pval = rep(0.5*des$alpha, des$K),
        correction = correction,
        des        = des,
        pval       = pval,
+       sigmas     = sigmas,
        summary    = summary)
 
 }

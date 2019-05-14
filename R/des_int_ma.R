@@ -1,7 +1,11 @@
-#' Design an optimal fixed-sample multi-arm clinical trial
+#' Design an optimal fixed-sample multi-arm clinical trial for a normally
+#' distributed primary outcome
 #'
 #' \code{des_int_ma()} determines \emph{A}-, \emph{D}-, and \emph{E}-optimal
-#' allocation ratios for fixed-sample multi-arm clinical trial designs.
+#' allocation ratios for fixed-sample multi-arm clinical trial designs assuming
+#' the primary outcome variable is normally distributed. It determines these
+#' optimal designs using an exhaustive search over possible allocations of a
+#' given number of patients across the treatment arms.
 #'
 #' @param K A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>K</i>}}{\eqn{K}}, the number of experimental treatment
@@ -33,9 +37,10 @@
 #' \emph{E}-optimality criteria. Defaults to \code{"D"}.
 #' @param correction A \code{\link{character}} string indicating the chosen
 #' multiple comparison correction. Can be any of \code{"benjamini_hochberg"},
-#' \code{"bonferroni"}, \code{"dunnett"}, \code{"hochberg"},
-#' \code{"holm_bonferroni"}, \code{"holm_sidak"}, \code{"none"}, \code{"sidak"},
-#' and \code{"step_down_dunnett"}. Defaults to \code{"dunnett"}.
+#' \code{"benjamini_yekutieli"}, \code{"bonferroni"}, \code{"dunnett"},
+#' \code{"hochberg"}, \code{"holm_bonferroni"}, \code{"holm_sidak"},
+#' \code{"none"}, \code{"sidak"}, and \code{"step_down_dunnett"}. Defaults to
+#' \code{"dunnett"}.
 #' @param power A \code{\link{character}} string indicating the chosen type of
 #' power to design the trial for. Can be one of \code{"conjunctive"},
 #' \code{"disjunctive"}, and \code{"marginal"}. Defaults to \code{"marginal"}.
@@ -50,23 +55,23 @@
 #' \item A \code{\link{numeric}} vector in the slot \code{$n} specifying
 #' \ifelse{html}{\out{<b><i>n</i></b>}}{\eqn{\bold{n}}}, the vector of sample
 #' sizes required in each arm.
-#' \item A \code{\link{numeric}} in the slot \code{$pi} specifying the critical
+#' \item A \code{\link{numeric}} in the slot \code{$gamma} specifying the critical
 #' threshold for \emph{p}-values,
-#' \ifelse{html}{\out{<i>&pi;</i></b>}}{\eqn{\pi}}, below which null hypotheses
-#' would be rejected. Will be \code{\link{NA}} if \code{correction} is not a
-#' single-step testing procedure.
-#' \item A \code{\link{numeric}} vector in the slot \code{$piO} specifying the
-#' critical thresholds for ordered \emph{p}-values,
-#' \ifelse{html}{\out{<b><i>&pi;</i></b>}}{\eqn{\bold{\pi}}}, to use with the
-#' chosen step-wise testing procedure. Will be \code{\link{NA}} if
+#' \ifelse{html}{\out{<i>&gamma;</i></b>}}{\eqn{\gamma}}, below which null
+#' hypotheses would be rejected. Will be \code{\link{NA}} if \code{correction}
+#' is not a single-step testing procedure.
+#' \item A \code{\link{numeric}} vector in the slot \code{$gammaO} specifying
+#' the critical thresholds for ordered \emph{p}-values,
+#' \ifelse{html}{\out{<b><i>&gamma;</i></b>}}{\eqn{\bold{\gamma}}}, to use with
+#' the chosen step-wise testing procedure. Will be \code{\link{NA}} if
 #' \code{correction} is not a step-wise testing procedure.
 #' \item A \code{\link{matrix}} in the slot \code{$CovZ} specifying the
 #' covariance matrix,
 #' \ifelse{html}{\out{Cov(<b><i>Z</i></b>)}}{\eqn{Cov(\bold{Z})}}, of the
 #' standardised test statistics.
-#' \item A \code{\link{numeric}} vector in the slot \code{$rho} specifying the
+#' \item A \code{\link{numeric}} vector in the slot \code{$ratio} specifying the
 #' vector of allocation ratios,
-#' \ifelse{html}{\out{<b><i>&rho;</i></b>}}{\eqn{\bold{\rho}}}.
+#' \ifelse{html}{\out{<b><i>r</i></b>}}{\eqn{\bold{r}}}.
 #' \item Each of the input variables, subject to possible internal modification.
 #' }
 #' @examples
@@ -97,9 +102,9 @@ des_int_ma <- function(K = 2, N = 183, alpha = 0.05, beta = 0.2, delta1 = 0.5,
   check_sigma(sigma, K, "sigma", "K")
   check_belong(ratio, "ratio", c("A", "D", "E"), 1)
   check_belong(correction, "correction",
-               c("benjamini_hochberg", "bonferroni", "dunnett", "hochberg",
-                 "holm_bonferroni", "holm_sidak", "none", "sidak",
-                 "step_down_dunnett"), 1)
+               c("benjamini_hochberg", "benjamini_yekutieli", "bonferroni",
+                 "dunnett", "hochberg", "holm_bonferroni", "holm_sidak", "none",
+                 "sidak", "step_down_dunnett"), 1)
   check_belong(power, "power", c("conjunctive", "disjunctive", "marginal"), 1)
   check_logical(summary, "summary")
 
@@ -170,21 +175,21 @@ des_int_ma <- function(K = 2, N = 183, alpha = 0.05, beta = 0.2, delta1 = 0.5,
   poss_n                                     <- do.call(rbind, poss_n)
   n                                          <- poss_n[which.min(poss_n[, Kp2]),
                                                        seq_Kp1]
-  CovTau                                     <- covariance_ma(K, rho, sigma)
+  CovTau                                     <- covariance_ma(K, n, sigma)
   diag_sqrt_I                                <- diag(1/sqrt(diag(CovTau)))
   CovZ                                       <-
     diag_sqrt_I%*%CovTau%*%diag_sqrt_I
-  pi_u                                       <- pi_ma(K, alpha, correction,
+  gamma_u                                       <- gamma_ma(K, alpha, correction,
                                                       CovZ)
-  pi                                         <- pi_u$pi
-  piO                                        <- pi_u$piO
-  u                                          <- pi_u$u
-  uO                                         <- pi_u$uO
+  gamma                                         <- gamma_u$gamma
+  gammaO                                        <- gamma_u$gammaO
+  u                                          <- gamma_u$u
+  uO                                         <- gamma_u$uO
   tau                                        <-
     rbind(rep(0, K), rep(delta1, K), matrix(delta0, K, K) +
                                        (delta1 - delta0)*diag(K))
-  if (correction %in% c("benjamini_hochberg", "hochberg", "holm_bonferroni",
-                        "holm_sidak", "step_down_dunnett")) {
+  if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli", "hochberg",
+                        "holm_bonferroni", "holm_sidak", "step_down_dunnett")) {
     opchar                                   <-
       opchar_ma_step(tau, K, sigma, correction, n, CovZ, uO)
   } else {
@@ -203,13 +208,13 @@ des_int_ma <- function(K = 2, N = 183, alpha = 0.05, beta = 0.2, delta1 = 0.5,
                         CovZ       = CovZ,
                         delta0     = delta0,
                         delta1     = delta1,
+                        gamma      = gamma,
+                        gammaO     = gammaO,
                         integer    = T,
                         K          = K,
                         N          = N,
                         n          = n,
                         opchar     = opchar,
-                        pi         = pi,
-                        piO        = piO,
                         power      = power,
                         ratio      = n[-1]/n[1],
                         sigma      = sigma,

@@ -1,14 +1,13 @@
-#' multiarm: Design and analysis of fixed-sample multi-arm clinical trials
+#' multiarm: Design and analysis of multi-arm clinical trials
 #'
-#' \strong{multiarm} provides functionality to assist with the design and
-#' analysis of fixed-sample multi-arm clinical trials utilising one of several
-#' supported multiple comparison corrections. Available functions allow for
-#' sample size determination (including for \emph{A}-, \emph{D}-, and \emph{E}-
-#' optimal designs), trial simulation, analytical operating characteristic
-#' calculation (including the conjunctive power, disjunctive power, family-wise
-#' error rate, and false discovery rate), and the production of several
-#' informative plots. An R Shiny graphical user interface is also provided to
-#' ease design determination.
+#' \strong{multiarm} provides functions to assist with the design and analysis
+#' of multi-arm clinical trials. Available functions allow for sample size
+#' determination when utilising a variety of multiple comparison corrections
+#' (including for \emph{A}-, \emph{D}-, and \emph{E}-optimal designs), trial
+#' simulation, analytical operating characteristic calculation (including the
+#' conjunctive power, disjunctive power, family-wise error-rate, and false
+#' discovery rate), and the production of several plots. An R Shiny graphical
+#' user interface is also provided to aid design determination.
 #'
 #' @section Getting started:
 #'
@@ -24,35 +23,41 @@
 #' Michael Grayling at \email{michael.grayling@@newcastle.ac.uk}.
 #'
 #' @section Details:
-#' Eight key functions are provided: \code{\link{an_ma}},
-#' \code{\link{build_ma}}, \code{\link{des_int_ma}}, \code{\link{des_ma}},
-#' \code{\link{gui_ma}}, \code{\link{opchar_ma}},
-#' \code{\link{plot.multiarm_des_ma}}, and \code{\link{sim_ma}}.
+#' Currently, functions are provided to support trials in which the primary
+#' outcome variable is assumed to be either normally or Bernoulli distributed.
+#' In total, 14 functions are available. Their naming conventions are such that
+#' several character strings are joined together separated by underscores. The
+#' first character string indicates the type of calculation the function
+#' performs (e.g., design determination, operating characteristic calculations),
+#' and the remainder which type of design it is for (normally or Bernoulli
+#' distributed outcomes):
 #'
 #' \itemize{
-#' \item \code{\link{an_ma}}: Analyses summary statistics from a supplied
-#' fixed-sample multi-arm clinical trial design, in order to determine which
-#' null hypotheses to reject.
-#' \item \code{\link{build_ma}}: Builds a fixed-sample multi-arm clinical trial
-#' design object, like those returned by \code{\link{des_ma}} and
-#' \code{\link{des_int_ma}}. For use when a specific design is of interest.
+#' \item \code{\link{an_ma}} and \code{\link{an_ma_bern}}: Analyse summary
+#' statistics from fixed-sample multi-arm clinical trial designs, in order to
+#' determine which null hypotheses to reject.
+#' \item \code{\link{build_ma}} and \code{\link{build_ma_bern}}: Build multi-arm
+#' clinical trial design objects, like those returned by \code{\link{des_ma}}
+#' and \code{\link{des_ma_bern}}. For use when a specific design is of interest.
 #' \item \code{\link{des_int_ma}}: Determines the \emph{A}-, \emph{D}-, and
-#' \emph{E}-optimal allocation of a set of patients in a fixed-sample multi-arm
-#' clinical trial.
-#' \item \code{\link{des_ma}}: Determines the sample size required a
-#' fixed-sample multi-arm clinical trial when one of a variety of multiple
-#' comparison procedures is used.
-#' \item \code{\link{gui_ma}}: Provides a graphical user interface to design
+#' \emph{E}-optimal allocation of a set of patients in a multi-arm clinical
+#' trial with normally distributed outcomes.
+#' \item \code{\link{des_ma}} and \code{\link{des_ma_bern}}: Determine the
+#' sample size required by a multi-arm clinical trial when one of several
+#' multiple comparison corrections is used.
+#' \item \code{\link{gui}}: Provides a graphical user interface to design
 #' determination.
-#' \item \code{\link{opchar_ma}}: Analytically determines the operating
-#' characteristics (power, family-wise error rates, etc.) of a supplied
-#' fixed-sample multi-arm clinical trial design.
-#' \item \code{\link{plot.multiarm_des_ma}}: Produces informative plots (power,
-#' false discovery rate curves, etc.) relating to a supplied fixed-sample
-#' multi-arm clinical trial design.
-#' \item \code{\link{sim_ma}}: Empirically estimates the operating
-#' characteristics (power, family-wise error rates, etc.) of a supplied
-#' fixed-sample multi-arm clinical trial design, via simulation.
+#' \item \code{\link{opchar_ma}} and \code{\link{opchar_ma_bern}}: Determine the
+#' operating characteristics (power, family-wise error rates, etc.) of supplied
+#' fixed-sample multi-arm clinical trial designs using multivariate normal
+#' integration.
+#' \item \code{\link{plot.multiarm_des_ma}} and
+#' \code{\link{plot.multiarm_des_ma_bern}}: Produce informative plots (power,
+#' false discovery rate curves, etc.) relating to supplied fixed-sample
+#' multi-arm clinical trial designs.
+#' \item \code{\link{sim_ma}} and \code{\link{sim_ma_bern}}: Empirically
+#' estimate the operating characteristics (power, family-wise error rates, etc.)
+#' of supplied fixed-sample multi-arm clinical trial designs, via simulation.
 #' }
 #'
 #' @docType package

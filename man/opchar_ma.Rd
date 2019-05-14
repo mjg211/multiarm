@@ -3,7 +3,7 @@
 \name{opchar_ma}
 \alias{opchar_ma}
 \title{Analytically determine the operating characteristics of a fixed-sample
-multi-arm clinical trial}
+multi-arm clinical trial for a normally distributed primary outcome}
 \usage{
 opchar_ma(des = des_ma(), tau, summary = F)
 }
@@ -11,7 +11,7 @@ opchar_ma(des = des_ma(), tau, summary = F)
 \item{des}{A \code{\link{list}} of class \code{"multiarm_des_ma"}, as
 returned by \code{\link{build_ma}}, \code{\link{des_ma}}, or
 \code{\link{des_int_ma}} (i.e., a fixed-sample multi-arm clinical trial
-design). Defaults to \code{des_ma()}.}
+design for a normally distributed outcome). Defaults to \code{des_ma()}.}
 
 \item{tau}{A \code{\link{matrix}} whose rows indicate values of
 \ifelse{html}{\out{<b><i>&tau;</i></b>}}{\eqn{\bold{\tau}}} at which to
@@ -24,8 +24,7 @@ of the function's progress should be printed to the console. Defaults to
 \code{F}.}
 }
 \value{
-A \code{\link{list}} of class \code{"multiarm_opchar_ma"} containing
-the following elements
+A \code{\link{list}} containing the following elements
 \itemize{
 \item A \code{\link{tibble}} in the slot \code{$opchar} giving the determined
 operating characteristics.
@@ -34,8 +33,9 @@ operating characteristics.
 }
 \description{
 \code{opchar_ma()} determines the operating characteristics of a specified
-fixed-sample multi-arm clinical trial design, for given values of the true
-treatment effects, using multivariate normal integration.
+fixed-sample multi-arm clinical trial design assuming the primary outcome
+variable is normally distributed, for given values of the true treatment
+effects, using multivariate normal integration.
 }
 \examples{
 # The operating characteristics for the default parameters
@@ -46,7 +46,7 @@ opchar_A      <- opchar_ma(des_A)
 # Using the root-K allocation rule, modifying the desired type of power and
 # chosen multiple comparison correction, and specifying tau explicitly
 des_root_K    <- des_ma(ratio      = rep(1/sqrt(2), 2),
-                        correction = "holm",
+                        correction = "holm_bonferroni",
                         power      = "disjunctive")
 opchar_root_K <- opchar_ma(des_root_K, rbind(c(0, 0),
                                              c(0.5, 0.5),
@@ -55,6 +55,6 @@ opchar_root_K <- opchar_ma(des_root_K, rbind(c(0, 0),
 }
 \seealso{
 \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},
-\code{\link{des_int_ma}}, \code{\link{gui_ma}},
-\code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
+\code{\link{des_int_ma}}, \code{\link{plot.multiarm_des_ma}},
+\code{\link{sim_ma}}.
 }
