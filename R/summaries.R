@@ -22,7 +22,7 @@ summary_an_ma                <- function(des, pval, type) {
   } else {
     message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
             uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(des$K), ": ", uc("tau"), uc_sub(K), " = ", uc(text),
+            uc_sub(des$K), ": ", uc("tau"), uc_sub(des$K), " = ", uc(text),
             uc_sub(des$K), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
   }
   message("")
@@ -113,9 +113,9 @@ summary_build_ma             <- function(K, n, alpha, beta, delta1, delta0,
       segment <- "Dunnett's\n  correction."
     } else if (correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
+    } else if (correction == "holm_bonferroni") {
       segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
+    } else if (correction == "holm_sidak") {
       segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
@@ -259,9 +259,9 @@ summary_build_ma_bern        <- function(K, n, alpha, beta, pi0, delta1,
       segment <- "Dunnett's\n  correction."
     } else if (correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
+    } else if (correction == "holm_bonferroni") {
       segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
+    } else if (correction == "holm_sidak") {
       segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
@@ -393,9 +393,9 @@ summary_des_int_ma           <- function(K, N, alpha, beta, delta1, delta0,
       segment <- "Dunnett's\n  correction."
     } else if (correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
+    } else if (correction == "holm_bonferroni") {
       segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
+    } else if (correction == "holm_sidak") {
       segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
@@ -498,9 +498,9 @@ summary_des_ma               <- function(K, alpha, beta, delta1, delta0, sigma,
       segment <- "Dunnett's\n  correction."
     } else if (correction == "hochberg") {
       segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
+    } else if (correction == "holm_bonferroni") {
       segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
+    } else if (correction == "holm_sidak") {
       segment <- "the\n  Holm-\u0160id\u00e1k procedure."
     } else if (correction == "sidak") {
       segment <- "\u0160id\u00e1k's\n  correction."
@@ -924,22 +924,22 @@ summary_plot_multiarm_des_ma <- function(des, delta_min, delta_max, delta,
     message("\n  For all error-rate calculations, the standard deviation of ",
             "the patient responses in\n  each arm will be assumed to be ",
             "known:\n")
-    if (length(unique(sigma)) == 1) {
+    if (length(unique(des$sigma)) == 1) {
       if (des$K == 2) {
         message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
-                " = ", round(sigma[1], 4), ".")
+                " = ", round(des$sigma[1], 4), ".")
       } else {
         message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
-                uc_sub(des$K), " = ", round(sigma[1], 4), ".")
+                uc_sub(des$K), " = ", round(des$sigma[1], 4), ".")
       }
     } else {
       if (des$K == 2L) {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4), ", ",
-                uc("sigma"), uc_sub(1), " = ", round(sigma[2], 4), ".")
+        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4), ", ",
+                uc("sigma"), uc_sub(1), " = ", round(des$sigma[2], 4), ".")
       } else {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4),
+        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4),
                 ", ..., ", uc("sigma"), uc_sub(des$K), " = ",
-                round(sigma[des$K + 1], 4), ".")
+                round(des$sigma[des$K + 1], 4), ".")
       }
     }
   }

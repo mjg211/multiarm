@@ -11,10 +11,10 @@
 #' outcome). Defaults to \code{des_ma_bern()}.
 #' @param delta_min A \code{\link{numeric}} specifying the chosen minimum value
 #' for the treatment effects to include on the produced plots. Defaults to
-#' \code{-x$pi0}.
+#' \code{-x$pi0 + 1e-6}.
 #' @param delta_max A \code{\link{numeric}} specifying the chosen maximum
 #' value for the treatment effects to include on the produced plots. Defaults to
-#' \code{1 - x$pi0}.
+#' \code{1 - x$pi0 - 1e-6}.
 #' @param delta A \code{\link{numeric}} specifying the chosen treatment effect
 #' shift to use in the 'shifted treatment effects plot'. Defaults to
 #' \code{x$delta1 - x$delta0}.
@@ -130,7 +130,7 @@ plot.multiarm_des_ma_bern <- function(x = des_ma_bern(),
   delta1                   <- des$delta1
   plots$plot_equal_power   <- ggplot2::ggplot() +
     ggplot2::geom_line(
-      data = dplyr::filter(opchar_equal, type %in% c("Pdis", "Pcon",
+      data = dplyr::filter(opchar_equal, .data$type %in% c("Pdis", "Pcon",
                                                      paste0("P", seq_K))),
       ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
@@ -177,17 +177,17 @@ plot.multiarm_des_ma_bern <- function(x = des_ma_bern(),
   plots$plot_equal_er      <- ggplot2::ggplot() +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,
-                           (type %in% c(paste0("FWERI", seq_K),
+                           (.data$type %in% c(paste0("FWERI", seq_K),
                                         paste0("FWERII", seq_K), "PHER")) &
-                             (pi1 <= pi0)),
+                             (.data$pi1 <= .data$pi0)),
       ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,
-                           (type %in% c(paste0("FWERI", seq_K),
+                           (.data$type %in% c(paste0("FWERI", seq_K),
                                         paste0("FWERII", seq_K), "PHER")) &
-                             (pi1 > pi0)),
+                             (.data$pi1 > .data$pi0)),
       ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +
@@ -229,15 +229,15 @@ plot.multiarm_des_ma_bern <- function(x = des_ma_bern(),
   plots$plot_equal_other   <- ggplot2::ggplot() +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,
-                           (type %in% c("FDR", "pFDR", "FNDR", "Sens",
-                                        "Spec")) & (pi1 <= pi0)),
+                           (.data$type %in% c("FDR", "pFDR", "FNDR", "Sens",
+                                        "Spec")) & (.data$pi1 <= .data$pi0)),
       ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,
-                           (type %in% c("FDR", "pFDR", "FNDR", "Sens",
-                                        "Spec")) & (pi1 > pi0)),
+                           (.data$type %in% c("FDR", "pFDR", "FNDR", "Sens",
+                                        "Spec")) & (.data$pi1 > .data$pi0)),
       ggplot2::aes(x   = .data$pi1,
                    y   = .data$P,
                    col = .data$type)) +

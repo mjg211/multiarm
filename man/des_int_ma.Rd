@@ -109,6 +109,6 @@ des_K_N <- des_int_ma(K = 3, N = 100)
 }
 \seealso{
 \code{\link{an_ma}}, \code{\link{build_ma}}, \code{\link{des_ma}},
-\code{\link{gui_ma}}, \code{\link{opchar_ma}},
+\code{\link{gui}}, \code{\link{opchar_ma}},
 \code{\link{plot.multiarm_des_ma}}, \code{\link{sim_ma}}.
 }

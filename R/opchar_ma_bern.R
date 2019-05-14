@@ -6,8 +6,8 @@
 #' outcome variable is Bernoulli distributed, for given values of the true
 #' treatment effects, using multivariate normal integration.
 #'
-#' @param des A \code{\link{list}} of class \code{"multiarm_des_ma_bin"}, as
-#' returned by \code{\link{des_ma_bin}} (i.e., a fixed-sample multi-arm clinical
+#' @param des A \code{\link{list}} of class \code{"multiarm_des_ma_bern"}, as
+#' returned by \code{\link{des_ma_bern}} (i.e., a fixed-sample multi-arm clinical
 #' trial design for a normally distributed outcome). Defaults to
 #' \code{des_ma_bern()}.
 #' @param pi A \code{\link{matrix}} whose rows indicate values of

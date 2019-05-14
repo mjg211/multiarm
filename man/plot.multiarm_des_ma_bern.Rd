@@ -6,8 +6,9 @@
 for a Bernoulli distributed primary outcome}
 \usage{
 \method{plot}{multiarm_des_ma_bern}(x = des_ma_bern(),
-  delta_min = -x$pi0, delta_max = 1 - x$pi0, delta = x$delta1 -
-  x$delta0, density = 100, output = F, summary = F, ...)
+  delta_min = -x$pi0 + 1e-06, delta_max = 1 - x$pi0 - 1e-06,
+  delta = x$delta1 - x$delta0, density = 100, output = F,
+  summary = F, ...)
 }
 \arguments{
 \item{x}{A \code{\link{list}} of class \code{"multiarm_des_ma_bern"}, as
@@ -17,11 +18,11 @@ outcome). Defaults to \code{des_ma_bern()}.}
 
 \item{delta_min}{A \code{\link{numeric}} specifying the chosen minimum value
 for the treatment effects to include on the produced plots. Defaults to
-\code{-x$pi0}.}
+\code{-x$pi0 + 1e-6}.}
 
 \item{delta_max}{A \code{\link{numeric}} specifying the chosen maximum
 value for the treatment effects to include on the produced plots. Defaults to
-\code{1 - x$pi0}.}
+\code{1 - x$pi0 - 1e-6}.}
 
 \item{delta}{A \code{\link{numeric}} specifying the chosen treatment effect
 shift to use in the 'shifted treatment effects plot'. Defaults to

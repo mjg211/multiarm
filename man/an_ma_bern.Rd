@@ -34,6 +34,17 @@ multiple comparison correction. Can be any of \code{"benjamini_hochberg"},
 \code{"des$correction"} (i.e., \code{correction} can be used to modify/update
 \code{des} if desired).}
 
+\item{sigmas}{A \code{\link{matrix}} (or \code{\link{numeric}} vector that
+can be coerced in to \code{\link{matrix}} form) indicating the assumed values
+of the standard deviations in each of the arms, for each row of \code{pval}.
+Should either have dimension equal to \code{nrow(pval)}
+\ifelse{html}{\out{x}}{\eqn{\times}} \code{des$K + 1}, or be coercible in to
+a form with dimension 1
+\ifelse{html}{\out{x}}{\eqn{\times}} \code{des$K + 1} (which will then be
+replicated to have \code{nrow(pval)} rows). Only used if \code{correction} is
+equal to \code{"dunnett"} or \code{"step_down_dunnett"}. Defaults internally
+to the standard deviations for the global null hypothesis.}
+
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
 \code{F}.}

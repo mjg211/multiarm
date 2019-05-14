@@ -8,8 +8,8 @@ multi-arm clinical trial for a Bernoulli distributed primary outcome}
 opchar_ma_bern(des = des_ma_bern(), pi, summary = F)
 }
 \arguments{
-\item{des}{A \code{\link{list}} of class \code{"multiarm_des_ma_bin"}, as
-returned by \code{\link{des_ma_bin}} (i.e., a fixed-sample multi-arm clinical
+\item{des}{A \code{\link{list}} of class \code{"multiarm_des_ma_bern"}, as
+returned by \code{\link{des_ma_bern}} (i.e., a fixed-sample multi-arm clinical
 trial design for a normally distributed outcome). Defaults to
 \code{des_ma_bern()}.}
 
