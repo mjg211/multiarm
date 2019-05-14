@@ -41,7 +41,7 @@ experimental treatment arms, following the accrual of outcome data from a
 specified number of patients on each arm.
 
 More formally, it supposes that outcomes $X_{ik}$ will be accrued from patients
-$i\in\{1,\dots,n_k\}$ on treatment arms $k\in\{0,\dots,K\}$. In Section BLANK,
+$i\in\{1,\dots,n_k\}$ on treatment arms $k\in\{0,\dots,K\}$. In Section 2.6,
 more information on the precise types of outcome that are currently supported is
 provided. Next, specifying that arm $k=0$ corresponds to the shared control arm,
 and arms $k\in\{1,\dots,K\}$ to the experimental arms, the hypotheses of
