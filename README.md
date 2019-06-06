@@ -1,13 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# multiarm
+# multiarm <img src='man/figures/multiarm.png' align="right" height="139" />
 
-[![contributions
-welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
-[![](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![](https://img.shields.io/badge/devel%20version-0.10.0-blue.svg)](https://github.com/mjg211/multiarm)
 [![](https://img.shields.io/github/languages/code-size/mjg211/multiarm.svg)](https://github.com/mjg211/multiarm)
-[![](https://img.shields.io/github/last-commit/mjg211/multiarm.svg)](https://github.com/mjg211/multiarm/commits/master)
+[![](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+![](https://img.shields.io/badge/contributions-welcome-blue.svg)
 
 ## Description
 
@@ -46,28 +45,28 @@ of calculation the function performs (e.g., design determination,
 operating characteristic calculations), and the remainder which type of
 design it is for (normally or Bernoulli distributed outcomes):
 
-  - `an_ma()` and `an_ma_bin()`: Analyse summary statistics from
+  - `an_ma()` and `an_ma_bern()`: Analyse summary statistics from
     fixed-sample multi-arm clinical trial designs, in order to determine
     which null hypotheses to reject.
-  - `build_ma()` and `build_ma_bin()`: Build multi-arm clinical trial
+  - `build_ma()` and `build_ma_bern()`: Build multi-arm clinical trial
     design objects, like those returned by `des_ma()` and
-    `des_ma_bin()`. For use when a specific design is of interest.
+    `des_ma_bern()`. For use when a specific design is of interest.
   - `des_int_ma()`: Determines the *A*-, *D*-, and *E*-optimal
     allocation of a set of patients in a multi-arm clinical trial with
     normally distributed outcomes.
-  - `des_ma()` and `des_ma_bin()`: Determine the sample size required by
-    a multi-arm clinical trial when one of several multiple comparison
-    corrections is used.
-  - `gui_ma()`: Provides a graphical user interface to design
+  - `des_ma()` and `des_ma_bern()`: Determine the sample size required
+    by a multi-arm clinical trial when one of several multiple
+    comparison corrections is used.
+  - `gui()`: Provides a graphical user interface to design
     determination.
-  - `opchar_ma()` and `opchar_ma_bin()`: Determine the operating
+  - `opchar_ma()` and `opchar_ma_bern()`: Determine the operating
     characteristics (power, family-wise error rates, etc.) of supplied
     fixed-sample multi-arm clinical trial designs using multivariate
     normal integration.
-  - `plot.multiarm_des_ma()` and `plot.multiarm_des_ma_bin()`: Produce
+  - `plot.multiarm_des_ma()` and `plot.multiarm_des_ma_bern()`: Produce
     informative plots (power, false discovery rate curves, etc.)
     relating to supplied fixed-sample multi-arm clinical trial designs.
-  - `sim_ma()` and `sim_ma_bin()`: Empirically estimate the operating
+  - `sim_ma()` and `sim_ma_bern()`: Empirically estimate the operating
     characteristics (power, family-wise error rates, etc.) of supplied
     fixed-sample multi-arm clinical trial designs, via simulation.
 
@@ -103,7 +102,7 @@ Then, the total required sample size is:
 
 ``` r
 des$N
-#> [1] 67.43273
+#> [1] 67.47041
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -115,10 +114,10 @@ des$opchar
 #> # A tibble: 5 x 20
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
-#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00773
+#> 1     0     0     0 0.0500 0.00107 0.0196 0.0196 0.0196 0.0500 0.00770
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0      
-#> 3     1     0     0 0.800  0.00330 0.800  0.0196 0.0196 0.0360 0.00330
-#> 4     0     1     0 0.801  0.00329 0.0196 0.800  0.0196 0.0359 0.00330
+#> 3     1     0     0 0.801  0.00328 0.800  0.0196 0.0196 0.0359 0.00329
+#> 4     0     1     0 0.800  0.00328 0.0196 0.800  0.0196 0.0359 0.00329
 #> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00329
 #> # … with 10 more variables: FWERI3 <dbl>, FWERII1 <dbl>, FWERII2 <dbl>,
 #> #   FWERII3 <dbl>, PHER <dbl>, FDR <dbl>, pFDR <dbl>, FNDR <dbl>,

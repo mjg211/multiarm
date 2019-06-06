@@ -12,12 +12,12 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
-# multiarm
+# multiarm <img src='man/figures/multiarm.png' align="right" height="139" />
 
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
-`r badger::badge_lifecycle("maturing", "blue")`
+`r badger::badge_devel("mjg211/multiarm", "blue")`
 `r badger::badge_code_size("mjg211/multiarm")`
-`r badger::badge_last_commit("mjg211/multiarm")`
+`r badger::badge_lifecycle("maturing", "blue")`
+`r badger::badge_custom("contributions", "welcome", "blue")`
 
 ## Description
 
@@ -26,9 +26,7 @@ multi-arm clinical trials. Available functions allow for sample size
 determination when utilising a variety of multiple comparison corrections
 (including for *A*-, *D*-, and *E*-optimal designs), trial simulation,
 analytical operating characteristic calculation (including the conjunctive
-power, disjunctive power, family-wise error-rate, and false discovery rate), and
-the production of several plots. An R Shiny graphical user interface is also
-provided to aid design determination.
+power, disjunctive power, family-wise error-rate, and false discovery rate), and the production of several plots. An R Shiny graphical user interface is also provided to aid design determination.
 
 ## Getting started
 
@@ -46,13 +44,7 @@ contact Michael Grayling at michael.grayling@newcastle.ac.uk.
 
 ## Details
 
-Currently, functions are provided to support trials in which the primary outcome
-variable is assumed to be either normally or Bernoulli distributed. In total, 14
-functions are available. Their naming conventions are such that several
-character strings are joined together separated by underscores. The first
-character string indicates the type of calculation the function performs (e.g.,
-design determination, operating characteristic calculations), and the remainder
-which type of design it is for (normally or Bernoulli distributed outcomes):
+Currently, functions are provided to support trials in which the primary outcome variable is assumed to be eiher normally or Bernoulli distributed. In total, 14 functions are available. Their naming conventions are such that several character strings are joined together separated by underscores. The first character string indicates the type of calculation the function performs (e.g., design determination, operating characteristic calculations), and the remainder which type of design it is for (normally or Bernoulli distributed outcomes):
 
 - `an_ma()` and `an_ma_bern()`: Analyse summary statistics from fixed-sample
 multi-arm clinical trial designs, in order to determine which null hypotheses to
