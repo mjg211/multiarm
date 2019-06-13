@@ -1,5 +1,6 @@
 ##### Load required packages ###################################################
 
+library(magrittr)
 library(multiarm)
 options(shiny.sanitize.errors = T)
 
@@ -113,14 +114,14 @@ ui <- shinydashboard::dashboardPage(
                 list("Per-hypothesis type-I error-rate control" =
                        list("No multiple comparison correction" = "none"),
                      "Familywise error-rate control: Single-step" =
-                       list("Bonferroni"      = "bonferroni",
-                            "Dunnett"         = "dunnett",
-                            "Sidak"           = "sidak"),
+                       list("Bonferroni" = "bonferroni",
+                            "Dunnett"    = "dunnett",
+                            "Sidak"      = "sidak"),
                      "Familywise error-rate control: Step-wise" =
-                       list("Hochberg"           = "hochberg",
-                            "Holm-Bonferroni"    = "holm_bonferroni",
-                            "Holm-Sidak"         = "holm_sidak",
-                            "Step-down Dunnett"  = "step_down_dunnett"),
+                       list("Hochberg"          = "hochberg",
+                            "Holm-Bonferroni"   = "holm_bonferroni",
+                            "Holm-Sidak"        = "holm_sidak",
+                            "Step-down Dunnett" = "step_down_dunnett"),
                      "False discovery rate control" =
                        list("Benjamini-Hochberg"  = "benjamini_hochberg",
                             "Benjamini-Yekutieli" = "benjamini_yekutieli")),
@@ -322,14 +323,35 @@ ui <- shinydashboard::dashboardPage(
           shinydashboard::valueBoxOutput("design_normal_fwer_box"),
           shinydashboard::valueBoxOutput("design_normal_power_box")
         ),
-        ##### Rows 3 & 4: Operating characteristics summary ####################
+        ##### Rows 3-5: Operating characteristics summary ######################
         shiny::fluidRow(
           shinydashboard::box(
-            title       = "Operating characteristics summary: Error-rates",
+            title       = "Operating characteristics summary: Key",
             width       = 12,
-            height      = 565,
             solidHeader = T,
             collapsible = T,
+            status      = "primary",
+            shiny::column(
+              width = 12,
+              align = "center",
+              shinycssloaders::withSpinner(
+                DT::DTOutput("design_normal_table_key",
+                             height = "500px"),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          )
+        ),
+        shiny::fluidRow(
+          shinydashboard::box(
+            title       =
+              "Operating characteristics summary: Familywise error-rates",
+            width       = 12,
+            solidHeader = T,
+            collapsible = T,
+            collapsed   = T,
             status      = "primary",
             shiny::column(
               width = 12,
@@ -349,9 +371,9 @@ ui <- shinydashboard::dashboardPage(
             title       =
               "Operating characteristics summary: Power & other quantities",
             width       = 12,
-            height      = 565,
             solidHeader = T,
             collapsible = T,
+            collapsed   = T,
             status      = "primary",
             shiny::column(
               width = 12,
@@ -366,7 +388,7 @@ ui <- shinydashboard::dashboardPage(
             )
           )
         ),
-        ##### Rows 5 & 6: Plots ################################################
+        ##### Rows 6 & 7: Plots ################################################
         shiny::fluidRow(
           shinydashboard::box(
             title       = "Equal treatment effects: Error-rates",
@@ -447,7 +469,7 @@ ui <- shinydashboard::dashboardPage(
             )
           )
         ),
-        ##### Row 7: Session information #######################################
+        ##### Row 8: Session information #######################################
         shiny::fluidRow(
           shinydashboard::box(
             title       = "Session Information",
@@ -460,12 +482,6 @@ ui <- shinydashboard::dashboardPage(
           )
         )
       ),
-
-
-
-
-
-
       ##### Tab: Design (Bernoulli) ############################################
       shinydashboard::tabItem(
         tabName = "design_bernoulli",
@@ -504,14 +520,14 @@ ui <- shinydashboard::dashboardPage(
                 list("Per-hypothesis type-I error-rate control" =
                        list("No multiple comparison correction" = "none"),
                      "Familywise error-rate control: Single-step" =
-                       list("Bonferroni"      = "bonferroni",
-                            "Dunnett"         = "dunnett",
-                            "Sidak"           = "sidak"),
+                       list("Bonferroni" = "bonferroni",
+                            "Dunnett"    = "dunnett",
+                            "Sidak"      = "sidak"),
                      "Familywise error-rate control: Step-wise" =
-                       list("Hochberg"           = "hochberg",
-                            "Holm-Bonferroni"    = "holm_bonferroni",
-                            "Holm-Sidak"         = "holm_sidak",
-                            "Step-down Dunnett"  = "step_down_dunnett"),
+                       list("Hochberg"          = "hochberg",
+                            "Holm-Bonferroni"   = "holm_bonferroni",
+                            "Holm-Sidak"        = "holm_sidak",
+                            "Step-down Dunnett" = "step_down_dunnett"),
                      "False discovery rate control" =
                        list("Benjamini-Hochberg"  = "benjamini_hochberg",
                             "Benjamini-Yekutieli" = "benjamini_yekutieli")),
@@ -582,7 +598,7 @@ ui <- shinydashboard::dashboardPage(
                 colour  = "black"
               ),
             shiny::uiOutput("design_bernoulli_delta"),
-            #shiny::uiOutput("design_bernoulli_delta0"),
+            shiny::uiOutput("design_bernoulli_delta0"),
             shiny::selectInput(
               inputId = "design_bernoulli_ratio_type",
               label   = "Allocation ratios:",
@@ -698,14 +714,35 @@ ui <- shinydashboard::dashboardPage(
           shinydashboard::valueBoxOutput("design_bernoulli_fwer_box"),
           shinydashboard::valueBoxOutput("design_bernoulli_power_box")
         ),
-        ##### Rows 3 & 4: Operating characteristics summary ####################
+        ##### Rows 3-5: Operating characteristics summary ######################
         shiny::fluidRow(
           shinydashboard::box(
-            title       = "Operating characteristics summary: Error-rates",
+            title       = "Operating characteristics summary: Key",
             width       = 12,
-            height      = 565,
             solidHeader = T,
             collapsible = T,
+            status      = "primary",
+            shiny::column(
+              width = 12,
+              align = "center",
+              shinycssloaders::withSpinner(
+                DT::DTOutput("design_bernoulli_table_key",
+                             height = "500px"),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          )
+        ),
+        shiny::fluidRow(
+          shinydashboard::box(
+            title       =
+              "Operating characteristics summary: Familywise error-rates",
+            width       = 12,
+            solidHeader = T,
+            collapsible = T,
+            collapsed   = T,
             status      = "primary",
             shiny::column(
               width = 12,
@@ -725,9 +762,9 @@ ui <- shinydashboard::dashboardPage(
             title       =
               "Operating characteristics summary: Power & other quantities",
             width       = 12,
-            height      = 565,
             solidHeader = T,
             collapsible = T,
+            collapsed   = T,
             status      = "primary",
             shiny::column(
               width = 12,
@@ -742,7 +779,7 @@ ui <- shinydashboard::dashboardPage(
             )
           )
         ),
-        ##### Rows 5 & 6: Plots ################################################
+        ##### Rows 6 & 7: Plots ################################################
         shiny::fluidRow(
           shinydashboard::box(
             title       = "Equal treatment effects: Error-rates",
@@ -823,7 +860,7 @@ ui <- shinydashboard::dashboardPage(
             )
           )
         ),
-        ##### Row 7: Session information #######################################
+        ##### Row 8: Session information #######################################
         shiny::fluidRow(
           shinydashboard::box(
             title       = "Session Information",
@@ -1643,6 +1680,19 @@ server <- function(input, output, session) {
   })
 
   ##### Design (Normal): Table #################################################
+
+  output$design_normal_table_key <- DT::renderDT({
+    table_key                                 <-
+      des_normal()$data[, c(1:(des_normal()$K + 1),
+                            (des_normal()$K + 3):(2*des_normal()$K + 3),
+                            4*des_normal()$K + 3)]
+    colnames(table_key)[2*des_normal()$K + 2] <- "<i>FWER</i>"
+    DT::datatable(
+      round(table_key, 3),
+      escape        = F,
+      fillContainer = T
+    )
+  })
 
   output$design_normal_table_error <- DT::renderDT({
     DT::datatable(
@@ -2500,11 +2550,26 @@ server <- function(input, output, session) {
 
   ##### Design (Bernoulli): Table ##############################################
 
+  output$design_bernoulli_table_key <- DT::renderDT({
+    table_key                                    <-
+      des_bernoulli()$data[, c(1:(des_bernoulli()$K + 2),
+                               (des_bernoulli()$K + 4):(2*des_bernoulli()$K +
+                                                          4),
+                               4*des_bernoulli()$K + 4)]
+    colnames(table_key)[2*des_bernoulli()$K + 3] <- "<i>FWER</i>"
+    DT::datatable(
+      round(table_key, 3),
+      escape        = F,
+      fillContainer = T
+    )
+  })
+
   output$design_bernoulli_table_error <- DT::renderDT({
     DT::datatable(
       round(
         des_bernoulli()$data[, c(1:(des_bernoulli()$K + 1),
-                              (2*des_bernoulli()$K + 4):(4*des_bernoulli()$K + 3))],
+                              (2*des_bernoulli()$K + 4):
+                                (4*des_bernoulli()$K + 3))],
         3),
       escape        = F,
       fillContainer = T
@@ -2514,7 +2579,8 @@ server <- function(input, output, session) {
   output$design_bernoulli_table_other <- DT::renderDT({
     DT::datatable(
       round(
-        des_bernoulli()$data[, -((2*des_bernoulli()$K + 4):(4*des_bernoulli()$K + 3))],
+        des_bernoulli()$data[, -((2*des_bernoulli()$K + 4):
+                                   (4*des_bernoulli()$K + 3))],
         3),
       escape        = F,
       fillContainer = T

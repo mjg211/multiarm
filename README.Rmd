@@ -12,6 +12,11 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+
+```{r, echo = F}
+suppressPackageStartupMessages(library(multiarm))
+```
+
 # multiarm <img src='man/figures/multiarm.png' align="right" height="139" />
 
 `r badger::badge_devel("mjg211/multiarm", "blue")`
@@ -38,9 +43,7 @@ devtools::install_github("mjg211/multiarm")
 ```
 
 An introductory example of how to make use of the package's core functionality
-can be found below. More detailed support is available in the package vignette,
-which can be accessed with `vignette("multiarm")`. For further help, please
-contact Michael Grayling at michael.grayling@newcastle.ac.uk.
+can be found below. More detailed support is available in the package vignette, which can be accessed with `vignette("multiarm")`. For further help, please contact Michael Grayling at michael.grayling@newcastle.ac.uk.
 
 ## Details
 
@@ -84,14 +87,14 @@ clinically relevant difference of 1 (see `beta`, `delta1`, and `power`);
 To compute the implied design, we would run:
 
 ```{r}
-des <- multiarm::des_ma(K          = 3,
-                        alpha      = 0.05,
-                        beta       = 0.2,
-                        delta1     = 1,
-                        sigma      = rep(1, 4),
-                        ratio      = rep(1, 3),
-                        correction = "dunnett",
-                        power      = "marginal")
+des <- des_ma(K          = 3,
+              alpha      = 0.05,
+              beta       = 0.2,
+              delta1     = 1,
+              sigma      = rep(1, 4),
+              ratio      = rep(1, 3),
+              correction = "dunnett",
+              power      = "marginal")
 ```
 
 Then, the total required sample size is:
@@ -111,5 +114,5 @@ des$opchar
 Useful plots can then be produced with `plot.multiarm_des_ma()` as follows:
 
 ```{r dpi = 600}
-multiarm:::plot.multiarm_des_ma(des)
+plot(des)
 ```

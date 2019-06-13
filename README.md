@@ -37,7 +37,7 @@ For further help, please contact Michael Grayling at
 ## Details
 
 Currently, functions are provided to support trials in which the primary
-outcome variable is assumed to be either normally or Bernoulli
+outcome variable is assumed to be eiher normally or Bernoulli
 distributed. In total, 14 functions are available. Their naming
 conventions are such that several character strings are joined together
 separated by underscores. The first character string indicates the type
@@ -88,21 +88,21 @@ for:
 To compute the implied design, we would run:
 
 ``` r
-des <- multiarm::des_ma(K          = 3,
-                        alpha      = 0.05,
-                        beta       = 0.2,
-                        delta1     = 1,
-                        sigma      = rep(1, 4),
-                        ratio      = rep(1, 3),
-                        correction = "dunnett",
-                        power      = "marginal")
+des <- des_ma(K          = 3,
+              alpha      = 0.05,
+              beta       = 0.2,
+              delta1     = 1,
+              sigma      = rep(1, 4),
+              ratio      = rep(1, 3),
+              correction = "dunnett",
+              power      = "marginal")
 ```
 
 Then, the total required sample size is:
 
 ``` r
 des$N
-#> [1] 67.47041
+#> [1] 67.44102
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -114,11 +114,11 @@ des$opchar
 #> # A tibble: 5 x 20
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
-#> 1     0     0     0 0.0500 0.00107 0.0196 0.0196 0.0196 0.0500 0.00770
+#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00772
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0      
-#> 3     1     0     0 0.801  0.00328 0.800  0.0196 0.0196 0.0359 0.00329
-#> 4     0     1     0 0.800  0.00328 0.0196 0.800  0.0196 0.0359 0.00329
-#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00329
+#> 3     1     0     0 0.801  0.00329 0.800  0.0196 0.0196 0.0359 0.00330
+#> 4     0     1     0 0.801  0.00329 0.0196 0.800  0.0196 0.0359 0.00330
+#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00330
 #> # … with 10 more variables: FWERI3 <dbl>, FWERII1 <dbl>, FWERII2 <dbl>,
 #> #   FWERII3 <dbl>, PHER <dbl>, FDR <dbl>, pFDR <dbl>, FNDR <dbl>,
 #> #   Sens <dbl>, Spec <dbl>
@@ -128,7 +128,7 @@ Useful plots can then be produced with `plot.multiarm_des_ma()` as
 follows:
 
 ``` r
-multiarm:::plot.multiarm_des_ma(des)
+plot(des)
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" /><img src="man/figures/README-unnamed-chunk-4-2.png" width="100%" /><img src="man/figures/README-unnamed-chunk-4-3.png" width="100%" /><img src="man/figures/README-unnamed-chunk-4-4.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" /><img src="man/figures/README-unnamed-chunk-5-2.png" width="100%" /><img src="man/figures/README-unnamed-chunk-5-3.png" width="100%" /><img src="man/figures/README-unnamed-chunk-5-4.png" width="100%" />

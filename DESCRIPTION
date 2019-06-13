@@ -2,7 +2,7 @@ Package: multiarm
 Type: Package
 Title: Design and analysis of multi-arm clinical trials
 Version: 0.10.0
-Authors@R: c(person(given = "Michael J.", family = "Grayling",
+Authors@R: c(person(given = "Michael J", family = "Grayling",
                     email = "michael.grayling@newcastle.ac.uk",
                     role = c("aut", "cre")))
 Description: multiarm provides functions to assist with the design and analysis
