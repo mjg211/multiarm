@@ -183,8 +183,10 @@ des_ma_bern <- function(K = 2, alpha = 0.05, beta = 0.2, pi0 = 0.3,
     message("  Identifying the required sample size", uc("two_elip"))
   }
   tau_power                         <- rep(delta1, K)
-  div_by                            <- sqrt(sigma[1]^2/rho[1] +
-                                              sigma[-1]^2/rho[-1])
+  sigma_power                       <-
+    c(sqrt(pi0*(1 - pi0)), rep(sqrt((pi0 + delta1)*(1 - pi0 - delta1)), K))
+  div_by                            <- sqrt(sigma_power[1]^2/rho[1] +
+                                              sigma_power[-1]^2/rho[-1])
   power_index                       <- NA
   if (power == "marginal") {
     if (length(unique(div_by)) == 1) {
@@ -197,22 +199,24 @@ des_ma_bern <- function(K = 2, alpha = 0.05, beta = 0.2, pi0 = 0.3,
       power_index                   <- which(div_by == min(div_by))[1]
     }
     tau_power[-power_index]         <- delta0
+    sigma_power[-c(1, power_index +
+                     1)]            <- sqrt((pi0 + delta0)*(1 - pi0 - delta0))
+    div_by                          <- sqrt(sigma_power[1]^2/rho[1] +
+                                                sigma_power[-1]^2/rho[-1])
   }
   EZ_div_sqrt_N                     <- tau_power/div_by
+  CovZ_power                        <- covariance_ma(K, rho, sigma_power, T)
   if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli", "hochberg",
                         "holm_bonferroni", "holm_sidak", "step_down_dunnett")) {
     components                      <- outcomes_ma_step(EZ_div_sqrt_N, K,
-                                                        correction, CovZ, uO)
+                                                        correction, CovZ_power,
+                                                        uO)
   } else {
     components                      <- outcomes_ma_single(K, u)
   }
   if (all(power == "marginal",
           correction %in% c("bonferroni", "dunnett", "none", "sidak"))) {
     if (correction == "dunnett") {
-      sigma_power                   <- sigma
-      sigma_power[-c(1, which.max(div_by))] <-
-        sqrt((pi0 + delta0)*(1 - pi0 - delta0))
-      CovZ_power                    <- covariance_ma(K, rho, sigma_power, T)
       gamma_u                       <- gamma_ma(K, alpha, correction,
                                                 CovZ_power)
       gamma_power                   <- gamma_u$gamma
@@ -225,13 +229,14 @@ des_ma_bern <- function(K = 2, alpha = 0.05, beta = 0.2, pi0 = 0.3,
   } else {
     Nmax                            <-
       3*((stats::qnorm(1 - alpha/K) + stats::qnorm(1 - beta))*
-           sqrt(sigma[1]^2/rho[1] + max(sigma[-1]^2/rho[-1]))/delta1)^2
+           sqrt(sigma_power[1]^2/rho[1] +
+                  max(sigma_power[-1]^2/rho[-1]))/delta1)^2
     N                               <-
       stats::uniroot(f = power_ma, interval = c(1e-16, Nmax), K = K,
                      beta = beta, correction = correction, power = power,
-                     CovZ = CovZ, u = u, uO = uO, EZ_div_sqrt_N = EZ_div_sqrt_N,
-                     type = "bernoulli", power_index = power_index,
-                     components = components)$root
+                     CovZ = CovZ_power, u = u, uO = uO,
+                     EZ_div_sqrt_N = EZ_div_sqrt_N, type = "bernoulli",
+                     power_index = power_index, components = components)$root
   }
   if (summary) {
     message(uc("two_elip"), "identified the required sample size.")
