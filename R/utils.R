@@ -544,7 +544,7 @@ sim_ma_internal        <- function(tau, n, sigma, correction, sigma_z, t_test,
   which_discoveries                     <- which(discoveries > 0)
   discoveries[-which_discoveries]       <- 1
   non_discoveries[non_discoveries == 0] <- 1
-  c(tau, sum(discoveries > 0)/replicates, sum(discoveries == K)/replicates,
+  c(tau, length(which_discoveries)/replicates, sum(discoveries == K)/replicates,
     Rfast::colsums(rej_mat)/replicates,
     sapply(1:K, function(k) { sum(false_discoveries >= k) })/replicates,
     sapply(1:K, function(k) { sum(false_non_discoveries >= k) })/replicates,
@@ -647,7 +647,7 @@ sim_ma_bern_internal   <- function(pi, n, alpha, correction, replicates, gamma,
   which_discoveries                     <- which(discoveries > 0)
   discoveries[-which_discoveries]       <- 1
   non_discoveries[non_discoveries == 0] <- 1
-  c(pi, sum(discoveries > 0)/replicates, sum(discoveries == K)/replicates,
+  c(pi, length(which_discoveries)/replicates, sum(discoveries == K)/replicates,
     Rfast::colsums(rej_mat)/replicates,
     sapply(seq_K, function(k) { sum(false_discoveries >= k) })/replicates,
     sapply(seq_K, function(k) { sum(false_non_discoveries >= k) })/replicates,
