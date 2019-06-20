@@ -347,7 +347,7 @@ ui <- shinydashboard::dashboardPage(
         shiny::fluidRow(
           shinydashboard::box(
             title       =
-              "Operating characteristics summary: Familywise error-rates",
+              "Operating characteristics summary: Error-rates",
             width       = 12,
             solidHeader = T,
             collapsible = T,
@@ -738,7 +738,7 @@ ui <- shinydashboard::dashboardPage(
         shiny::fluidRow(
           shinydashboard::box(
             title       =
-              "Operating characteristics summary: Familywise error-rates",
+              "Operating characteristics summary: Error-rates",
             width       = 12,
             solidHeader = T,
             collapsible = T,
@@ -1698,7 +1698,7 @@ server <- function(input, output, session) {
     DT::datatable(
       round(
         des_normal()$data[, c(1:des_normal()$K,
-                              (2*des_normal()$K + 3):(4*des_normal()$K + 2))],
+                              (2*des_normal()$K + 3):(4*des_normal()$K + 3))],
         3),
       escape        = F,
       fillContainer = T
@@ -1708,7 +1708,7 @@ server <- function(input, output, session) {
   output$design_normal_table_other <- DT::renderDT({
     DT::datatable(
       round(
-        des_normal()$data[, -((2*des_normal()$K + 3):(4*des_normal()$K + 2))],
+        des_normal()$data[, -((2*des_normal()$K + 3):(4*des_normal()$K + 3))],
         3),
       escape        = F,
       fillContainer = T
@@ -2569,7 +2569,7 @@ server <- function(input, output, session) {
       round(
         des_bernoulli()$data[, c(1:(des_bernoulli()$K + 1),
                               (2*des_bernoulli()$K + 4):
-                                (4*des_bernoulli()$K + 3))],
+                                (4*des_bernoulli()$K + 4))],
         3),
       escape        = F,
       fillContainer = T
@@ -2580,7 +2580,7 @@ server <- function(input, output, session) {
     DT::datatable(
       round(
         des_bernoulli()$data[, -((2*des_bernoulli()$K + 4):
-                                   (4*des_bernoulli()$K + 3))],
+                                   (4*des_bernoulli()$K + 4))],
         3),
       escape        = F,
       fillContainer = T
