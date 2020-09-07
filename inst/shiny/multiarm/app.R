@@ -952,7 +952,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_normal_alpha, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_normal_alpha",
-      condition = any(input$design_normal_alpha <= 0,
+      show = any(input$design_normal_alpha <= 0,
                       input$design_normal_alpha >= 1),
       text      = "Must be strictly between 0 and 1")
   })
@@ -960,7 +960,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_normal_beta, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_normal_beta",
-      condition = any(input$design_normal_beta <= 0,
+      show = any(input$design_normal_beta <= 0,
                       input$design_normal_beta >= 1),
       text      = "Must be strictly between 0 and 1")
   })
@@ -968,14 +968,14 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_normal_delta1, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_normal_delta1",
-      condition = (input$design_normal_delta1 <= 0),
+      show = (input$design_normal_delta1 <= 0),
       text      = "Must be strictly positive")
   })
 
   shiny::observeEvent(input$design_normal_delta0, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_normal_delta0",
-      condition = (input$design_normal_delta0 >= input$design_normal_delta1),
+      show = (input$design_normal_delta0 >= input$design_normal_delta1),
       text      =
         "Must be strictly smaller than the interesting treatment effect")
   })
@@ -983,14 +983,14 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_normal_sigma, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_normal_sigma",
-      condition = (input$design_normal_sigma <= 0),
+      show = (input$design_normal_sigma <= 0),
       text      = "Must be strictly positive")
   })
 
   shiny::observeEvent(input$design_normal_sigma_0, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_normal_sigma_0",
-      condition = (input$design_normal_sigma_0 <= 0),
+      show = (input$design_normal_sigma_0 <= 0),
       text      = "Must be strictly positive")
   })
 
@@ -1005,7 +1005,7 @@ server <- function(input, output, session) {
     for (i in 1:5) {
       shinyFeedback::feedbackDanger(
         inputId   = paste0("design_normal_sigma_", i),
-        condition = (vals[i] <= 0),
+        show = (vals[i] <= 0),
         text      = "Must be strictly positive")
     }
   })
@@ -1021,7 +1021,7 @@ server <- function(input, output, session) {
     for (i in 1:5) {
       shinyFeedback::feedbackDanger(
         inputId   = paste0("design_normal_ratio_", i),
-        condition = (vals[i] <= 0),
+        show = (vals[i] <= 0),
         text      = "Must be strictly positive")
     }
   })
@@ -1029,7 +1029,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_normal_filename, {
     shinyFeedback::feedbackWarning(
       inputId   = "design_normal_filename",
-      condition = any(strsplit(input$design_normal_filename,
+      show = any(strsplit(input$design_normal_filename,
                                split = "")[[1]] %in%
                         c('/', '\\', '?', "%", "*", ":", "|", "<", ">")),
       text      = paste0('It is generally inadvisable to use the characters /',
@@ -1820,7 +1820,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_bernoulli_alpha, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_bernoulli_alpha",
-      condition = any(input$design_bernoulli_alpha <= 0,
+      show = any(input$design_bernoulli_alpha <= 0,
                       input$design_bernoulli_alpha >= 1),
       text      = "Must be strictly between 0 and 1")
   })
@@ -1828,7 +1828,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_bernoulli_beta, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_bernoulli_beta",
-      condition = any(input$design_bernoulli_beta <= 0,
+      show = any(input$design_bernoulli_beta <= 0,
                       input$design_bernoulli_beta >= 1),
       text      = "Must be strictly between 0 and 1")
   })
@@ -1836,7 +1836,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_bernoulli_pi0, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_bernoulli_pi0",
-      condition = any(input$design_bernoulli_pi0 <= 0,
+      show = any(input$design_bernoulli_pi0 <= 0,
                       input$design_bernoulli_pi0 >= 1),
       text      = "Must be strictly between 0 and 1")
   })
@@ -1844,7 +1844,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_bernoulli_delta1, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_bernoulli_delta1",
-      condition = any(input$design_bernoulli_delta1 <= 0,
+      show = any(input$design_bernoulli_delta1 <= 0,
                       input$design_bernoulli_delta1 >=
                         1 - input$design_bernoulli_pi0),
       text      = paste0("Must be strictly between 0 and one minus the control",
@@ -1854,7 +1854,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_bernoulli_delta0, {
     shinyFeedback::feedbackDanger(
       inputId   = "design_bernoulli_delta0",
-      condition = any(input$design_bernoulli_delta0 >=
+      show = any(input$design_bernoulli_delta0 >=
                         input$design_bernoulli_delta1,
                       input$design_bernoulli_delta0 <=
                         -input$design_bernoulli_pi0),
@@ -1873,7 +1873,7 @@ server <- function(input, output, session) {
     for (i in 1:5) {
       shinyFeedback::feedbackDanger(
         inputId   = paste0("design_bernoulli_ratio_", i),
-        condition = (vals[i] <= 0),
+        show = (vals[i] <= 0),
         text      = "Must be strictly positive")
     }
   })
@@ -1881,7 +1881,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$design_bernoulli_filename, {
     shinyFeedback::feedbackWarning(
       inputId   = "design_bernoulli_filename",
-      condition = any(strsplit(input$design_bernoulli_filename,
+      show = any(strsplit(input$design_bernoulli_filename,
                                split = "")[[1]] %in%
                         c('/', '\\', '?', "%", "*", ":", "|", "<", ">")),
       text      = paste0('It is generally inadvisable to use the characters /',
