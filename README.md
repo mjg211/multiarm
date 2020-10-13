@@ -43,8 +43,8 @@ by underscores. The first string indicates the purpose of the function
   - `build_###_###()`: Build multi-arm clinical trial design objects,
     like those returned by the `des_###_###()` functions. For use when a
     specific design is of interest.
-  - \`des\_\#\#\#\_\#\#\#()\`\`: Determine the sample size required by a
-    particular type of multi-arm clinical trial design.
+  - `des_###_###()`: Determine the sample size required by a particular
+    type of multi-arm clinical trial design.
   - `gui()`: Provides a graphical user interface to design
     determination.
   - `opchar_###_###()`: Determine the operating characteristics (power,
@@ -105,7 +105,7 @@ Then, the total required sample size is:
 
 ``` r
 des$N
-#> [1] 67.49174
+#> [1] 67.40181
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -117,11 +117,11 @@ des$opchar
 #> # A tibble: 5 x 20
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2  FWERI3
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
-#> 1     0     0     0 0.0501 0.00108 0.0196 0.0196 0.0196 0.0501 0.00773 0.00108
-#> 2     1     1     1 0.950  0.612   0.800  0.800  0.800  0      0       0      
-#> 3     1     0     0 0.801  0.00330 0.801  0.0196 0.0196 0.0360 0.00330 0      
-#> 4     0     1     0 0.801  0.00330 0.0196 0.800  0.0196 0.0360 0.00330 0      
-#> 5     0     0     1 0.801  0.00330 0.0196 0.0196 0.801  0.0360 0.00330 0      
+#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00773 0.00108
+#> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0       0      
+#> 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0359 0.00329 0      
+#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.00329 0      
+#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00329 0      
 #> # … with 9 more variables: FWERII1 <dbl>, FWERII2 <dbl>, FWERII3 <dbl>,
 #> #   PHER <dbl>, FDR <dbl>, pFDR <dbl>, FNDR <dbl>, Sens <dbl>, Spec <dbl>
 ```

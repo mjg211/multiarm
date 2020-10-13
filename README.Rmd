@@ -51,7 +51,7 @@ The first string indicates the purpose of the function (i.e., what type of calcu
 
 - `build_###_###()`: Build multi-arm clinical trial design objects, like those returned by the `des_###_###()` functions.
 For use when a specific design is of interest.
-- `des_###_###()``: Determine the sample size required by a particular type of multi-arm clinical trial design.
+- `des_###_###()`: Determine the sample size required by a particular type of multi-arm clinical trial design.
 - `gui()`: Provides a graphical user interface to design determination.
 - `opchar_###_###()`: Determine the operating characteristics (power, family-wise error-rates, etc.) of a supplied multi-arm clinical trial design, via multivariate normal integration.
 - `plot.multiarm_des_###_###()`: Produce informative plots (power, false discovery rate curves, etc.) relating to a supplied multi-arm clinical trial design.
