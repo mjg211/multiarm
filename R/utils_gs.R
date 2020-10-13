@@ -895,8 +895,8 @@ opchar_gs_internal                <- function(comp) {
                            paste0("FWERII", comp$seq_K), "PHER", "FDR", "pFDR",
                            "FNDR", "Sens", "Spec",# paste0("P", powers_names),
                            "ESS", "SDSS", "MSS", "maxN")
-  comp$opchar         <- tibble::as_tibble(opchar)
-  comp$pmf_N          <- tibble::as_tibble(pmf_N)
+  comp$opchar         <- tibble::as_tibble(opchar, .name_repair = "minimal")
+  comp$pmf_N          <- tibble::as_tibble(pmf_N, .name_repair = "minimal")
   comp
 }
 

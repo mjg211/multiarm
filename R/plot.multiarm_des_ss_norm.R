@@ -260,7 +260,8 @@ plot.multiarm_des_ss_norm <- function(x = des_ss_norm(), delta_min = -x$delta1,
       rbind(opchar_matrix, cbind(as.matrix(opchar_k[, c(k, K + 2 + k)]),
                                  as.matrix(opchar_k)))
   }
-  opchar_shifted_og           <- tibble::as_tibble(opchar_matrix)
+  opchar_shifted_og           <- tibble::as_tibble(opchar_matrix,
+                                                   .name_repair = "minimal")
   opchar_shifted              <- opchar_shifted_og[, 1:2]
   colnames(opchar_shifted)    <- c("tauk", "P")
   opchar_shifted_og           <- opchar_shifted_og[, -(1:2)]

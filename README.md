@@ -105,7 +105,7 @@ Then, the total required sample size is:
 
 ``` r
 des$N
-#> [1] 67.46512
+#> [1] 67.49174
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -117,11 +117,11 @@ des$opchar
 #> # A tibble: 5 x 20
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2  FWERI3
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
-#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00771 0.00108
-#> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0       0      
-#> 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0359 0.00329 0      
-#> 4     0     1     0 0.800  0.00328 0.0196 0.800  0.0196 0.0359 0.00329 0      
-#> 5     0     0     1 0.801  0.00329 0.0196 0.0196 0.800  0.0359 0.00329 0      
+#> 1     0     0     0 0.0501 0.00108 0.0196 0.0196 0.0196 0.0501 0.00773 0.00108
+#> 2     1     1     1 0.950  0.612   0.800  0.800  0.800  0      0       0      
+#> 3     1     0     0 0.801  0.00330 0.801  0.0196 0.0196 0.0360 0.00330 0      
+#> 4     0     1     0 0.801  0.00330 0.0196 0.800  0.0196 0.0360 0.00330 0      
+#> 5     0     0     1 0.801  0.00330 0.0196 0.0196 0.801  0.0360 0.00330 0      
 #> # … with 9 more variables: FWERII1 <dbl>, FWERII2 <dbl>, FWERII3 <dbl>,
 #> #   PHER <dbl>, FDR <dbl>, pFDR <dbl>, FNDR <dbl>, Sens <dbl>, Spec <dbl>
 ```
@@ -133,14 +133,7 @@ follows:
 plot(des)
 ```
 
-<img src="man/figures/README-plot-1.png" width="100%" /><img src="man/figures/README-plot-2.png" width="100%" />
-
-    #> Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
-    #> Using compatibility `.name_repair`.
-    #> This warning is displayed once every 8 hours.
-    #> Call `lifecycle::last_warnings()` to see where this warning was generated.
-
-<img src="man/figures/README-plot-3.png" width="100%" /><img src="man/figures/README-plot-4.png" width="100%" />
+<img src="man/figures/README-plot-1.png" width="100%" /><img src="man/figures/README-plot-2.png" width="100%" /><img src="man/figures/README-plot-3.png" width="100%" /><img src="man/figures/README-plot-4.png" width="100%" />
 
 ## References
 

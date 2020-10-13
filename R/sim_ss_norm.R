@@ -80,7 +80,7 @@ sim_ss_norm <- function(des = des_ss_norm(integer = T), tau, replicates = 1e5,
                         paste0("P", seq_K), paste0("FWERI", seq_K),
                         paste0("FWERII", seq_K), "PHER", "FDR", "pFDR", "FNDR",
                         "Sens", "Spec")
-  sim              <- tibble::as_tibble(sim)
+  sim              <- tibble::as_tibble(sim, .name_repair = "minimal")
   if (summary) {
     message("..completed the required simulations.")
     message("  Preparing for outputting..")

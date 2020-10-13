@@ -40,7 +40,7 @@ sim_dtl_norm <- function(des = des_dtl_norm(integer = T), tau, replicates = 1e5,
                         paste0("P", seq_K), paste0("FWERI", seq_K),
                         paste0("FWERII", seq_K), "PHER", "FDR", "pFDR", "FNDR",
                         "Sens", "Spec", "ESS", "SDSS", "MSS", "maxN")
-  sim              <- tibble::as_tibble(sim)
+  sim              <- tibble::as_tibble(sim, .name_repair = "minimal")
   if (summary) {
     message("..completed the required simulations.")
     message("  Preparing for outputting..")

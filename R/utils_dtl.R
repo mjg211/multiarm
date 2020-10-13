@@ -431,7 +431,7 @@ opchar_dtl_internal                <- function(comp) {
                            paste0("FWERI", comp$seq_K),
                            paste0("FWERII", comp$seq_K), "PHER", "FDR", "pFDR",
                            "FNDR", "Sens", "Spec", "ESS", "SDSS", "MSS", "maxN")
-  comp$opchar         <- tibble::as_tibble(opchar)
+  comp$opchar         <- tibble::as_tibble(opchar, .name_repair = "minimal")
   comp
 }
 
