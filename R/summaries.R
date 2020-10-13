@@ -1,227 +1,117 @@
-summary_an_ma                <- function(des, pval, type) {
-  message("  ", rep("-", 79))
-  message("  ", des$K, "-experimental treatment fixed-sample multi-arm trial ",
-          "analysis")
-  message("  ", rep("-", 79))
-  if (type == "normal") {
-    message("  The outcome variables will be assumed to be normally ",
-            "distributed.")
-    text <- "mu"
-  } else {
-    message("  The outcome variables will be assumed to be Bernoulli ",
-            "distributed.")
-    text <- "pi"
-  }
-  message("")
-  message("  The hypotheses to be tested will be:\n")
-  if (des$K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc(text), uc_sub(2),
-            " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
-  } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(des$K), ": ", uc("tau"), uc_sub(des$K), " = ", uc(text),
-            uc_sub(des$K), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
-  }
-  message("")
-  if (des$correction == "none") {
-    message("  No multiple comparison correction will be applied. Each ",
-            "hypothesis will be tested at\n  significance level ", uc("alpha"),
-            " = ", round(des$alpha, 4), ".")
-  } else if (des$correction %in% c("benjamini_hochberg",
-                                   "benjamini_yekutieli")) {
-    if (des$correction == "benjamini_hochberg") {
-      sub_type <- "Hochberg"
-    } else {
-      sub_type <- "Yekutieli"
-    }
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(des$alpha, 4), " using the Benjamini-", sub_type,
-            " procedure.")
-  } else {
-    if (des$correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (des$correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (des$correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (des$correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (des$correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
-    }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(des$alpha, 4), " will be achieved using ", segment)
-  }
-  message("")
-  if (des$K == 2) {
-    message("  The rejection decisions will be determined for ", nrow(pval),
-            " possible values of (p", uc_sub(1), ",p", uc_sub(2), ").")
-  } else if (des$K == 3) {
-    message("  The rejection decisions will be determined for ", nrow(pval),
-            " possible values of (p", uc_sub(1), ",p", uc_sub(2), ",p",
-            uc_sub(3), ").")
-  } else {
-    message("  The rejection decisions will be determined for ", nrow(pval),
-            " possible values of (p", uc_sub(1), ",...,p", uc_sub(des$K), ").")
-  }
-}
-
-summary_build_ma             <- function(K, n, alpha, beta, delta1, delta0,
+summary_build_ss_norm        <- function(K, n, alpha, beta, delta1, delta0,
                                          sigma, correction, power) {
   message("  ", rep("-", 60))
-  message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
+  message("  ", K, "-experimental treatment single-stage multi-arm trial ",
           "design")
   message("  ", rep("-", 60))
-  message("  The outcome variables will be assumed to be normally distributed.")
-  message("")
+  message("  The outcome variables will be assumed to be normally distributed.",
+          "\n")
   message("  The hypotheses to be tested will be:\n")
   if (K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
-            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc("mu"), uc_sub(2),
-            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = mu1 - mu0 <= 0, H2 : tau2 = mu2 - mu0 <= 0.\n")
   } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
-            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(K), ": ", uc("tau"), uc_sub(K), " = ", uc("mu"), uc_sub(K),
-            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = mu1 - mu0 <= 0, ... , H", K, " : tau", K, " = mu",
+            K, " - mu0 <= 0.\n")
   }
-  message("")
   if (correction == "none") {
     message("  No multiple comparison correction will be applied. Each ",
-            "hypothesis will be tested at\n  significance level ", uc("alpha"),
-            " = ", round(alpha, 4), ".")
+            "hypothesis will be tested at\n  significance level alpha = ",
+            round(alpha, 4), ".")
   } else if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli")) {
     if (correction == "benjamini_hochberg") {
       sub_type <- "Hochberg"
     } else {
       sub_type <- "Yekutieli"
     }
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(alpha, 4), " using the Benjamini-", sub_type, " procedure.")
+    message("  The FDR will be controlled to level alpha = ", round(alpha, 4),
+            " using the Benjamini-", sub_type, " procedure.")
   } else {
-    if (correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
-    }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(alpha, 4), " will be achieved using ", segment)
+    segment   <- c("bonferroni"        = "Bonferroni's\n  correction.",
+                   "dunnett"           = "Dunnett's\n  correction.",
+                   "hochberg"          = "Hochberg's\n  correction.",
+                   "holm_bonferroni"   = "the\n  Holm-Bonferroni procedure.",
+                   "holm_sidak"        = "the\n  Holm-Sidak procedure.",
+                   "sidak"             = "Sidak's correction.",
+                   "step_down_dunnett" =
+                     "the step-down\n  Dunnett correction.")[correction]
+    message("  Strong control of the FWER to level alpha = ", round(alpha, 4),
+            " will be achieved using ", segment, "\n")
   }
-  message("")
   if (power == "conjunctive") {
-    message("  The trial will desire conjunctive  power of at least 1 - ",
-            uc("beta"), " = ", round(1 - beta, 4),
+    message("  The trial will desire conjunctive power of at least 1 - beta = ",
+            round(1 - beta, 4),
             " under the global alternative, HA, given by:\n")
     if (K == 2) {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ", uc("tau"), uc_sub(2),
-              " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4), ".")
+      message("    HA: tau1 = tau2 = delta1 = ", round(delta1, 4), ".")
     } else {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ... = ", uc("tau"),
-              uc_sub(K), " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4),
+      message("    HA: tau1 = ... = tau", K, " = delta1 = ", round(delta1, 4),
               ".")
     }
   } else if (power == "disjunctive") {
-    message("  The trial will desire disjunctive power of at least 1 - ",
-            uc("beta"), " = ", round(1 - beta, 4),
+    message("  The trial will desire disjunctive power of at least 1 - beta = ",
+            round(1 - beta, 4),
             " under the global alternative, HA, given by:\n")
     if (K == 2) {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ", uc("tau"), uc_sub(2),
-              " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4), ".")
+      message("    HA: tau1 = tau2 = delta1 = ", round(delta1, 4), ".")
     } else {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ... = ", uc("tau"),
-              uc_sub(K), " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4),
+      message("    HA: tau1 = ... = tau", K, " = delta1 = ", round(delta1, 4),
               ".")
     }
   } else if (power == "marginal") {
-    message("  The trial will desire marginal power of at least 1 - ",
-            uc("beta"), " = ", round(1 - beta, 4), " to reject each of the ",
-            "null hypotheses, under the LFC for each null hypothesis. The LFC ",
-            "for H", uc_sub(1), ", LFC", uc_sub(1), ", is, e.g., given by:\n")
+    message("  The trial will desire marginal power of at least 1 - beta = ",
+            round(1 - beta, 4), " to reject each of the null hypotheses, under",
+            " the LFC for each null hypothesis. The LFC for H1, LFC1, is, ",
+            "e.g., given by:\n")
     if (K == 2) {
-      message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-              uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-              uc_sub(2), " = ", uc("delta"), uc_sub(0), " = ", round(delta0, 4),
-              ".")
+      message("    LFC1 : tau1 = delta1 = ", round(delta1, 4), ", tau2 = delta",
+              "0 = ", round(delta0, 4), ".")
     } else if (K == 3) {
-      message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-              uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-              uc_sub(2), " = ", uc("tau"), uc_sub(3), " = ", uc("delta"),
-              uc_sub(0), " = ", round(delta0, 4), ".")
+      message("    LFC1 : tau1 = delta1 = ", round(delta1, 4),
+              ", tau2 = tau3 = delta0 = ", round(delta0, 4), ".")
     } else {
-      message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-              uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-              uc_sub(2), " = ... = ", uc("tau"), uc_sub(K), " = ", uc("delta"),
-              uc_sub(0), " = ", round(delta0, 4), ".")
+      message("    LFC1 : tau1 = delta1 = ", round(delta1, 4),
+              ", tau2 = ... = tau", K, " = delta0 = ", round(delta0, 4), ".")
     }
   }
   message("\n  The standard deviation of the patient responses in each arm ",
           "will be assumed to be:\n")
   if (length(unique(sigma)) == 1) {
     if (K == 2) {
-      message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
-              " = ", round(sigma[1], 4), ".")
+      message("    sigma0 = sigma1 = ", round(sigma[1], 4), ".")
     } else {
-      message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
-              uc_sub(K), " = ", round(sigma[1], 4), ".")
+      message("    sigma0 = ... = sigma", K, " = ", round(sigma[1], 4), ".")
     }
   } else {
     if (K == 2) {
-      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4), ", ",
-              uc("sigma"), uc_sub(1), " = ", round(sigma[2], 4), ".")
+      message("    sigma0 = ", round(sigma[1], 4), ", sigma1 = ",
+              round(sigma[2], 4), ".\n")
     } else {
-      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4),
-              ", ..., ", uc("sigma"), uc_sub(K), " = ", round(sigma[K + 1], 4),
-              ".")
+      message("    sigma0 = ", round(sigma[1], 4), ", ..., sigma", K, " = ",
+              round(sigma[K + 1], 4), ".\n")
     }
   }
-  message("")
   message("  The group size in each arm will be:")
   if (length(unique(n)) == 1) {
     if (K == 2) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = n", uc_sub(2), " = ",
-              round(n[1], 4), ".")
-    } else if (K %in% c(3, 4, 5, 7)) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(K),
-              " = ", round(n[1], 4), ".")
+      message("    n0 = n1 = n2 = ", round(n[1], 4), ".")
     } else {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(K),
-              " = ", round(n[1], 4), ".")
+      message("    n0 = n1 = ... = n", K, " = ", round(n[1], 4), ".")
     }
   } else {
     if (K == 2) {
-      message("    n", uc_sub(0), " = ", round(n[1], 4), ", n", uc_sub(1),
-              " = ", round(n[2], 4), ", n", uc_sub(2), " = ", round(n[3], 4),
-              ".")
+      message("    n0 = ", round(n[1], 4), ", n1 = ", round(n[2], 4), ", n2 = ",
+              round(n[3], 4), ".")
     } else {
-      message("    n", uc_sub(0), " = ", round(n[1], 4), ", n", uc_sub(1),
-              " = ", round(n[2], 4), ", ..., n", uc_sub(K), " = ",
-              round(n[K + 1], 4), ".")
+      message("    n0 = ", round(n[1], 4), ", n1 = ", round(n[2], 4),
+              ", ..., n", K, " = ", round(n[K + 1], 4), ".")
     }
   }
 }
 
-summary_build_ma_bern        <- function(K, n, alpha, beta, pi0, delta1,
+summary_build_ss_bern        <- function(K, n, alpha, beta, pi0, delta1,
                                          delta0, correction, power) {
   message("  ", rep("-", 60))
-  message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
+  message("  ", K, "-experimental treatment single-stage multi-arm trial ",
           "design")
   message("  ", rep("-", 60))
   message("  The outcome variables will be assumed to be Bernoulli ",
@@ -229,567 +119,352 @@ summary_build_ma_bern        <- function(K, n, alpha, beta, pi0, delta1,
   message("")
   message("  The hypotheses to be tested will be:\n")
   if (K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("pi"),
-            uc_sub(1), " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc("pi"), uc_sub(2),
-            " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = pi1 - pi0 <= 0, H2 : tau2 = pi2 - pi0 <= 0.\n")
   } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("pi"),
-            uc_sub(1), " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(K), ": ", uc("tau"), uc_sub(K), " = ", uc("pi"), uc_sub(K),
-            " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = pi1 - pi0 <= 0, ... , H", K, " : tau", K, " = pi",
+            K, " - pi0 <= 0.\n")
   }
-  message("")
   if (correction == "none") {
     message("  No multiple comparison correction will be applied. Each ",
-            "hypothesis will be tested at\n  significance level ", uc("alpha"),
-            " = ", round(alpha, 4), ".")
+            "hypothesis will be tested at\n  significance level alpha = ",
+            round(alpha, 4), ".")
   } else if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli")) {
     if (correction == "benjamini_hochberg") {
       sub_type <- "Hochberg"
     } else {
       sub_type <- "Yekutieli"
     }
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(alpha, 4), " using the Benjamini-", sub_type, " procedure.")
+    message("  The FDR will be controlled to level alpha = ", round(alpha, 4),
+            " using the Benjamini-", sub_type, " procedure.")
   } else {
-    if (correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
-    }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(alpha, 4), " will be achieved using ", segment)
+    segment   <- c("bonferroni"        = "Bonferroni's\n  correction.",
+                   "dunnett"           = "Dunnett's\n  correction.",
+                   "hochberg"          = "Hochberg's\n  correction.",
+                   "holm_bonferroni"   = "the\n  Holm-Bonferroni procedure.",
+                   "holm_sidak"        = "the\n  Holm-Sidak procedure.",
+                   "sidak"             = "Sidak's correction.",
+                   "step_down_dunnett" =
+                     "the step-down\n  Dunnett correction.")[correction]
+    message("  Strong control of the FWER to level alpha = ", round(alpha, 4),
+            " will be achieved using ", segment, "\n")
   }
-  message("")
   if (power == "conjunctive") {
-    message("  The trial will desire conjunctive  power of at least 1 - ",
-            uc("beta"), " = ", round(1 - beta, 4),
+    message("  The trial will desire conjunctive  power of at least 1 - beta",
+            " = ", round(1 - beta, 4),
             " under the global alternative, HA, given by:\n")
     if (K == 2) {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ", uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(0),
-              " + ", uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ".")
-    } else {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ... = ", uc("pi"), uc_sub(K), " = ", uc("pi"),
-              uc_sub(0), " + ", uc("delta"), uc_sub(1), " = ",
+      message("    HA: pi0 = ", pi0, ", pi1 = pi2 = pi0 + delta1 = ",
               round(pi0 + delta1, 4), ".")
+    } else {
+      message("    HA: pi0 = ", pi0, ", pi1 = ... = pi", K,
+              " = pi0 + delta1 = ", round(pi0 + delta1, 4), ".")
     }
   } else if (power == "disjunctive") {
-    message("  The trial will desire disjunctive power of at least 1 - ",
-            uc("beta"), " = ", round(1 - beta, 4),
+    message("  The trial will desire disjunctive power of at least 1 - beta",
+            " = ", round(1 - beta, 4),
             " under the global alternative, HA, given by:\n")
     if (K == 2) {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ", uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(0),
-              " + ", uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ".")
-    } else {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ... = ", uc("pi"), uc_sub(K), " = ", uc("pi"),
-              uc_sub(0), " + ", uc("delta"), uc_sub(1), " = ",
+      message("    HA: pi0 = ", pi0, ", pi1 = pi2 = pi0 + delta1 = ",
               round(pi0 + delta1, 4), ".")
+    } else {
+      message("    HA: pi0 = ", pi0, ", pi1 = ... = pi", K,
+              " = pi0 + delta1 = ", round(pi0 + delta1, 4), ".")
     }
   } else if (power == "marginal") {
-    message("  The trial will desire marginal power of at least 1 - ",
-            uc("beta"), " = ", round(1 - beta, 4), " to reject each of the ",
-            "null hypotheses, under the LFC for each null hypothesis. The LFC ",
-            "for H", uc_sub(1), ", LFC", uc_sub(1), ", is, e.g., given by:\n")
-    if (K == 2L) {
-      message("    LFC", uc_sub(1), ": ", uc("pi"), uc_sub(0), " = ", pi0, ", ",
-              uc("pi"), uc_sub(1), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ", ",
-              uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(0), " = ", round(pi0 + delta0, 4), ".")
-    } else if (K == 3L) {
-      message("    LFC", uc_sub(1), ": ", uc("pi"), uc_sub(0), " = ", pi0, ", ",
-              uc("pi"), uc_sub(1), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ", ",
-              uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(3), " = ", uc("pi"),
-              uc_sub(0), " + ", uc("delta"), uc_sub(0), " = ",
-              round(pi0 + delta0, 4), ".")
+    message("  The trial will desire marginal power of at least 1 - beta = ",
+            round(1 - beta, 4), " to reject each of the null hypotheses, under",
+            " the LFC for each null hypothesis. The LFC for H1, LFC1, is, ",
+            "e.g., given by:\n")
+    if (K == 2) {
+      message("    LFC1 : pi0 = ", pi0, ", pi1 = pi0 + delta1 = ",
+              round(pi0 + delta1, 4), ", pi2 = pi0 + delta0 = ",
+              round(pi0 + delta0, 4), ".\n")
+    } else if (K == 3) {
+      message("    LFC1 : pi0 = ", pi0, ", pi1 = pi0 + delta1 = ",
+              round(pi0 + delta1, 4), ", pi2 = pi3 = pi0 + delta0 = ",
+              round(pi0 + delta0, 4), ".\n")
     } else {
-      message("    LFC", uc_sub(1), ": ", uc("pi"), uc_sub(0), " = ", pi0, ", ",
-              uc("pi"), uc_sub(1), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ", ",
-              uc("pi"), uc_sub(2), " = ... = ", uc("pi"), uc_sub(K), " = ",
-              uc("pi"), uc_sub(0), " + ", uc("delta"), uc_sub(0), " = ",
-              round(pi0 + delta0, 4), ".")
+      message("    LFC1 : pi0 = ", pi0, ", pi1 = pi0 + delta1 = ",
+              round(pi0 + delta1, 4), ", pi2 = ... = pi", K,
+              " = pi0 + delta0 = ", round(pi0 + delta0, 4), ".\n")
     }
   }
-  message("")
   message("  The group size in each arm will be:")
   if (length(unique(n)) == 1) {
     if (K == 2) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = n", uc_sub(2), " = ",
-              round(n[1], 4), ".")
-    } else if (K %in% c(3, 4, 5, 7)) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(K),
-              " = ", round(n[1], 4), ".")
+      message("    n0 = n1 = n2 = ", round(n[1], 4), ".")
     } else {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(K),
-              " = ", round(n[1], 4), ".")
+      message("    n0 = n1 = ... = n", K, " = ", round(n[1], 4), ".")
     }
   } else {
     if (K == 2) {
-      message("    n", uc_sub(0), " = ", round(n[1], 4), ", n", uc_sub(1),
-              " = ", round(n[2], 4), ", n", uc_sub(2), " = ", round(n[3], 4),
-              ".")
+      message("    n0 = ", round(n[1], 4), ", n1 = ", round(n[2], 4), ", n2 = ",
+              round(n[3], 4), ".")
     } else {
-      message("    n", uc_sub(0), " = ", round(n[1], 4), ", n", uc_sub(1),
-              " = ", round(n[2], 4), ", ..., n", uc_sub(K), " = ",
-              round(n[K + 1], 4), ".")
+      message("    n0 = ", round(n[1], 4), ", n1 = ", round(n[2], 4),
+              ", ..., n", K, " = ", round(n[K + 1], 4), ".")
     }
   }
 }
 
-summary_des_int_ma           <- function(K, N, alpha, beta, delta1, delta0,
-                                         sigma, ratio, correction) {
-  message("  ", rep("-", 80))
-  message("  ", K, "-experimental treatment optimal constrained fixed-sample ",
-          "multi-arm trial design")
-  message("  ", rep("-", 80))
-  message("  The outcome variables will be assumed to be normally distributed.")
-  message("")
-  message("  The hypotheses to be tested will be:\n")
-  if (K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
-            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc("mu"), uc_sub(2),
-            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
-  } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
-            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(K), ": ", uc("tau"), uc_sub(K), " = ", uc("mu"), uc_sub(K),
-            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
-  }
-  message("")
-  if (correction == "none") {
-    message("  No multiple comparison correction will be applied. Each ",
-            "hypothesis will be tested at\n  significance level ", uc("alpha"),
-            " = ", round(alpha, 4), ".")
-  } else if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli")) {
-    if (correction == "benjamini_hochberg") {
-      sub_type <- "Hochberg"
-    } else {
-      sub_type <- "Yekutieli"
-    }
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(alpha, 4), " using the Benjamini-", sub_type, " procedure.")
-  } else {
-    if (correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
-    }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(alpha, 4), " will be achieved using ", segment)
-  }
-  message("\n  The trial's power will be evaluated under the global ",
-          "alternative, HA, given by:\n")
-  if (K == 2) {
-    message("    HA: ", uc("tau"), uc_sub(1), " = ", uc("tau"), uc_sub(2),
-            " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4), ".")
-  } else {
-    message("   HA: ", uc("tau"), uc_sub(1), " = ... = ", uc("tau"), uc_sub(K),
-            " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4), ".")
-  }
-  message("\n  It will also be evaluated under the LFC for each null ",
-          "hypothesis. The LFC for H", uc_sub(1), ",\n  LFC", uc_sub(1),
-          " is, e.g., given by:\n")
-  if (K == 2) {
-    message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-            uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-            uc_sub(2), " = ", uc("delta"), uc_sub(0), " = ", round(delta0, 4),
-            ".")
-  } else if (K == 3) {
-    message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-            uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-            uc_sub(2), " = ", uc("tau"), uc_sub(3), " = ", uc("delta"),
-            uc_sub(0), " = ", round(delta0, 4), ".")
-  } else {
-    message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-            uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-            uc_sub(2), " = ... = ", uc("tau"), uc_sub(K), " = ", uc("delta"),
-            uc_sub(0), " = ", round(delta0, 4), ".")
-  }
-  message("\n  For all error-rate calculations, the standard deviation of the ",
-          "patient responses in\n  each arm will be assumed to be known:\n")
-  if (length(unique(sigma)) == 1) {
-    if (K == 2) {
-      message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
-              " = ", round(sigma[1], 4), ".")
-    } else {
-      message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
-              uc_sub(K), " = ", round(sigma[1], 4), ".")
-    }
-  } else {
-    if (K == 2) {
-      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4), ", ",
-              uc("sigma"), uc_sub(1), " = ", round(sigma[2], 4), ".")
-    } else {
-      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4),
-              ", ..., ", uc("sigma"), uc_sub(K), " = ", round(sigma[K + 1], 4),
-              ".")
-    }
-  }
-  message("\n  The allocation ratios will be chosen as those which are ", ratio,
-          "-optimal, constraining\n  the sample size across the control ",
-          "and experimental arms to N = ", N, ".")
-}
-
-summary_des_ma               <- function(K, alpha, beta, delta1, delta0, sigma,
-                                         ratio, correction, power, integer) {
+summary_des_ss_norm          <- function(comp) {
   message("  ", rep("-", 60))
-  message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
+  message("  ", comp$K, "-experimental treatment single-stage multi-arm trial ",
           "design")
   message("  ", rep("-", 60))
-  message("  The outcome variables will be assumed to be normally distributed.")
-  message("")
+  message("  The outcome variables will be assumed to be normally distributed.",
+          "\n")
   message("  The hypotheses to be tested will be:\n")
-  if (K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
-            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc("mu"), uc_sub(2),
-            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
+  if (comp$K == 2) {
+    message("    H1 : tau1 = mu1 - mu0 <= 0, H2 : tau2 = mu2 - mu0 <= 0.\n")
   } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("mu"),
-            uc_sub(1), " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(K), ": ", uc("tau"), uc_sub(K), " = ", uc("mu"), uc_sub(K),
-            " - ", uc("mu"), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = mu1 - mu0 <= 0, ... , H", comp$K, " : tau", comp$K,
+            " = mu", comp$K, " - mu0 <= 0.\n")
   }
-  message("")
-  if (correction == "none") {
+  if (comp$correction == "none") {
     message("  No multiple comparison correction will be applied. Each ",
-            "hypothesis will be tested at\n  significance level ", uc("alpha"),
-            " = ", round(alpha, 4), ".")
-  } else if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli")) {
-    if (correction == "benjamini_hochberg") {
+            "hypothesis will be tested at\n  significance level alpha = ",
+            round(comp$alpha, 4), ".")
+  } else if (comp$correction %in% c("benjamini_hochberg",
+                                   "benjamini_yekutieli")) {
+    if (comp$correction == "benjamini_hochberg") {
       sub_type <- "Hochberg"
     } else {
       sub_type <- "Yekutieli"
     }
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(alpha, 4), " using the Benjamini-", sub_type, " procedure.")
+    message("  The FDR will be controlled to level alpha = ",
+            round(comp$alpha, 4), " using the Benjamini-", sub_type,
+            " procedure.")
   } else {
-    if (correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
-    }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(alpha, 4), " will be achieved using ", segment)
+    segment   <- c("bonferroni"        = "Bonferroni's\n  correction.",
+                   "dunnett"           = "Dunnett's\n  correction.",
+                   "hochberg"          = "Hochberg's\n  correction.",
+                   "holm_bonferroni"   = "the\n  Holm-Bonferroni procedure.",
+                   "holm_sidak"        = "the\n  Holm-Sidak procedure.",
+                   "sidak"             = "Sidak's correction.",
+                   "step_down_dunnett" =
+                     "the step-down\n  Dunnett correction.")[comp$correction]
+    message("  Strong control of the FWER to level alpha = ",
+            round(comp$alpha, 4), " will be achieved using ", segment, "\n")
   }
-  message("")
-  if (power == "conjunctive") {
-    message("  The trial's total sample-size will be chosen so that the trial ",
-            "has conjunctive\n  power of at least 1 - ", uc("beta"), " = ",
-            round(1 - beta, 4),
-            " under the global alternative, HA, given by:\n")
-    if (K == 2) {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ", uc("tau"), uc_sub(2),
-              " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4), ".")
+  if (comp$power == "conjunctive") {
+    message("  The trial will desire conjunctive power of at least 1 - beta = ",
+            round(1 - comp$beta, 4),
+            " under the global\n  alternative, HA, given by:\n")
+    if (comp$K == 2) {
+      message("    HA: tau1 = tau2 = delta1 = ", round(comp$delta1, 4), ".")
     } else {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ... = ", uc("tau"),
-              uc_sub(K), " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4),
-              ".")
+      message("    HA: tau1 = ... = tau", comp$K, " = delta1 = ",
+              round(comp$delta1, 4), ".")
     }
-  } else if (power == "disjunctive") {
-    message("  The trial's total sample-size will be chosen so that the trial ",
-            "has disjunctive\n  power of at least 1 - ", uc("beta"), " = ",
-            round(1 - beta, 4),
-            " under the global alternative, HA, given by:\n")
-    if (K == 2) {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ", uc("tau"), uc_sub(2),
-              " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4), ".")
+  } else if (comp$power == "disjunctive") {
+    message("  The trial will desire disjunctive power of at least 1 - beta = ",
+            round(1 - comp$beta, 4),
+            " under the global\n  alternative, HA, given by:\n")
+    if (comp$K == 2) {
+      message("    HA: tau1 = tau2 = delta1 = ", round(comp$delta1, 4), ".")
     } else {
-      message("    HA: ", uc("tau"), uc_sub(1), " = ... = ", uc("tau"),
-              uc_sub(K), " = ", uc("delta"), uc_sub(1), " = ", round(delta1, 4),
-              ".")
+      message("    HA: tau1 = ... = tau", comp$K, " = delta1 = ",
+              round(comp$delta1, 4), ".")
     }
-  } else if (power == "marginal") {
-    message("  The trial's total sample-size will be chosen so that the trial ",
-            "has marginal power\n  of at least 1 - ", uc("beta"), " = ",
-            round(1 - beta, 4), " to reject each of the null hypotheses, under",
-            " the LFC for\n  each null hypothesis. The LFC for H", uc_sub(1),
-            ", LFC", uc_sub(1), ", is, e.g., given by:\n")
-    if (K == 2) {
-      message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-              uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-              uc_sub(2), " = ", uc("delta"), uc_sub(0), " = ", round(delta0, 4),
-              ".")
-    } else if (K == 3) {
-      message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-              uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-              uc_sub(2), " = ", uc("tau"), uc_sub(3), " = ", uc("delta"),
-              uc_sub(0), " = ", round(delta0, 4), ".")
+  } else if (comp$power == "marginal") {
+    message("  The trial will desire marginal power of at least 1 - beta = ",
+            round(1 - comp$beta, 4),
+            " to reject each of the\n  null hypotheses, under",
+            " the LFC for each null hypothesis. The LFC for H1, LFC1, is,\n  ",
+            "e.g., given by:\n")
+    if (comp$K == 2) {
+      message("    LFC1 : tau1 = delta1 = ", round(comp$delta1, 4),
+              ", tau2 = delta0 = ", round(comp$delta0, 4), ".")
+    } else if (comp$K == 3) {
+      message("    LFC1 : tau1 = delta1 = ", round(comp$delta1, 4),
+              ", tau2 = tau3 = delta0 = ", round(comp$delta0, 4), ".")
     } else {
-      message("    LFC", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ",
-              uc("delta"), uc_sub(1), " = ", round(delta1, 4), ", ", uc("tau"),
-              uc_sub(2), " = ... = ", uc("tau"), uc_sub(K), " = ", uc("delta"),
-              uc_sub(0), " = ", round(delta0, 4), ".")
+      message("    LFC1 : tau1 = delta1 = ", round(comp$delta1, 4),
+              ", tau2 = ... = tau", comp$K, " = delta0 = ", round(comp$delta0, 4),
+              ".")
     }
   }
-  message("\n  For all error-rate calculations, the standard deviation of the ",
-          "patient responses in\n  each arm will be assumed to be known:\n")
-  if (length(unique(sigma)) == 1) {
-    if (K == 2) {
-      message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
-              " = ", round(sigma[1], 4), ".")
+  message("\n  The standard deviation of the patient responses in each arm ",
+          "will be assumed to be:\n")
+  if (length(unique(comp$sigma)) == 1) {
+    if (comp$K == 2) {
+      message("    sigma0 = sigma1 = ", round(comp$sigma[1], 4), ".\n")
     } else {
-      message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
-              uc_sub(K), " = ", round(sigma[1], 4), ".")
+      message("    sigma0 = ... = sigma", comp$K, " = ", round(comp$sigma[1], 4),
+              ".\n")
     }
   } else {
-    if (K == 2) {
-      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4), ", ",
-              uc("sigma"), uc_sub(1), " = ", round(sigma[2], 4), ".")
+    if (comp$K == 2) {
+      message("    sigma0 = ", round(comp$sigma[1], 4), ", sigma1 = ",
+              round(comp$sigma[2], 4), ".\n")
     } else {
-      message("    ", uc("sigma"), uc_sub(0), " = ", round(sigma[1], 4),
-              ", ..., ", uc("sigma"), uc_sub(K), " = ", round(sigma[K + 1], 4),
-              ".")
+      message("    sigma0 = ", round(comp$sigma[1], 4), ", ..., sigma", comp$K,
+              " = ", round(comp$sigma[comp$K + 1], 4), ".\n")
     }
   }
-  message("")
-  if (integer) {
+  if (comp$integer) {
     message("  The sample sizes in each will be forced to be whole numbers.")
   } else {
     message("  The sample sizes in each will not be forced to be whole ",
             "numbers.")
   }
   message("")
-  if (is.character(ratio)) {
-    message("  The allocation ratios will be chosen as those which are ", ratio,
-            "-optimal.")
+  if (is.character(comp$ratio)) {
+    message("  The allocation ratios will be chosen as those which are ",
+            comp$ratio, "-optimal.")
   } else {
     message("  The (approximate) allocation ratios to each experimental arm ",
             "will be:\n")
-    if (length(unique(ratio)) == 1) {
-      chars <- c("na", "third", "quarter", "fifth", "sixth", "na", "eigth")
-      if (K == 2) {
-        message("    r", uc_sub(1), " = r", uc_sub(2), " = ", round(ratio, 3),
-                ".")
+    if (length(unique(comp$ratio)) == 1) {
+      if (comp$K == 2) {
+        message("    r1 = r2 = ", round(comp$ratio, 3), ".")
       } else {
-        message("    r", uc_sub(1), " = ... = r", uc_sub(K), " = ",
-                round(ratio, 3), ".")
+        message("    r1 = ... = r", comp$K, " = ", round(comp$ratio, 3), ".")
       }
     } else {
-      if (K == 2) {
-        message("    r", uc_sub(1), " = ", round(ratio[1], 3), ", r", uc_sub(2),
-                " = ", round(ratio[2], 3), ".")
+      if (comp$K == 2) {
+        message("    r1 = ", round(comp$ratio[1], 3), ", r2 = ",
+                round(comp$ratio[2], 3), ".")
       } else {
-        message("    r", uc_sub(1), " = ", round(ratio[1], 3), ", ..., r",
-                uc_sub(K), " = ", round(ratio[K], 3), ".")
+        message("    r1 = ", round(comp$ratio[1], 3), ", ..., r", comp$K,
+                " = ", round(comp$ratio[comp$K], 3), ".")
       }
     }
   }
 }
 
-summary_des_ma_bern          <- function(K, alpha, beta, pi0, delta1, delta0,
-                                         ratio, correction, power, integer,
-                                         ratio_scenario) {
+summary_des_ss_bern          <- function(comp) {
   message("  ", rep("-", 60))
-  message("  ", K, "-experimental treatment fixed-sample multi-arm trial ",
-          "design for a Bernoulli distributed primary outcome")
+  message("  ", comp$K, "-experimental treatment single-stage multi-arm trial ",
+          "design")
   message("  ", rep("-", 60))
   message("  The outcome variables will be assumed to be Bernoulli ",
           "distributed.")
   message("")
   message("  The hypotheses to be tested will be:\n")
-  if (K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("pi"),
-            uc_sub(1), " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc("pi"), uc_sub(2),
-            " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0.")
+  if (comp$K == 2) {
+    message("    H1 : tau1 = pi1 - pi0 <= 0, H2 : tau2 = pi2 - pi0 <= 0.\n")
   } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc("pi"),
-            uc_sub(1), " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(K), ": ", uc("tau"), uc_sub(K), " = ", uc("pi"), uc_sub(K),
-            " - ", uc("pi"), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = pi1 - pi0 <= 0, ... , H", comp$K, " : tau", comp$K, " = pi",
+            comp$K, " - pi0 <= 0.\n")
   }
-  message("")
-  if (correction == "none") {
+  if (comp$correction == "none") {
     message("  No multiple comparison correction will be applied. Each ",
-            "hypothesis will be tested at\n  significance level ", uc("alpha"),
-            " = ", round(alpha, 4), ".")
-  } else if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli")) {
-    if (correction == "benjamini_hochberg") {
+            "hypothesis will be tested at\n  significance level alpha = ",
+            round(comp$alpha, 4), ".")
+  } else if (comp$correction %in% c("benjamini_hochberg", "benjamini_yekutieli")) {
+    if (comp$correction == "benjamini_hochberg") {
       sub_type <- "Hochberg"
     } else {
       sub_type <- "Yekutieli"
     }
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(alpha, 4), " using the Benjamini-", sub_type,
-            " procedure.")
+    message("  The FDR will be controlled to level alpha = ", round(comp$alpha, 4),
+            " using the Benjamini-", sub_type, " procedure.")
   } else {
-    if (correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
-    }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(alpha, 4), " will be achieved using ", segment)
+    segment   <- c("bonferroni"        = "Bonferroni's\n  correction.",
+                   "dunnett"           = "Dunnett's\n  correction.",
+                   "hochberg"          = "Hochberg's\n  correction.",
+                   "holm_bonferroni"   = "the\n  Holm-Bonferroni procedure.",
+                   "holm_sidak"        = "the\n  Holm-Sidak procedure.",
+                   "sidak"             = "Sidak's correction.",
+                   "step_down_dunnett" =
+                     "the step-down\n  Dunnett correction.")[comp$correction]
+    message("  Strong control of the FWER to level alpha = ", round(comp$alpha, 4),
+            " will be achieved using ", segment, "\n")
   }
-  message("")
-  if (power == "conjunctive") {
-    message("  The trial's total sample-size will be chosen so that the trial ",
-            "has conjunctive\n  power of at least 1 - ", uc("beta"), " = ",
-            round(1 - beta, 4),
+  if (comp$power == "conjunctive") {
+    message("  The trial will desire conjunctive  power of at least 1 - beta",
+            " = ", round(1 - comp$beta, 4),
             " under the global alternative, HA, given by:\n")
-    if (K == 2L) {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ", uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(0),
-              " + ", uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ".")
+    if (comp$K == 2) {
+      message("    HA: pi0 = ", comp$pi0, ", pi1 = pi2 = pi0 + delta1 = ",
+              round(comp$pi0 + comp$delta1, 4), ".")
     } else {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ... = ", uc("pi"), uc_sub(K), " = ", uc("pi"),
-              uc_sub(0), " + ", uc("delta"), uc_sub(1), " = ",
-              round(pi0 + delta1, 4), ".")
+      message("    HA: pi0 = ", comp$pi0, ", pi1 = ... = pi", comp$K,
+              " = pi0 + delta1 = ", round(comp$pi0 + comp$delta1, 4), ".")
     }
-  } else if (power == "disjunctive") {
-    message("  The trial's total sample-size will be chosen so that the trial ",
-            "has disjunctive\n  power of at least 1 - ", uc("beta"), " = ",
-            round(1 - beta, 4),
+  } else if (comp$power == "disjunctive") {
+    message("  The trial will desire disjunctive power of at least 1 - beta",
+            " = ", round(1 - comp$beta, 4),
             " under the global alternative, HA, given by:\n")
-    if (K == 2L) {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ", uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(0),
-              " + ", uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ".")
+    if (comp$K == 2) {
+      message("    HA: pi0 = ", comp$pi0, ", pi1 = pi2 = pi0 + delta1 = ",
+              round(comp$pi0 + comp$delta1, 4), ".")
     } else {
-      message("    HA: ", uc("pi"), uc_sub(0), " = ", pi0, ", ", uc("pi"),
-              uc_sub(1), " = ... = ", uc("pi"), uc_sub(K), " = ", uc("pi"),
-              uc_sub(0), " + ", uc("delta"), uc_sub(1), " = ",
-              round(pi0 + delta1, 4), ".")
+      message("    HA: pi0 = ", comp$pi0, ", pi1 = ... = pi", comp$K,
+              " = pi0 + delta1 = ", round(comp$pi0 + comp$delta1, 4), ".")
     }
-  } else if (power == "marginal") {
-    message("  The trial's total sample-size will be chosen so that the trial ",
-            "has marginal power\n  of at least 1 - ", uc("beta"), " = ",
-            round(1 - beta, 4), " to reject each of the null hypotheses, under",
-            " the LFC for\n  each null hypothesis. The LFC for H", uc_sub(1),
-            ", LFC", uc_sub(1), ", is, e.g., given by:\n")
-    if (K == 2L) {
-      message("    LFC", uc_sub(1), ": ", uc("pi"), uc_sub(0), " = ", pi0, ", ",
-              uc("pi"), uc_sub(1), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ", ",
-              uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(0), " = ", round(pi0 + delta0, 4), ".")
-    } else if (K == 3L) {
-      message("    LFC", uc_sub(1), ": ", uc("pi"), uc_sub(0), " = ", pi0, ", ",
-              uc("pi"), uc_sub(1), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ", ",
-              uc("pi"), uc_sub(2), " = ", uc("pi"), uc_sub(3), " = ", uc("pi"),
-              uc_sub(0), " + ", uc("delta"), uc_sub(0), " = ",
-              round(pi0 + delta0, 4), ".")
+  } else if (comp$power == "marginal") {
+    message("  The trial will desire marginal power of at least 1 - beta = ",
+            round(1 - comp$beta, 4), " to reject each of the null hypotheses, under",
+            " the LFC for each null hypothesis. The LFC for H1, LFC1, is, ",
+            "e.g., given by:\n")
+    if (comp$K == 2) {
+      message("    LFC1 : pi0 = ", comp$pi0, ", pi1 = pi0 + delta1 = ",
+              round(comp$pi0 + comp$delta1, 4), ", pi2 = pi0 + delta0 = ",
+              round(comp$pi0 + comp$delta0, 4), ".\n")
+    } else if (comp$K == 3) {
+      message("    LFC1 : pi0 = ", comp$pi0, ", pi1 = pi0 + delta1 = ",
+              round(comp$pi0 + comp$delta1, 4), ", pi2 = pi3 = pi0 + delta0 = ",
+              round(comp$pi0 + comp$delta0, 4), ".\n")
     } else {
-      message("    LFC", uc_sub(1), ": ", uc("pi"), uc_sub(0), " = ", pi0, ", ",
-              uc("pi"), uc_sub(1), " = ", uc("pi"), uc_sub(0), " + ",
-              uc("delta"), uc_sub(1), " = ", round(pi0 + delta1, 4), ", ",
-              uc("pi"), uc_sub(2), " = ... = ", uc("pi"), uc_sub(K), " = ",
-              uc("pi"), uc_sub(0), " + ", uc("delta"), uc_sub(0), " = ",
-              round(pi0 + delta0, 4), ".")
+      message("    LFC1 : pi0 = ", comp$pi0, ", pi1 = pi0 + delta1 = ",
+              round(comp$pi0 + comp$delta1, 4), ", pi2 = ... = pi", comp$K,
+              " = pi0 + delta0 = ", round(comp$pi0 + comp$delta0, 4), ".\n")
     }
   }
-  message("")
-  if (integer) {
-    message("  The sample sizes in each will be forced to be whole numbers.")
+  if (comp$integer) {
+    message("  The sample sizes in each will be forced to be whole numbers.\n")
   } else {
     message("  The sample sizes in each will not be forced to be whole ",
-            "numbers.")
+            "numbers.\n")
   }
-  message("")
-  if (is.character(ratio)) {
-    message("  The allocation ratios will be chosen as those which are ", ratio,
-            "-optimal, under ", ratio_scenario, ".")
+  if (is.character(comp$ratio)) {
+    message("  The allocation ratios will be chosen as those which are ", comp$ratio,
+            "-optimal, under ", comp$ratio_scenario, ".")
   } else {
     message("  The (approximate) allocation ratios to each experimental arm ",
             "will be:\n")
-    if (length(unique(ratio)) == 1) {
-      chars <- c("na", "third", "quarter", "fifth", "sixth", "na", "eigth")
-      if (K == 2) {
-        message("    r", uc_sub(1), " = r", uc_sub(2), " = ", round(ratio, 3),
-                ".")
+    if (length(unique(comp$ratio)) == 1) {
+      if (comp$K == 2) {
+        message("    r1 = r2 = ", round(comp$ratio, 3), ".")
       } else {
-        message("    r", uc_sub(1), " = ... = r", uc_sub(K), " = ",
-                round(ratio, 3), ".")
+        message("    r1 = ... = r", comp$K, " = ", round(comp$ratio, 3), ".")
       }
     } else {
-      if (K == 2) {
-        message("    r", uc_sub(1), " = ", round(ratio[1], 3), ", r", uc_sub(2),
-                " = ", round(ratio[2], 3), ".")
+      if (comp$K == 2) {
+        message("    r1 = ", round(comp$ratio[1], 3), ", r2 = ",
+                round(comp$ratio[2], 3), ".")
       } else {
-        message("    r", uc_sub(1), " = ", round(ratio[1], 3), ", ..., r",
-                uc_sub(K), " = ", round(ratio[K], 3), ".")
+        message("    r1 = ", round(comp$ratio[1], 3), ", ..., r", comp$K,
+                " = ", round(comp$ratio[comp$K], 3), ".")
       }
     }
   }
 }
 
-summary_opchar_ma            <- function(des, tau_pi, type) {
+summary_opchar_ss            <- function(des, tau_pi, type) {
   message("  ", rep("-", 79))
-  message("  ", des$K, "-experimental treatment fixed-sample multi-arm trial ",
+  message("  ", des$K, "-experimental treatment single-stage multi-arm trial ",
           "operating characteristics")
   message("  ", rep("-", 79))
   if (type == "normal") {
     message("  The outcome variables will be assumed to be normally ",
-            "distributed.")
+            "distributed.\n")
     text <- "mu"
   } else {
     message("  The outcome variables will be assumed to be Bernoulli ",
-            "distributed.")
+            "distributed.\n")
     text <- "pi"
   }
-  message("")
   message("  The hypotheses to be tested will be:\n")
   if (des$K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc(text), uc_sub(2),
-            " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = ", text, "1 - ", text, "0 <= 0, H2 : tau2 = ",
+            text, "2 - ", text, "0 <= 0.\n")
   } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(des$K), ": ", uc("tau"), uc_sub(des$K), " = ", uc(text), uc_sub(des$K),
-            " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = ", text, "1 - ", text, "0 <= 0, ... , H", des$K,
+            " : tau", des$K, " = ", text, des$K, " - ", text, "0 <= 0.\n")
   }
   if (type == "normal") {
     message("\n  For all error-rate calculations, the standard deviation of ",
@@ -797,52 +472,40 @@ summary_opchar_ma            <- function(des, tau_pi, type) {
             "known:\n")
     if (length(unique(des$sigma)) == 1) {
       if (des$K == 2) {
-        message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
-                " = ", round(des$sigma[1], 4), ".")
+        message("    sigma0 = sigma1 = ", round(des$sigma[1], 4), ".")
       } else {
-        message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
-                uc_sub(des$K), " = ", round(des$sigma[1], 4), ".")
+        message("    sigma0 = ... = sigma", des$K, " = ",
+                round(des$sigma[1], 4), ".")
       }
     } else {
       if (des$K == 2) {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4),
-                ", ", uc("sigma"), uc_sub(1), " = ", round(des$sigma[2], 4),
-                ".")
+        message("    sigma0 = ", round(des$sigma[1], 4), ", sigma1 = ",
+                round(des$sigma[2], 4), ".\n")
       } else {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4),
-                ", ..., ", uc("sigma"), uc_sub(des$K), " = ",
-                round(des$sigma[des$K + 1], 4), ".")
+        message("    sigma0 = ", round(des$sigma[1], 4), ", ..., sigma", des$K,
+                " = ", round(des$sigma[des$K + 1], 4), ".\n")
       }
     }
   }
-  message("")
   message("  The group size in each arm will be:\n")
   if (length(unique(des$n)) == 1) {
     if (des$K == 2) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = n", uc_sub(2), " = ",
-              round(des$n[1], 4), ".")
-    } else if (des$K %in% c(3, 4, 5, 7)) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(des$K),
-              " = ", round(des$n[1], 4), ".")
+      message("    n0 = n1 = n2 = ", round(des$n[1], 4), ".\n")
     } else {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n", uc_sub(des$K),
-              " = ", round(des$n[1], 4), ".")
+      message("    n0 = n1 = ... = n", des$K, " = ", round(des$n[1], 4), ".\n")
     }
   } else {
     if (des$K == 2) {
-      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
-              " = ", round(des$n[2], 4), ", n", uc_sub(2), " = ",
-              round(des$n[3], 4), ".")
+      message("    n0 = ", round(des$n[1], 4), ", n1 = ", round(des$n[2], 4),
+              ", n2 = ", round(des$n[3], 4), ".\n")
     } else {
-      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
-              " = ", round(des$n[2], 4), ", ..., n", uc_sub(des$K), " = ",
-              round(des$n[des$K + 1], 4), ".")
+      message("    n0 = ", round(des$n[1], 4), ", n1 = ", round(des$n[2], 4),
+              ", ..., n", des$K, " = ", round(des$n[des$K + 1], 4), ".\n")
     }
   }
-  message("")
   if (des$correction == "none") {
-    message("  No multiplity correction will be applied. Each hypothesis will ",
-            "be tested at\n  significance level ", uc("alpha"), " = ",
+    message("  No multiple comparison correction will be applied. Each ",
+            "hypothesis will be tested at\n  significance level alpha = ",
             round(des$alpha, 4), ".")
   } else if (des$correction %in% c("benjamini_hochberg",
                                    "benjamini_yekutieli")) {
@@ -851,74 +514,60 @@ summary_opchar_ma            <- function(des, tau_pi, type) {
     } else {
       sub_type <- "Yekutieli"
     }
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
+    message("  The FDR will be controlled to level alpha = ",
             round(des$alpha, 4), " using the Benjamini-", sub_type,
             " procedure.")
   } else {
-    if (des$correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (des$correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (des$correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (des$correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (des$correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
-    }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(des$alpha, 4), " will be achieved using ", segment)
+    segment   <- c("bonferroni"        = "Bonferroni's\n  correction.",
+                   "dunnett"           = "Dunnett's\n  correction.",
+                   "hochberg"          = "Hochberg's\n  correction.",
+                   "holm_bonferroni"   = "the\n  Holm-Bonferroni procedure.",
+                   "holm_sidak"        = "the\n  Holm-Sidak procedure.",
+                   "sidak"             = "Sidak's correction.",
+                   "step_down_dunnett" =
+                     "the step-down\n  Dunnett correction.")[des$correction]
+    message("  Strong control of the FWER to level alpha = ",
+            round(des$alpha, 4), " will be achieved using ", segment, "\n")
   }
-  message("")
   if (type == "normal") {
     text <- "tau"
   }
   if (des$K == 2) {
     message("  The operating characteristics will be evaluated at ",
-            nrow(tau_pi), " possible values of (", uc(text), uc_sub(1), ",",
-            uc(text), uc_sub(2), ").")
+            nrow(tau_pi), " possible values of (", text, "1,", text, "2).")
   } else if (des$K == 3) {
     message("  The operating characteristics will be evaluated at ",
-            nrow(tau_pi), " possible values of (", uc(text), uc_sub(1), ",",
-            uc(text), uc_sub(2), ",", uc(text), uc_sub(3), ").")
+            nrow(tau_pi), " possible values of (", text, "1,", text, "2,", text,
+            "3).")
   } else {
     message("  The operating characteristics will be evaluated at ",
-            nrow(tau_pi), " possible values of (", uc(text), uc_sub(1), ",...,",
-            uc(text), uc_sub(des$K), ").")
+            nrow(tau_pi), " possible values of (", text, "1,...,", text, des$K,
+            ").")
   }
 }
 
-summary_plot_multiarm_des_ma <- function(des, delta_min, delta_max, delta,
+summary_plot_multiarm_des_ss <- function(des, delta_min, delta_max, delta,
                                          density, type) {
   message("  ", rep("-", 79))
-  message("  ", des$K, "-experimental treatment fixed-sample multi-arm trial ",
+  message("  ", des$K, "-experimental treatment single-stage multi-arm trial ",
           "operating characteristics")
   message("  ", rep("-", 79))
   if (type == "normal") {
     message("  The outcome variables will be assumed to be normally ",
-            "distributed.")
+            "distributed.\n")
     text <- "mu"
   } else {
     message("  The outcome variables will be assumed to be Bernoulli ",
-            "distributed.")
+            "distributed.\n")
     text <- "pi"
   }
-  message("")
   message("  The hypotheses to be tested will be:\n")
   if (des$K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc(text), uc_sub(2),
-            " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = ", text, "1 - ", text, "0 <= 0, H2 : tau2 = ",
+            text, "2 - ", text, "0 <= 0.\n")
   } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(des$K), ": ", uc("tau"), uc_sub(des$K), " = ", uc(text),
-            uc_sub(des$K), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = ", text, "1 - ", text, "0 <= 0, ... , H", des$K,
+            " : tau", des$K, " = ", text, des$K, " - ", text, "0 <= 0.\n")
   }
   if (type == "normal") {
     message("\n  For all error-rate calculations, the standard deviation of ",
@@ -926,106 +575,90 @@ summary_plot_multiarm_des_ma <- function(des, delta_min, delta_max, delta,
             "known:\n")
     if (length(unique(des$sigma)) == 1) {
       if (des$K == 2) {
-        message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
-                " = ", round(des$sigma[1], 4), ".")
+        message("    sigma0 = sigma1 = ", round(des$sigma[1], 4), ".")
       } else {
-        message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
-                uc_sub(des$K), " = ", round(des$sigma[1], 4), ".")
+        message("    sigma0 = ... = sigma", des$K, " = ",
+                round(des$sigma[1], 4), ".")
       }
     } else {
-      if (des$K == 2L) {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4), ", ",
-                uc("sigma"), uc_sub(1), " = ", round(des$sigma[2], 4), ".")
+      if (des$K == 2) {
+        message("    sigma0 = ", round(des$sigma[1], 4), ", sigma1 = ",
+                round(des$sigma[2], 4), ".\n")
       } else {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4),
-                ", ..., ", uc("sigma"), uc_sub(des$K), " = ",
-                round(des$sigma[des$K + 1], 4), ".")
+        message("    sigma0 = ", round(des$sigma[1], 4), ", ..., sigma", des$K,
+                " = ", round(des$sigma[des$K + 1], 4), ".\n")
       }
     }
   }
-  message("")
   message("  The group size in each arm will be:\n")
-  if (length(unique(des$n)) == 1L) {
-    if (des$K == 2L) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = n", uc_sub(2), " = ",
-              round(des$n[1], 4), ".")
-    } else if (des$K %in% c(3L, 4L, 5L, 7L)) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n",
-              uc_sub(des$K), " = ", round(des$n[1], 4), ".")
+  if (length(unique(des$n)) == 1) {
+    if (des$K == 2) {
+      message("    n0 = n1 = n2 = ", round(des$n[1], 4), ".\n")
     } else {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n",
-              uc_sub(des$K), " = ", round(des$n[1], 4), ".")
+      message("    n0 = n1 = ... = n", des$K, " = ", round(des$n[1], 4), ".\n")
     }
   } else {
-    if (des$K == 2L) {
-      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
-              " = ", round(des$n[2], 4), ", n", uc_sub(2), " = ",
-              round(des$n[3], 4), ".")
+    if (des$K == 2) {
+      message("    n0 = ", round(des$n[1], 4), ", n1 = ", round(des$n[2], 4),
+              ", n2 = ", round(des$n[3], 4), ".\n")
     } else {
-      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
-              " = ", round(des$n[2], 4), ", ..., n", uc_sub(des$K), " = ",
-              round(des$n[des$K + 1L], 4), ".")
+      message("    n0 = ", round(des$n[1], 4), ", n1 = ", round(des$n[2], 4),
+              ", ..., n", des$K, " = ", round(des$n[des$K + 1], 4), ".\n")
     }
   }
-  message("")
   if (des$correction == "none") {
-    message("  No multiplity correction will be applied. Each hypothesis will ",
-            "be tested at\n  significance level ", uc("alpha"), " = ",
+    message("  No multiple comparison correction will be applied. Each ",
+            "hypothesis will be tested at\n  significance level alpha = ",
             round(des$alpha, 4), ".")
-  } else if (des$correction == "benjamini_hochberg") {
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(des$alpha, 4), " using the Benjamini-Hochberg procedure.")
-  } else {
-    if (des$correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (des$correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (des$correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (des$correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (des$correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
+  } else if (des$correction %in% c("benjamini_hochberg",
+                                   "benjamini_yekutieli")) {
+    if (des$correction == "benjamini_hochberg") {
+      sub_type <- "Hochberg"
+    } else {
+      sub_type <- "Yekutieli"
     }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(des$alpha, 4), " will be achieved using ", segment)
+    message("  The FDR will be controlled to level alpha = ",
+            round(des$alpha, 4), " using the Benjamini-", sub_type,
+            " procedure.")
+  } else {
+    segment   <- c("bonferroni"        = "Bonferroni's\n  correction.",
+                   "dunnett"           = "Dunnett's\n  correction.",
+                   "hochberg"          = "Hochberg's\n  correction.",
+                   "holm_bonferroni"   = "the\n  Holm-Bonferroni procedure.",
+                   "holm_sidak"        = "the\n  Holm-Sidak procedure.",
+                   "sidak"             = "Sidak's correction.",
+                   "step_down_dunnett" =
+                     "the step-down\n  Dunnett correction.")[des$correction]
+    message("  Strong control of the FWER to level alpha = ",
+            round(des$alpha, 4), " will be achieved using ", segment, "\n")
   }
-  message("")
   message("  The operating characteristics will be evaluated for treatment ",
           "effects over the range ", delta_min, " to ", delta_max,
           ", producing each line curve using ", density, " points and with a",
           " treatment effect shift of ", delta)
 }
 
-summary_sim_ma               <- function(des, tau_pi, replicates, type) {
+summary_sim_ss               <- function(des, tau_pi, replicates, type) {
   message("  ", rep("-", 64))
-  message("  ", des$K, "-experimental treatment fixed-sample multi-arm trial ",
+  message("  ", des$K, "-experimental treatment single-stage multi-arm trial ",
           "simulation")
   message("  ", rep("-", 64))
   if (type == "normal") {
     message("  The outcome variables will be assumed to be normally ",
-            "distributed.")
-    text <- "mu"
+            "distributed.\n")
+    text       <- "mu"
   } else {
     message("  The outcome variables will be assumed to be Bernoulli ",
-            "distributed.")
-    text <- "pi"
+            "distributed.\n")
+    text       <- "pi"
   }
   message("  The hypotheses to be tested will be:\n")
   if (des$K == 2) {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, H",
-            uc_sub(2), ": ", uc("tau"), uc_sub(2), " = ", uc(text), uc_sub(2),
-            " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = ", text, "1 - ", text, "0 <= 0, H2 : tau2 = ",
+            text, "2 - ", text, "0 <= 0.\n")
   } else {
-    message("    H", uc_sub(1), ": ", uc("tau"), uc_sub(1), " = ", uc(text),
-            uc_sub(1), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0, ..., H",
-            uc_sub(des$K), ": ", uc("tau"), uc_sub(des$K), " = ", uc(text),
-            uc_sub(des$K), " - ", uc(text), uc_sub(0), " ", uc("le"), " 0.")
+    message("    H1 : tau1 = ", text, "1 - ", text, "0 <= 0, ... , H", des$K,
+            " : tau", des$K, " = ", text, des$K, " - ", text, "0 <= 0.\n")
   }
   if (type == "normal") {
     message("\n  For all error-rate calculations, the standard deviation of ",
@@ -1033,157 +666,74 @@ summary_sim_ma               <- function(des, tau_pi, replicates, type) {
             "known:\n")
     if (length(unique(des$sigma)) == 1) {
       if (des$K == 2) {
-        message("    ", uc("sigma"), uc_sub(0), " = ", uc("sigma"), uc_sub(1),
-                " = ", round(des$sigma[1], 4), ".")
+        message("    sigma0 = sigma1 = ", round(des$sigma[1], 4), ".")
       } else {
-        message("    ", uc("sigma"), uc_sub(0), " = ... = ", uc("sigma"),
-                uc_sub(des$K), " = ", round(des$sigma[1], 4), ".")
+        message("    sigma0 = ... = sigma", des$K, " = ",
+                round(des$sigma[1], 4), ".")
       }
     } else {
       if (des$K == 2) {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4),
-                ", ", uc("sigma"), uc_sub(1), " = ", round(des$sigma[2], 4),
-                ".")
+        message("    sigma0 = ", round(des$sigma[1], 4), ", sigma1 = ",
+                round(des$sigma[2], 4), ".\n")
       } else {
-        message("    ", uc("sigma"), uc_sub(0), " = ", round(des$sigma[1], 4),
-                ", ..., ", uc("sigma"), uc_sub(des$K), " = ",
-                round(des$sigma[des$K + 1], 4), ".")
+        message("    sigma0 = ", round(des$sigma[1], 4), ", ..., sigma", des$K,
+                " = ", round(des$sigma[des$K + 1], 4), ".\n")
       }
     }
   }
-  message("")
   message("  The group size in each arm will be:\n")
   if (length(unique(des$n)) == 1) {
     if (des$K == 2) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = n", uc_sub(2), " = ",
-              round(des$n[1], 4), ".")
-    } else if (des$K %in% c(3, 4, 5, 7)) {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n",
-              uc_sub(des$K), " = ", round(des$n[1], 4), ".")
+      message("    n0 = n1 = n2 = ", round(des$n[1], 4), ".\n")
     } else {
-      message("    n", uc_sub(0), " = n", uc_sub(1), " = ... = n",
-              uc_sub(des$K), " = ", round(des$n[1], 4), ".")
+      message("    n0 = n1 = ... = n", des$K, " = ", round(des$n[1], 4), ".\n")
     }
   } else {
     if (des$K == 2) {
-      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
-              " = ", round(des$n[2], 4), ", n", uc_sub(2), " = ",
-              round(des$n[3], 4), ".")
+      message("    n0 = ", round(des$n[1], 4), ", n1 = ", round(des$n[2], 4),
+              ", n2 = ", round(des$n[3], 4), ".\n")
     } else {
-      message("    n", uc_sub(0), " = ", round(des$n[1], 4), ", n", uc_sub(1),
-              " = ", round(des$n[2], 4), ", ..., n", uc_sub(des$K), " = ",
-              round(des$n[des$K + 1], 4), ".")
+      message("    n0 = ", round(des$n[1], 4), ", n1 = ", round(des$n[2], 4),
+              ", ..., n", des$K, " = ", round(des$n[des$K + 1], 4), ".\n")
     }
   }
-  message("")
   if (des$correction == "none") {
     message("  No multiple comparison correction will be applied. Each ",
-            "hypothesis will be tested at\n  significance level ", uc("alpha"),
-            " = ", round(des$alpha, 4), ".")
-  } else if (des$correction == "benjamini_hochberg") {
-    message("  The FDR will be controlled to level ", uc("alpha"), " = ",
-            round(des$alpha, 4), " using the Benjamini-Hochberg procedure.")
-  } else {
-    if (des$correction == "bonferroni") {
-      segment <- "Bonferroni's\n  correction."
-    } else if (des$correction == "dunnett") {
-      segment <- "Dunnett's\n  correction."
-    } else if (des$correction == "hochberg") {
-      segment <- "Hochberg's\n  correction."
-    } else if (des$correction == "holm_bonferroni") {
-      segment <- "the\n  Holm-Bonferroni procedure."
-    } else if (des$correction == "holm_sidak") {
-      segment <- "the\n  Holm-\u0160id\u00e1k procedure."
-    } else if (des$correction == "sidak") {
-      segment <- "\u0160id\u00e1k's\n  correction."
-    } else if (des$correction == "step_down_dunnett") {
-      segment <- "the step-down\n  Dunnett correction."
+            "hypothesis will be tested at\n  significance level alpha = ",
+            round(des$alpha, 4), ".")
+  } else if (des$correction %in% c("benjamini_hochberg",
+                                   "benjamini_yekutieli")) {
+    if (des$correction == "benjamini_hochberg") {
+      sub_type <- "Hochberg"
+    } else {
+      sub_type <- "Yekutieli"
     }
-    message("  Strong control of the FWER to level ", uc("alpha"), " = ",
-            round(des$alpha, 4), " will be achieved using ", segment)
+    message("  The FDR will be controlled to level alpha = ",
+            round(des$alpha, 4), " using the Benjamini-", sub_type,
+            " procedure.")
+  } else {
+    segment   <- c("bonferroni"        = "Bonferroni's\n  correction.",
+                   "dunnett"           = "Dunnett's\n  correction.",
+                   "hochberg"          = "Hochberg's\n  correction.",
+                   "holm_bonferroni"   = "the\n  Holm-Bonferroni procedure.",
+                   "holm_sidak"        = "the\n  Holm-Sidak procedure.",
+                   "sidak"             = "Sidak's correction.",
+                   "step_down_dunnett" =
+                     "the step-down\n  Dunnett correction.")[des$correction]
+    message("  Strong control of the FWER to level alpha = ",
+            round(des$alpha, 4), " will be achieved using ", segment, "\n")
   }
-  message("")
   if (des$K == 2) {
     message("  The operating characteristics will be estimated at ",
-            nrow(tau_pi), " possible values of (", uc(text), uc_sub(1), ",",
-            uc(text), uc_sub(2), ").")
+            nrow(tau_pi), " possible values of (", text, "1,", text, "2).")
   } else if (des$K == 3) {
     message("  The operating characteristics will be estimated at ",
-            nrow(tau_pi), " possible values of (", uc(text), uc_sub(1), ",",
-            uc(text), uc_sub(2), ",", uc(text), uc_sub(3), ").")
+            nrow(tau_pi), " possible values of (", text, "1,", text, "2,", text,
+            "3).")
   } else {
     message("  The operating characteristics will be estimated at ",
-            nrow(tau_pi), " possible values of (", uc(text), uc_sub(1), ",...,",
-            uc(text), uc_sub(des$K), ").")
+            nrow(tau_pi), " possible values of (", text, "1,...,", text, des$K,
+            ").")
   }
   message("\n  ", replicates, " simulations will be used for each scenario.")
-}
-
-uc                           <- function(char) {
-  lookup <- matrix(c("alpha",    "\u03B1",
-                     "beta",     "\u03B2",
-                     "gamma",    "\u03B3",
-                     "delta",    "\u03B4",
-                     "epsilon",  "\u03B5",
-                     "zeta",     "\u03B6",
-                     "eta",      "\u03B7",
-                     "theta",    "\u03B8",
-                     "iota",     "\u03B9",
-                     "kappa",    "\u03BA",
-                     "lambda",   "\u03BB",
-                     "mu",       "\u03BC",
-                     "nu",       "\u03BD",
-                     "xi",       "\u03BE",
-                     "omicron",  "\u03BF",
-                     "pi",       "\u03C0",
-                     "rho",      "\u03C1",
-                     "sigma",    "\u03C3",
-                     "tau",      "\u03C4",
-                     "upsilon",  "\u03C5",
-                     "phi",      "\u03C6",
-                     "chi",      "\u03C7",
-                     "psi",      "\u03C8",
-                     "omega",    "\u03C9",
-                     "Alpha",    "\u0391",
-                     "Beta",     "\u0392",
-                     "Gamma",    "\u0393",
-                     "Delta",    "\u0394",
-                     "Epsilon",  "\u0395",
-                     "Zeta",     "\u0396",
-                     "Eta",      "\u0397",
-                     "Theta",    "\u0398",
-                     "Iota",     "\u0399",
-                     "Kappa",    "\u039A",
-                     "Lambda",   "\u039B",
-                     "Mu",       "\u039C",
-                     "Nu",       "\u039D",
-                     "Xi",       "\u039E",
-                     "Omicron",  "\u039F",
-                     "Pi",       "\u03A0",
-                     "Rho",      "\u03A1",
-                     "Sigma",    "\u03A3",
-                     "Tau",      "\u03A4",
-                     "Upsilon",  "\u03A5",
-                     "Phi",      "\u03A6",
-                     "Chi",      "\u03A7",
-                     "Psi",      "\u03A8",
-                     "Omega",    "\u03A9",
-                     "le",       "\u2264",
-                     "third",    "\u2153",
-                     "quarter",  "\u00BC",
-                     "fifth",    "\u2155",
-                     "sixth",    "\u2159",
-                     "eigth",    "\u215B",
-                     "two_elip", "\u2026\u2026"), ncol = 2, byrow = T)
-  lookup[which(lookup[, 1] == char), 2]
-}
-
-uc_sub                       <- function(n) {
-  codes  <- c("\u2080", "\u2081", "\u2082", "\u2083", "\u2084", "\u2085",
-              "\u2086", "\u2087", "\u2088", "\u2089")
-  if (n < 10) {
-    codes[n + 1]
-  } else {
-    paste(codes[n%/%10 + 1], codes[n%%10 + 1], sep = "")
-  }
 }

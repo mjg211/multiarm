@@ -1,0 +1,209 @@
+---
+title: "Single-stage multi-arm clinical trial design for a normally distributed primary outcome"
+date: "`r format(Sys.time(), '%d/%m/%Y')`"
+params:
+  K:            NA
+  alpha:        NA
+  beta:         NA
+  delta1:       NA
+  delta0:       NA
+  sigma:        NA
+  ratio_type:   NA
+  ratio_init:   NA
+  ratio:        NA
+  correction:   NA
+  power:        NA
+  integer:      NA
+  large_N:      NA
+  small_n:      NA
+  opchar:       NA
+  gamma:        NA
+  gammaO:       NA
+  plots:        NA
+  equal_error:  NA
+  equal_power:  NA
+  equal_other:  NA
+  shifted_power: NA
+  data:         NA
+---
+
+```{r, include = F}
+knitr::opts_chunk$set(echo = F, results = "asis")
+```
+
+# Design setting
+
+The trial will be designed to compare $K$ experimental treatments to a shared control arm.
+Response $X_{ik}$, from patient $i=1,\dots,n_k$ in arm $k=0,\dots,K$, will be assumed to be distributed as $X_{ik} \sim N(\mu_k,\sigma_k^2)$. Then, the hypotheses to be tested will be:
+$$ H_k : \tau_k = \mu_k - \mu_0 \le 0,\ k=1,\dots,K.$$
+The *global null hypothesis*, $H_G$, will be:
+$$ \tau_1 = \cdots = \tau_K = 0. $$
+The *global alternative hypothesis*, $H_A$, will be:
+$$ \tau_1 = \cdots = \tau_K = \delta_1. $$
+The *least favourable configuration* for experimental arm $k$, $LFC_k$, will be:
+$$ \tau_k = \delta_1,\ \tau_1 = \cdots = \tau_{k-1} = \tau_{k+1} = \cdots = \tau_K = \delta_0. $$
+Here, $\delta_1$ and $\delta_0$ are *interesting* and *uninteresting* treatment effects respectively.
+
+# Inputs
+
+```{r, echo = F, results = "asis"}
+K           <- params$K
+alpha       <- params$alpha
+beta        <- params$beta
+delta1      <- params$delta1
+delta0      <- params$delta0
+sigma       <- params$sigma
+ratio_type  <- params$ratio_type
+ratio_init  <- params$ratio_init
+ratio       <- params$ratio
+correction  <- params$correction
+power       <- params$power
+integer     <- params$integer
+N           <- params$large_N
+n           <- params$small_n
+opchar      <- params$opchar
+gamma       <- params$gamma
+gammaO      <- params$gammaO
+plots       <- params$plots
+equal_error <- params$equal_error
+equal_power <- params$equal_power
+equal_other <- params$equal_other
+shifted_power <- params$shifted_power
+```
+  
+```{r, echo = F, results = "asis"}
+if (correction == "bonferroni") {
+  correction_text     <- "Bonferroni's correction"
+} else if (correction == "dunnett") {
+  correction_text     <- "Dunnett's correction"
+} else if (correction == "none") {
+  correction_text     <- "no multiple comparison correction"
+} else if (correction == "sidak") {
+  correction_text     <- "Sidak's correction"
+} else if (correction == "benjamini_hochberg") {
+  correction_text     <- "the Benjamini-Hochberg correction"
+} else if (correction == "benjamini_yekutieli") {
+  correction_text     <- "the Benjamini-Yekutieli correction"
+} else if (correction == "hochberg") {
+  correction_text     <- "Hochberg's correction"
+} else if (correction == "holm_bonferroni") {
+  correction_text     <- "the Holm-Bonferroni correction"
+} else if (correction == "holm_sidak") {
+  correction_text     <- "the Holm-Sidak correction"
+} else if (correction == "step_down_dunnett") {
+  correction_text     <- "the step-down version of Dunnett's correction"
+}
+
+if (power == "marginal") {
+  power_type_text     <- "marginal power for each null hypothesis"
+  power_scenario_text <-
+    "each of their respective least favourable configurations"
+} else {
+  power_scenario_text <- "the global alternative hypothesis"
+  if (power == "conjunctive") {
+    power_type_text   <- "conjunctive power"
+  } else if (power == "disjunctive") {
+    power_type_text   <- "disjunctive power"
+  }
+}
+
+if (ratio_type == "equal_all") {
+  ratio_text          <- "the same as the control arm"
+} else if (ratio_type == "equal_exp") {
+  ratio_text          <- paste0(ratio_init[1], " times that of the control arm")
+} else if (ratio_type == "unequal") {
+  ratio_text          <- paste0(paste(ratio_init[1:K], collapse = ", "),
+                                " times that of the control arm")
+} else if (ratio_type == "root_K") {
+  ratio_text          <- paste0(round(1/sqrt(K), 3),
+                                " times that of the control arm")
+} else {
+  ratio_text          <- paste0("chosen for ", ratio_type, "-optimality")
+}
+
+if (integer) {
+  integer_text        <- "will"
+} else {
+  integer_text        <- "will not"
+}
+
+if (plots) {
+  plot_text           <- "will"
+} else {
+  plot_text           <- "will not"
+}
+```
+
+The following choices were made:
+
+- $K = \boldsymbol{`r K`}$ experimental treatments will be included in the trial.
+- A significance level of $\alpha = \boldsymbol{`r alpha`}$ will be used, in combination with __`r correction_text`__.
+- The standard deviations of the responses will be assumed to be: $(\sigma_0,\dots,\sigma_K) = \boldsymbol{(`r paste(round(sigma, 3), collapse = ", ")`)}$.
+- The __`r power_type_text`__ will be controlled to level $1-\beta = \boldsymbol{`r 1 - beta`}$ under __`r power_scenario_text`__.
+- The interesting and uninteresting treatment effects will be: $\delta_1 = \boldsymbol{`r round(delta1, 3)`}$ and $\delta_0 = \boldsymbol{`r round(delta0, 3)`}$ respectively.
+- The target allocation to each of the experimental arms will be: __`r ratio_text`__.
+- The sample size in each arm __`r integer_text`__ be required to be an integer.
+- Plots __`r plot_text`__ be produced.
+
+# Outputs
+
+```{r, echo = F, results = "asis"}
+FWER                  <- round(opchar$FWERI1[1], 3)
+if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli", "hochberg",
+                      "holm_bonferroni", "holm_sidak", "step_down_dunnett")) {
+  punc_text_3         <- "s"
+  gamma_text          <- paste0("(", paste(round(gammaO, 3),
+                                           collapse = ", "), ")")
+} else {
+  punc_text_3         <- ""
+  gamma_text          <- round(gamma, 3)
+}
+
+if (power == "marginal") {
+  power_type_text     <- "minimum marginal power"
+  power_value         <-
+    round(min(diag(as.matrix(opchar[-(1:2), (K + 3):(2*K + 2)]))), 3)
+} else {
+  power_scenario_text <- "the global alternative hypothesis"
+  if (power == "conjunctive") {
+    power_type_text   <- "conjunctive power"
+    power_value       <- round(opchar$Pcon[2], 3)
+  } else if (power == "disjunctive") {
+    power_type_text   <- "disjunctive power"
+    power_value       <- round(opchar$Pdis[2], 3)
+  }
+}
+```
+
+- The total required sample size is: $N = \boldsymbol{`r round(N, 3)`}$.
+- The required sample size in each arm is: $(n_0,\dots,n_K) = \boldsymbol{(`r paste(round(n, 3), collapse = ", ")`)}$.
+- Therefore, the realised allocation ratios to the experimental arms are: $(r_1,\dots,r_K) = \boldsymbol{(`r paste(round(ratio, 3), collapse = ", ")`)}$.
+- The maximum familywise error-rate is: $\boldsymbol{`r FWER`}$.
+- The __`r power_type_text`__ is: $\boldsymbol{`r power_value`}$.
+- The following critical threshold`r punc_text_3` should be used with the chosen multiple comparison correction: $\boldsymbol{`r gamma_text`}$.
+
+# Operating characteristcs
+
+```{r, echo = F, results = "asis"}
+library(knitr)
+kable(params$data[, c(1:K, (2*K + 3):(4*K + 2))])
+kable(params$data[, 1:(2*K + 2)])
+kable(params$data[, -((K + 1):(4*K + 2))])
+```
+
+# Plots
+
+```{r, echo = F, results = "asis", dpi = 600}
+if (params$plots) {
+  print(params$equal_error)
+  cat("\n \n \n \n \n \n")
+  print(params$equal_power)
+  cat("\n \n \n \n \n \n")
+  print(params$equal_other)
+  cat("\n \n \n \n \n \n")
+  print(params$shifted_power)
+} else {
+  cat("Not chosen for output: select the box next to 'Plot power curves' to",
+      "add plots to the report.")
+}
+```

@@ -54,63 +54,62 @@ check_delta0_delta1        <- function(delta0, delta1, name_delta0, name_delta1,
   }
 }
 
-check_multiarm_des_ma      <- function(des, int = F) {
-  if (!("multiarm_des_ma" %in% class(des))) {
-    stop("des must be of class multiarm_des_ma")
+check_multiarm_des_ss_norm <- function(des, int = FALSE, name = "des") {
+  if (!("multiarm_des_ss_norm" %in% class(des))) {
+    stop(name, " must be of class multiarm_des_ss")
   }
-  des$K <- check_integer_range(des$K, "des$K", c(1, Inf), 1)
-  check_real_range_strict(des$alpha, "des$alpha", c(0, 1), 1)
-  check_real_range_strict(des$beta, "des$beta", c(0, 1), 1)
-  check_delta0_delta1(des$delta0, des$delta1, "des$delta0", "des$delta1")
-  check_sigma(des$sigma, des$K, "des$sigma", "des$K")
-  check_n_N(des$n, des$N, des$K, "des$n", "des$N", "des$K", int)
-  check_ratio(des$ratio, des$K, des$n, "des$ratio", "des$K", "des$n")
-  check_belong(des$correction, "des$correction",
+  des$K <- check_integer_range(des$K, "x$K", c(1, Inf), 1)
+  check_real_range_strict(des$alpha, "x$alpha", c(0, 1), 1)
+  check_real_range_strict(des$beta, "x$beta", c(0, 1), 1)
+  check_delta0_delta1(des$delta0, des$delta1, "x$delta0", "x$delta1")
+  check_sigma(des$sigma, des$K, "x$sigma", "x$K")
+  check_n_N(des$n, des$N, des$K, "x$n", "x$N", "x$K", int)
+  check_ratio(des$ratio, des$K, des$n, "x$ratio", "x$K", "x$n")
+  check_belong(des$correction, "x$correction",
                c("benjamini_hochberg", "benjamini_yekutieli", "bonferroni",
                  "dunnett", "hochberg", "holm_bonferroni", "holm_sidak", "none",
                  "sidak", "step_down_dunnett"), 1)
-  check_belong(des$power, "des$power",
+  check_belong(des$power, "x$power",
                c("conjunctive", "disjunctive", "marginal"), 1)
-  check_CovZ(des$CovZ, des$K, des$sigma, des$n, "des$CovZ", "des$K",
-             "des$sigma", "des$n")
-  check_gamma_gammaO(des$gamma, des$gammaO, des$K, des$correction, "des$gamma", "des$gammaO",
-               "des$K", "des$correction")
-  check_opchar(des$opchar, des$K, des$delta0, des$delta1, "des$opchar",
-               "des$K", "des$delta0", "des$delta1")
+  check_CovZ(des$CovZ, des$K, des$sigma, des$n, "x$CovZ", "x$K", "x$sigma",
+             "x$n")
+  check_gamma_gammaO(des$gamma, des$gammaO, des$K, des$correction, "x$gamma",
+                     "x$gammaO", "x$K", "x$correction")
+  check_opchar(des$opchar, des$K, des$delta0, des$delta1, "x$opchar",
+               "x$K", "x$delta0", "x$delta1")
 }
 
-check_multiarm_des_ma_bern <- function(des, int = F) {
-  if (!("multiarm_des_ma_bern" %in% class(des))) {
-    stop("des must be of class multiarm_des_ma_bern")
+check_multiarm_des_ss_bern <- function(des, int = FALSE, name = "des") {
+  if (!("multiarm_des_ss_bern" %in% class(des))) {
+    stop(name, " must be of class multiarm_des_ss_bern")
   }
-  des$K <- check_integer_range(des$K, "des$K", c(1, Inf), 1)
-  check_real_range_strict(des$alpha, "des$alpha", c(0, 1), 1)
-  check_real_range_strict(des$beta, "des$beta", c(0, 1), 1)
-  check_real_range_strict(des$pi0, "des$pi0", c(0, 1), 1)
-  check_delta0_delta1(des$delta0, des$delta1, "des$delta0", "des$delta1",
-                      des$pi0, "des$pi0")
-  check_n_N(des$n, des$N, des$K, "des$n", "des$N", "des$K", int)
-  check_ratio(des$ratio, des$K, des$n, "des$ratio", "des$K", "des$n")
-  check_belong(des$ratio_scenario, "des$ratio_scenario", c("HG", "HA"), 1)
-  check_belong(des$correction, "des$correction",
+  des$K <- check_integer_range(des$K, "x$K", c(1, Inf), 1)
+  check_real_range_strict(des$alpha, "x$alpha", c(0, 1), 1)
+  check_real_range_strict(des$beta, "x$beta", c(0, 1), 1)
+  check_real_range_strict(des$pi0, "x$pi0", c(0, 1), 1)
+  check_delta0_delta1(des$delta0, des$delta1, "x$delta0", "x$delta1",
+                      des$pi0, "x$pi0")
+  check_n_N(des$n, des$N, des$K, "x$n", "x$N", "x$K", int)
+  check_ratio(des$ratio, des$K, des$n, "x$ratio", "x$K", "x$n")
+  check_belong(des$ratio_scenario, "x$ratio_scenario", c("HG", "HA"), 1)
+  check_belong(des$correction, "x$correction",
                c("benjamini_hochberg", "benjamini_yekutieli", "bonferroni",
                  "dunnett", "hochberg", "holm_bonferroni", "holm_sidak", "none",
                  "sidak", "step_down_dunnett"), 1)
-  check_belong(des$power, "des$power",
+  check_belong(des$power, "x$power",
                c("conjunctive", "disjunctive", "marginal"), 1)
-  check_gamma_gammaO(des$gamma, des$gammaO, des$K, des$correction, "des$gamma",
-                     "des$gammaO", "des$K", "des$correction")
+  check_gamma_gammaO(des$gamma, des$gammaO, des$K, des$correction, "x$gamma",
+                     "x$gammaO", "x$K", "x$correction")
   check_opchar_bern(des$opchar, des$K, des$pi0, des$delta0, des$delta1,
-                    "des$opchar", "des$K", "des$pi0", "des$delta0",
-                    "des$delta1")
+                    "x$opchar", "x$K", "x$pi0", "x$delta0", "x$delta1")
 }
 
 check_integer_range        <- function(value, name, range, len) {
-  check         <- F
+  check         <- FALSE
   if (is.finite(len)) {
     if (any(length(value) != len, !is.numeric(value), value%%1 != 0,
             value <= range[1], value >= range[2])) {
-      check     <- T
+      check     <- TRUE
       if (len == 1) {
         segment <- " must be a single integer that belongs to {"
       } else {
@@ -120,7 +119,7 @@ check_integer_range        <- function(value, name, range, len) {
     }
   } else if (any(value%%1 != 0, !is.numeric(value), value <= range[1],
                  value >= range[2])) {
-    check       <- T
+    check       <- TRUE
     segment     <- " must be an integer vector whose elements all belong to {"
   }
   if (check) {
@@ -141,7 +140,18 @@ check_integer_range        <- function(value, name, range, len) {
       stop(name, segment, range[1] + 1, ", ..., ", range[2] - 1, "}")
     }
   }
-  return(as.integer(value))
+  as.integer(value)
+}
+
+check_Kv                   <- function(Kv, name_Kv) {
+  if (any(length(Kv) == 1, !is.numeric(Kv), Kv%%1 != 0)) {
+    stop(name_Kv, " must be a numeric vector of monotonically decreasing whole",
+         " numbers, whose final element is 1")
+  } else if (any(Kv[-1] >= Kv[-length(Kv)])) {
+    stop(name_Kv, " must be a numeric vector of monotonically decreasing whole",
+         " numbers, whose final element is 1")
+  }
+  as.integer(Kv)
 }
 
 check_logical              <- function(value, name) {
@@ -287,6 +297,35 @@ check_real_range           <- function(value, name, range, len) {
   }
 }
 
+check_boundaries           <- function(fshape, eshape, ffix, efix, fshape_name,
+                                       eshape_name, ffix_name, efix_name) {
+  check_belong(fshape, fshape_name,
+               c("fixed", "obf", "pocock", "triangular"), 1)
+  check_belong(eshape, eshape_name,
+               c("fixed", "obf", "pocock", "triangular"), 1)
+  if (fshape == "fixed") {
+    check_real_range_strict(ffix, ffix_name, c(-Inf,Inf), 1)
+  } else {
+    if (ffix != -3) {
+      warning(ffix_name, " has been changed from default, but this will have ",
+              "no effect given the value of ", fshape_name)
+    }
+  }
+  if (eshape == "fixed") {
+    check_real_range_strict(efix, efix_name, c(-Inf,Inf), 1)
+  } else {
+    if (efix != 3) {
+      warning(efix_name, " has been changed from default, but this will have ",
+              "no effect given the value of ", eshape_name)
+    }
+  }
+  if (all(c(fshape, eshape) == "fixed")) {
+    if (efix <= ffix) {
+      stop(efix_name, " must be strictly smaller than ", ffix_name)
+    }
+  }
+}
+
 check_real_range_strict    <- function(value, name, range, len) {
   if (is.finite(len)) {
     if (any(length(value) != len, !is.numeric(value), value <= range[1],
@@ -308,30 +347,57 @@ check_real_range_strict    <- function(value, name, range, len) {
 }
 
 check_ratio                <- function(ratio, K, n, name_ratio, name_K,
-                                       name_n) {
-  if (missing(n)) {
-    if (is.character(ratio)) {
-      if (any(length(ratio) > 1, !(ratio %in% c("A", "D", "E")))) {
-        stop("ratio must be either \"A\", \"D\", \"E\", or a numeric vector of",
-             " length K, whose elements all belong to (0, Inf).")
+                                       name_n, des = "fixed") {
+  if (des == "fixed") {
+    if (missing(n)) {
+      if (is.character(ratio)) {
+        if (any(length(ratio) > 1, !(ratio %in% c("A", "D", "E")))) {
+          stop("ratio must be either \"A\", \"D\", \"E\", or a numeric vector of",
+               " length K, whose elements all belong to (0, Inf).")
+        }
+      } else if (any(length(ratio) != K, !is.numeric(ratio), ratio <= 0,
+                     is.infinite(ratio))) {
+        stop("ratio must be either \"A\", \"D\", \"E\", or a numeric vector of ",
+             "length K, whose elements all belong to (0, Inf).")
       }
-    } else if (any(length(ratio) != K, !is.numeric(ratio), ratio <= 0,
-                   is.infinite(ratio))) {
-      stop("ratio must be either \"A\", \"D\", \"E\", or a numeric vector of ",
-           "length K, whose elements all belong to (0, Inf).")
+    } else {
+      if (!all.equal(ratio, n[-1]/n[1])) {
+        stop(name_ratio, " must correspond to ", name_n)
+      }
     }
   } else {
-    if (!all.equal(ratio, n[-1]/n[1])) {
-      stop(name_ratio, " must correspond to ", name_n)
+    if (missing(n)) {
+      if (any(length(ratio) != 1, !is.numeric(ratio), ratio <= 0,
+              is.infinite(ratio))) {
+        stop("ratio must be a single numeric that belongs to (0,Inf).")
+      }
+    } else {
+      if (!all.equal(ratio, n[-1]/n[1])) {
+        stop(name_ratio, " must correspond to ", name_n)
+      }
     }
   }
 }
 
-check_sigma                <- function(sigma, K, name_sigma, name_K) {
-  if (any(length(sigma) != K + 1L, !is.numeric(sigma), sigma <= 0,
-          is.infinite(sigma))) {
-    stop(name_sigma, " must be a numeric vector of length ", name_K, " + 1, ",
-         "whose elements all belong to (0, \u221E).")
+check_sigma                <- function(sigma, K, name_sigma, name_K,
+                                       des = "fixed") {
+  if (des == "fixed") {
+    if (any(length(sigma) != K + 1L, !is.numeric(sigma), sigma <= 0,
+            is.infinite(sigma))) {
+      stop(name_sigma, " must be a numeric vector of length ", name_K, " + 1, ",
+           "whose elements all belong to (0, \u221E).")
+    }
+  } else {
+    if (any(!(length(sigma) %in% 1:2), !is.numeric(sigma), sigma <= 0,
+            is.infinite(sigma))) {
+      stop(name_sigma, " must be a numeric vector of length 1 or 2, whose ",
+           "elements all belong to (0, \u221E).")
+    }
+    if (length(sigma) == 1) {
+      rep(sigma, 2)
+    } else {
+      sigma
+    }
   }
 }
 
@@ -351,11 +417,20 @@ check_sigmas               <- function(sigmas, pval) {
 
 check_pi                   <- function(pi, des) {
   if (missing(pi)) {
-    pi <- rbind(rep(des$pi0, des$K + 1),
-               c(des$pi0, rep(des$pi0 + des$delta1, des$K)),
-               cbind(rep(des$pi0, des$K),
-                     matrix(des$pi0 + des$delta0, des$K, des$K) +
-                       (des$delta1 - des$delta0)*diag(des$K)))
+    if (any(c("multiarm_des_dtl_bern", "multiarm_des_dtl_norm") %in%
+            class(des))) {
+      pi <- rbind(rep(des$pi0, des$Kv[1] + 1),
+                  c(des$pi0, rep(des$pi0 + des$delta1, des$Kv[1])),
+                  cbind(rep(des$pi0, des$Kv[1]),
+                        matrix(des$pi0 + des$delta0, des$Kv[1], des$Kv[1]) +
+                          (des$delta1 - des$delta0)*diag(des$Kv[1])))
+    } else {
+      pi <- rbind(rep(des$pi0, des$K + 1),
+                  c(des$pi0, rep(des$pi0 + des$delta1, des$K)),
+                  cbind(rep(des$pi0, des$K),
+                        matrix(des$pi0 + des$delta0, des$K, des$K) +
+                          (des$delta1 - des$delta0)*diag(des$K)))
+    }
   } else {
     if (!is.numeric(pi)) {
       stop("If specified, pi must be numeric.")
@@ -365,8 +440,15 @@ check_pi                   <- function(pi, des) {
     if (is.vector(pi)) {
       pi <- matrix(pi, 1)
     }
-    if (ncol(pi) != des$K + 1) {
-      stop("If specified, pi must have des$K + 1 columns.")
+    if (any(c("multiarm_des_dtl_bern", "multiarm_des_dtl_norm") %in%
+            class(des))) {
+      if (ncol(pi) != des$Kv[1] + 1) {
+        stop("If specified, pi must have des$K + 1 columns.")
+      }
+    } else {
+      if (ncol(pi) != des$K + 1) {
+        stop("If specified, pi must have des$K + 1 columns.")
+      }
     }
     if (sum(duplicated(pi)) > 0) {
       warning("pi contains duplicated rows.")
@@ -377,9 +459,16 @@ check_pi                   <- function(pi, des) {
 
 check_tau                  <- function(tau, des) {
   if (missing(tau)) {
-    tau <- rbind(rep(0, des$K), rep(des$delta1, des$K),
-                 matrix(des$delta0, des$K, des$K) +
-                   (des$delta1 - des$delta0)*diag(des$K))
+    if (any(c("multiarm_des_dtl_bern", "multiarm_des_dtl_norm") %in%
+            class(des))) {
+      tau <- rbind(rep(0, des$Kv[1]), rep(des$delta1, des$Kv[1]),
+                   matrix(des$delta0, des$Kv[1], des$Kv[1]) +
+                     (des$delta1 - des$delta0)*diag(des$Kv[1]))
+    } else {
+      tau <- rbind(rep(0, des$K), rep(des$delta1, des$K),
+                   matrix(des$delta0, des$K, des$K) +
+                     (des$delta1 - des$delta0)*diag(des$K))
+    }
   } else {
     if (!is.numeric(tau)) {
       stop("If specified, tau must be numeric.")
@@ -389,8 +478,15 @@ check_tau                  <- function(tau, des) {
     if (is.vector(tau)) {
       tau <- matrix(tau, 1)
     }
-    if (ncol(tau) != des$K) {
-      stop("If specified, tau must have des$K columns.")
+    if (any(c("multiarm_des_dtl_bern", "multiarm_des_dtl_norm") %in%
+            class(des))) {
+      if (ncol(tau) != des$Kv[1]) {
+        stop("If specified, tau must have des$Kv[1] columns.")
+      }
+    } else {
+      if (ncol(tau) != des$K) {
+        stop("If specified, tau must have des$K columns.")
+      }
     }
     if (sum(duplicated(tau)) > 0) {
       warning("tau contains duplicated rows.")

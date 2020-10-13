@@ -1,0 +1,11 @@
+---
+title: "design_delta"
+output: md_document
+---
+
+# Plot treatment effect shift
+
+__multiarm__ can produce a selection of plots (e.g., of power curves).
+One of these requires a value, $\delta$, to be specified for a shift in the treatment effects between the experimental arms.
+Specify your choice for the treatment effect shift here.
+It should be strictly positive.

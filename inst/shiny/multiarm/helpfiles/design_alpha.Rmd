@@ -1,0 +1,11 @@
+---
+title: "design_alpha"
+output: md_document
+---
+
+# Significance level
+
+__multiarm__ requires a significance level, $\alpha$, to be chosen.
+This is used in combination with the other design parameters to determine the rejection rules.
+Specify your chosen significance level here.
+It should be strictly between 0 and 1.

@@ -1,9 +1,14 @@
 citHeader("To cite multiarm in publications please use")
 
-citEntry(entry = "Misc",
-         key = "grayling2019",
-         title = "{multiarm: Design and analysis of fixed-sample multi-arm clinical trials}",
-         author = as.person("Michael J. Grayling"),
-         year = "2019",
-         url = "http://www.github.com/mjg211/multiarm/",
-         textVersion = paste("Grayling MJ (2019) multiarm: Design and analysis of fixed-sample multi-arm clinical trials. URL: http://www.github.com/mjg211/multiarm/."))
+citEntry(entry = "Article",
+         author = c(person(given = "Michael J.", family = "Grayling"),
+                    person(given = "James M.S.", family = "Wason")),
+         doi = "10.1186/s12885-020-6525-0",
+         journal = "BMC Cancer",
+         key = "grayling2020",
+         pages = "80",
+         title = "A web application for the design of multi-arm clinical trials",
+         url = "https://doi.org/10.1186/s12885-020-6525-0",
+         volume = "20",
+         year = "2020",
+         textVersion = paste("Grayling MJ, Wason JMS (2020) A web application for the design of multi-arm clinical trials. BMC Cancer 20:80. DOI: 10.1186/s12885-020-6525-0."))

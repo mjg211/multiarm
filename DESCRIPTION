@@ -1,25 +1,25 @@
 Package: multiarm
 Type: Package
-Title: Design and analysis of multi-arm clinical trials
-Version: 0.10.0
+Title: Design of single- and multi-stage multi-arm clinical trials
+Version: 0.11.0
 Authors@R: c(person(given = "Michael J", family = "Grayling",
                     email = "michael.grayling@newcastle.ac.uk",
                     role = c("aut", "cre")))
-Description: multiarm provides functions to assist with the design and analysis
-    of multi-arm clinical trials. Available functions allow for sample size
-    determination when utilising a variety of multiple comparison corrections
-    (including for *A*-, *D*-, and *E*-optimal designs), trial simulation,
-    analytical operating characteristic calculation (including the conjunctive
-    power, disjunctive power, family-wise error-rate, and false discovery rate),
-    and the production of several plots. An R Shiny graphical user interface is
-    also provided to aid design determination.
+Description: multiarm provides functions to assist with the design of
+    single- and multi-stage multi-arm clinical trials. In both cases the
+    available functions allow for sample size determination, trial simulation,
+    analytical operating characteristic calculation, and the production of
+    several informative plots. An R Shiny graphical user interface is also
+    provided to aid design determination. Further details on single-stage design
+    can be found in Grayling and Wason (2020) <doi:10.1186/s12885-020-6525-0>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
-VignetteBuilder: knitr
+RoxygenNote: 7.1.1
+VignetteBuilder: rmarkdown
 Imports:
     dplyr,
+    GA,
     ggplot2,
     ggthemes,
     iterpc,
@@ -42,6 +42,6 @@ Imports:
     tibble,
     tidyr,
     xml2
-Date: 2019-04-18
+Date: 2020-09-16
 URL: http://github.com/mjg211/multiarm
 BugReports: http://github.com/mjg211/multiarm/issues

@@ -1,0 +1,10 @@
+---
+title: "design_filename"
+output: md_document
+---
+
+# Downloadable report filename
+
+__multiarm__ can produce downloadable reports on identified designs.
+When a report is to be generated, a filename is required for the download.
+Specify your chosen filename here.

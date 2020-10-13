@@ -1,0 +1,237 @@
+---
+title: "Multi-stage group-sequential multi-arm clinical trial design for a normally distributed primary outcome"
+date: "`r format(Sys.time(), '%d/%m/%Y')`"
+params:
+  alpha:       NA
+  beta:        NA
+  delta0:      NA
+  delta1:      NA
+  e:           NA
+  efix:        NA
+  f:           NA
+  ffix:        NA
+  integer:     NA
+  J:           NA
+  K:           NA
+  lower:       NA
+  maxN:        NA
+  n10:         NA
+  n1:          NA
+  opchar:      NA
+  plots:       NA
+  power:       NA
+  ratio_type:  NA
+  ratio_init:  NA
+  ratio:       NA
+  sigma:       NA
+  stopping:    NA
+  swss:        NA
+  upper:       NA
+  equal_error: NA
+  equal_power: NA
+  equal_other: NA
+  equal_sample_size: NA
+  shifted_power:     NA
+  shifted_sample_size:     NA
+  pmf_N:     NA
+---
+
+```{r, include = F}
+knitr::opts_chunk$set(echo = F, results = "asis")
+```
+
+# Design setting
+
+The trial will be designed to compare $K$ experimental treatments to a shared control arm.
+Response $X_{ik}$, from patient $i=1,\dots,n_k$ in arm $k=0,\dots,K$, will be assumed to be distributed as $X_{ik} \sim N(\mu_k,\sigma_k^2)$. Then, the hypotheses to be tested will be:
+$$ H_k : \tau_k = \mu_k - \mu_0 \le 0,\ k=1,\dots,K.$$
+The *global null hypothesis*, $H_G$, will be:
+$$ \tau_1 = \cdots = \tau_K = 0. $$
+The *global alternative hypothesis*, $H_A$, will be:
+$$ \tau_1 = \cdots = \tau_K = \delta_1. $$
+The *least favourable configuration* for experimental arm $k$, $LFC_k$, will be:
+$$ \tau_k = \delta_1,\ \tau_1 = \cdots = \tau_{k-1} = \tau_{k+1} = \cdots = \tau_K = \delta_0. $$
+Here, $\delta_1$ and $\delta_0$ are *interesting* and *uninteresting* treatment effects respectively.
+
+# Inputs
+
+```{r, echo = F, results = "asis"}
+alpha       <- params$alpha
+beta        <- params$beta
+delta0      <- params$delta0
+delta1      <- params$delta1
+e           <- params$e
+efix        <- params$efix
+f           <- params$f
+ffix        <- params$ffix
+integer     <- params$integer
+J           <- params$J
+K           <- params$K
+lower       <- params$lower
+maxN        <- params$maxN
+n10         <- params$n10
+n1          <- params$n1
+opchar      <- params$opchar
+plots       <- params$plots
+power       <- params$power
+ratio_type  <- params$ratio_type
+ratio_init  <- params$ratio_init
+ratio       <- params$ratio
+sigma       <- params$sigma
+stopping    <- params$stopping
+swss        <- params$swss
+upper       <- params$upper
+```
+
+```{r input_text, echo = FALSE, results = "asis"}
+if (power == "marginal") {
+  power_type_text     <- "marginal power for each null hypothesis"
+  power_scenario_text <-
+    "each of their respective least favourable configurations"
+} else {
+  power_scenario_text <- "the global alternative hypothesis"
+  if (power == "conjunctive") {
+    power_type_text   <- "conjunctive power"
+  } else if (power == "disjunctive") {
+    power_type_text   <- "disjunctive power"
+  }
+}
+
+if (ratio_type == "equal_all") {
+  ratio_text          <- "the same as the control arm"
+} else if (ratio_type == "equal_exp") {
+  ratio_text          <- paste0(ratio_init[1], " times that of the control arm")
+} else {
+  ratio_text          <- paste0(round(1/sqrt(K), 3),
+                                " times that of the control arm")
+}
+
+if (lower == "fixed") {
+  lower_prelim <- "fixed value"
+} else if (lower == "obf") {
+  lower_prelim <- "O'Brien-Fleming"
+} else if (lower == "pocock") {
+  lower_prelim <- "Pocock"
+} else if (lower == "triangular") {
+  lower_prelim <- "triangular"
+}
+
+if (upper == "fixed") {
+  upper_prelim <- "fixed value"
+} else if (upper == "obf") {
+  upper_prelim <- "O'Brien-Fleming"
+} else if (upper == "pocock") {
+  upper_prelim <- "Pocock"
+} else if (upper == "triangular") {
+  upper_prelim <- "triangular"
+}
+
+if (lower == "fixed") {
+  lower_text          <- paste0(lower_prelim, ", with a fixed value of ", ffix)
+} else {
+  lower_text          <- lower_prelim
+}
+
+if (upper == "fixed") {
+  upper_text          <- paste0(upper_prelim, ", with a fixed value of ", efix)
+} else {
+  upper_text          <- upper_prelim
+}
+
+if (integer) {
+  integer_text        <- "will"
+} else {
+  integer_text        <- "will not"
+}
+
+if (plots) {
+  plot_text           <- "will"
+} else {
+  plot_text           <- "will not"
+}
+```
+
+```{r output_text, echo = F, results = "asis"}
+FWER                  <- round(opchar$FWERI1[1], 3)
+if (power == "marginal") {
+  power_type_text     <- "minimum marginal power"
+  power_value         <-
+    round(min(diag(as.matrix(opchar[-(1:2), (K + 3):(2*K + 2)]))), 3)
+} else {
+  power_scenario_text <- "the global alternative hypothesis."
+  if (power == "conjunctive") {
+    power_type_text   <- "conjunctive power"
+    power_value       <- round(opchar$Pcon[2], 3)
+  } else if (power == "disjunctive") {
+    power_type_text   <- "disjunctive power"
+    power_value       <- round(opchar$Pdis[2], 3)
+  }
+}
+if (swss == "fixed") {
+  swss_text  <- "is"
+  swss_text2 <- round(n1, 3)
+} else {
+  swss_text  <- "to the control arm is"
+  swss_text2 <- round(n10, 3)
+}
+```
+
+#### Inputs
+
+The following choices were made:
+
+- $K = \boldsymbol{`r K`}$ experimental treatments will initially be included in the trial.
+- A maximum of $J = \boldsymbol{`r J`}$ stages will be allowed in the trial.
+- A __`r stopping`__ stopping rule will be used.
+- The stage-wise sample size will be __`r swss`__.
+- The lower stopping boundaries will be __`r lower_text`__.
+- The upper stopping boundaries will be __`r upper_text`__.
+- A family-wise error-rate of $\alpha = \boldsymbol{`r alpha`}$ will be used.
+- The __`r power_type_text`__ will be controlled to level $1-\beta = \boldsymbol{`r 1 - beta`}$ under __`r power_scenario_text`__.
+- The interesting and uninteresting treatment effects will be: $\delta_1 = \boldsymbol{`r round(delta1, 3)`}$ and $\delta_0 = \boldsymbol{`r round(delta0, 3)`}$ respectively.
+- The standard deviations of the responses will be assumed to be: $(\sigma_0,\dots,\sigma_K) = \boldsymbol{(`r paste(round(sigma, 3), collapse = ", ")`)}$.
+- The target allocation to each of the experimental arms will be: __`r ratio_text`__.
+- The sample size in each arm __`r integer_text`__ be required to be an integer.
+- Plots __`r plot_text`__ be produced.
+
+#### Outputs
+
+- The maximum required sample size is: $\boldsymbol{`r round(maxN, 3)`}$.
+- The stage-wise sample size __`r swss_text`__: __`r swss_text2`__.
+- The realised allocation ratios to the experimental arms are: $(r_1,\dots,r_K) = \boldsymbol{(`r paste(rep(round(ratio, 3), K), collapse = ", ")`)}$.
+- The maximum familywise error-rate is: $\boldsymbol{`r FWER`}$.
+- The __`r power_type_text`__ is: $\boldsymbol{`r power_value`}$.
+- The lower stopping boundaries are: $\boldsymbol{`r paste0("(", paste(round(f, 3), collapse = ", "), ")")`}$.
+- The upper stopping boundaries are: $\boldsymbol{`r paste0("(", paste(round(e, 3), collapse = ", "), ")")`}$.
+
+# Operating characteristcs
+
+```{r, echo = F, results = "asis"}
+library(knitr)
+kable(opchar[, c(1:K, (2*K + 3):(4*K + 2))])
+kable(opchar[, 1:(2*K + 2)])
+kable(opchar[, -((K + 1):(4*K + 2))])
+```
+
+# Plots
+
+```{r, echo = F, results = "asis", dpi = 600}
+if (params$plots) {
+  print(params$equal_error)
+  cat("\n \n \n \n \n \n")
+  print(params$equal_power)
+  cat("\n \n \n \n \n \n")
+  print(params$equal_other)
+  cat("\n \n \n \n \n \n")
+  print(params$equal_sample_size)
+  cat("\n \n \n \n \n \n")
+  print(params$shifted_power)
+  cat("\n \n \n \n \n \n")
+  print(params$shifted_sample_size)
+  cat("\n \n \n \n \n \n")
+  print(params$pmf_N)
+} else {
+  cat("Not chosen for output: select the box next to 'Plot power curves' to",
+      "add plots to the report.")
+}
+```

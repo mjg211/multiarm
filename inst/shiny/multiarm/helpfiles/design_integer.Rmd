@@ -1,0 +1,9 @@
+---
+title: "design_integer"
+output: md_document
+---
+
+# Require integer sample sizes
+
+__multiarm__ requires a choice to be made about whether the identified sample size required in each arm (in each stage, for multi-stage designs) should be forced to be an integer (a whole number).
+Specify your choice here.

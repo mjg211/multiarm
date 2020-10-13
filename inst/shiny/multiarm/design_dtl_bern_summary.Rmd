@@ -1,0 +1,131 @@
+---
+title: ""
+output: html_document
+params:
+  alpha:      NA
+  beta:       NA
+  delta0:     NA
+  delta1:     NA
+  integer:    NA
+  J:          NA
+  K:          NA
+  Kv:         NA
+  maxN:       NA
+  n10:        NA
+  n1:         NA
+  opchar:     NA
+  pi0:        NA
+  plots:      NA
+  power:      NA
+  ratio_type: NA
+  ratio_init: NA
+  ratio:      NA
+  swss:       NA
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(echo = F, results = "asis")
+```
+
+```{r params, echo = F, results = "asis"}
+alpha      <- params$alpha
+beta       <- params$beta
+delta0     <- params$delta0
+delta1     <- params$delta1
+integer    <- params$integer
+J          <- params$J
+K          <- params$K
+Kv         <- params$Kv
+maxN       <- params$maxN
+n10        <- params$n10
+n1         <- params$n1
+opchar     <- params$opchar
+pi0        <- params$pi0
+plots      <- params$plots
+power      <- params$power
+ratio_type <- params$ratio_type
+ratio_init <- params$ratio_init
+ratio      <- params$ratio
+swss       <- params$swss
+```
+
+```{r input_text, echo = F, results = "asis"}
+if (power == "marginal") {
+  power_scenario_text <-
+    "each of their respective least favourable configurations"
+  power_type_text     <- "marginal power for each null hypothesis"
+} else {
+  power_scenario_text <- "the global alternative hypothesis"
+  power_type_text     <- "disjunctive power"
+}
+
+if (ratio_type == "equal_all") {
+  ratio_text          <- "the same as the control arm"
+} else if (ratio_type == "equal_exp") {
+  ratio_text          <- paste0(ratio_init[1], " times that of the control arm")
+} else {
+  ratio_text          <- paste0(round(1/sqrt(K), 3),
+                                " times that of the control arm")
+}
+
+if (integer) {
+  integer_text        <- "will"
+} else {
+  integer_text        <- "will not"
+}
+
+if (plots) {
+  plot_text           <- "will"
+} else {
+  plot_text           <- "will not"
+}
+```
+
+```{r output_text, echo = F, results = "asis"}
+FWER                  <- round(opchar$FWERI1[1], 3)
+if (power == "marginal") {
+  power_type_text     <- "minimum marginal power"
+  power_value         <-
+    round(min(diag(as.matrix(opchar[-(1:2), (K + 3):(2*K + 2)]))), 3)
+} else {
+  power_scenario_text <- "the global alternative hypothesis."
+  if (power == "conjunctive") {
+    power_type_text   <- "conjunctive power"
+    power_value       <- round(opchar$Pcon[2], 3)
+  } else if (power == "disjunctive") {
+    power_type_text   <- "disjunctive power"
+    power_value       <- round(opchar$Pdis[2], 3)
+  }
+}
+if (swss == "fixed") {
+  swss_text  <- "is"
+  swss_text2 <- round(n1, 3)
+} else {
+  swss_text  <- "to the control arm is"
+  swss_text2 <- round(n10, 3)
+}
+```
+
+#### Inputs
+
+The following choices were made:
+
+- $K = \boldsymbol{`r K`}$ experimental treatments will initially be included in the trial.
+- $J = \boldsymbol{`r J`}$ stages will be allowed in the trial.
+- $\boldsymbol{K} = \boldsymbol{(`r paste(Kv, collapse = ", ")`)}$ experimental treatments will be present in each stage.
+- The stage-wise sample size will be __`r swss`__.
+- A family-wise error-rate of $\alpha = \boldsymbol{`r alpha`}$ will be used.
+- The __`r power_type_text`__ will be controlled to level $1-\beta = \boldsymbol{`r 1 - beta`}$ under __`r power_scenario_text`__.
+- The response rate in the control arm will be assumed to be: $\pi_0 = \boldsymbol{`r pi0`}$.
+- The interesting and uninteresting treatment effects will be: $\delta_1 = \boldsymbol{`r round(delta1, 3)`}$ and $\delta_0 = \boldsymbol{`r round(delta0, 3)`}$ respectively.
+- The target allocation to each of the experimental arms will be: __`r ratio_text`__.
+- The sample size in each arm __`r integer_text`__ be required to be an integer.
+- Plots __`r plot_text`__ be produced.
+
+#### Outputs
+
+- The required sample size is: $\boldsymbol{`r round(maxN, 3)`}$.
+- The stage-wise sample size __`r swss_text`__: __`r swss_text2`__.
+- The realised allocation ratios to the experimental arms are: $(r_1,\dots,r_K) = \boldsymbol{(`r paste(rep(round(ratio, 3), K), collapse = ", ")`)}$.
+- The maximum familywise error-rate is: $\boldsymbol{`r FWER`}$.
+- The __`r power_type_text`__ is: $\boldsymbol{`r power_value`}$.
