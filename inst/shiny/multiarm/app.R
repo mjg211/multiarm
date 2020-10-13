@@ -6,8 +6,8 @@ library(multiarm)
 options(shiny.sanitize.errors = TRUE)
 
 sapply(c("design_dtl_bern_setting.Rmd", "design_dtl_norm_setting.Rmd",
-          "design_gs_bern_setting.Rmd",  "design_gs_norm_setting.Rmd",
-          "design_ss_bern_setting.Rmd",  "design_ss_norm_setting.Rmd"), knit,
+         "design_gs_bern_setting.Rmd",  "design_gs_norm_setting.Rmd",
+         "design_ss_bern_setting.Rmd",  "design_ss_norm_setting.Rmd"), knit,
        quiet = TRUE)
 
 ##### UI #######################################################################
@@ -2858,7 +2858,7 @@ ui <- function(request) {
                     "with a talk that included a discussion of upcoming ",
                     "multi-stage functionality, are presented as part of the",
                     em("5th International Clinical Trials Methodology",
-                    "Conference"), "in Brighton, UK.")
+                       "Conference"), "in Brighton, UK.")
                 ),
                 shinydashboardPlus::timelineItem(
                   title = strong("Paper submitted for publication"),
@@ -3099,16 +3099,16 @@ server <- function(input, output, session) {
                         input$design_ss_bern_ratio3,
                         input$design_ss_bern_ratio4,
                         input$design_ss_bern_ratio5), {
-    vals <- c(input$design_ss_bern_ratio1, input$design_ss_bern_ratio2,
-              input$design_ss_bern_ratio3, input$design_ss_bern_ratio4,
-              input$design_ss_bern_ratio5)
-    for (i in 1:5) {
-      shinyFeedback::feedbackDanger(
-        inputId = paste0("design_ss_bern_ratio", i),
-        show    = (vals[i] <= 0),
-        text    = "Must be strictly positive")
-    }
-  })
+                          vals <- c(input$design_ss_bern_ratio1, input$design_ss_bern_ratio2,
+                                    input$design_ss_bern_ratio3, input$design_ss_bern_ratio4,
+                                    input$design_ss_bern_ratio5)
+                          for (i in 1:5) {
+                            shinyFeedback::feedbackDanger(
+                              inputId = paste0("design_ss_bern_ratio", i),
+                              show    = (vals[i] <= 0),
+                              text    = "Must be strictly positive")
+                          }
+                        })
 
   shiny::observeEvent(input$design_ss_bern_filename, {
     shinyFeedback::feedbackWarning(
@@ -3967,15 +3967,15 @@ server <- function(input, output, session) {
     }
     design                <-
       multiarm::des_ss_norm(K          = input$design_ss_norm_K,
-                       alpha      = input$design_ss_norm_alpha,
-                       beta       = 1 - input$design_ss_norm_beta,
-                       delta1     = input$design_ss_norm_delta1,
-                       delta0     = input$design_ss_norm_delta0,
-                       sigma      = sigma,
-                       ratio      = ratio,
-                       correction = input$design_ss_norm_correction,
-                       power      = input$design_ss_norm_power,
-                       integer    = input$design_ss_norm_integer)
+                            alpha      = input$design_ss_norm_alpha,
+                            beta       = 1 - input$design_ss_norm_beta,
+                            delta1     = input$design_ss_norm_delta1,
+                            delta0     = input$design_ss_norm_delta0,
+                            sigma      = sigma,
+                            ratio      = ratio,
+                            correction = input$design_ss_norm_correction,
+                            power      = input$design_ss_norm_power,
+                            integer    = input$design_ss_norm_integer)
     progress$inc(amount = 0.25, message = "Rendering design summary")
     rmarkdown::render(
       input         = "design_ss_norm_summary.Rmd",
@@ -4481,9 +4481,9 @@ server <- function(input, output, session) {
       input$design_gs_bern_equal_sample_size_brush
     if (!is.null(brush_sample_size)) {
       ranges_design_gs_bern_equal_sample_size$x   <- c(brush_sample_size$xmin,
-                                                 brush_sample_size$xmax)
+                                                       brush_sample_size$xmax)
       ranges_design_gs_bern_equal_sample_size$y   <- c(brush_sample_size$ymin,
-                                                 brush_sample_size$ymax)
+                                                       brush_sample_size$ymax)
     } else {
       ranges_design_gs_bern_equal_sample_size$x   <-
         ranges_design_gs_bern_equal_sample_size$y <- NULL
@@ -4495,9 +4495,9 @@ server <- function(input, output, session) {
       input$design_gs_bern_shifted_power_brush
     if (!is.null(brush_shifted_power)) {
       ranges_design_gs_bern_shifted_power$x   <- c(brush_shifted_power$xmin,
-                                             brush_shifted_power$xmax)
+                                                   brush_shifted_power$xmax)
       ranges_design_gs_bern_shifted_power$y   <- c(brush_shifted_power$ymin,
-                                             brush_shifted_power$ymax)
+                                                   brush_shifted_power$ymax)
     } else {
       ranges_design_gs_bern_shifted_power$x   <-
         ranges_design_gs_bern_shifted_power$y <- NULL
@@ -4509,9 +4509,9 @@ server <- function(input, output, session) {
       input$design_gs_bern_shifted_sample_size_brush
     if (!is.null(brush_shifted_sample_size)) {
       ranges_design_gs_bern_shifted_sample_size$x   <- c(brush_shifted_sample_size$xmin,
-                                                   brush_shifted_sample_size$xmax)
+                                                         brush_shifted_sample_size$xmax)
       ranges_design_gs_bern_shifted_sample_size$y   <- c(brush_shifted_sample_size$ymin,
-                                                   brush_shifted_sample_size$ymax)
+                                                         brush_shifted_sample_size$ymax)
     } else {
       ranges_design_gs_bern_shifted_sample_size$x   <-
         ranges_design_gs_bern_shifted_sample_size$y <- NULL
@@ -4523,9 +4523,9 @@ server <- function(input, output, session) {
       input$design_gs_bern_pmf_N_brush
     if (!is.null(brush_pmf_N)) {
       ranges_design_gs_bern_pmf_N$x   <- c(brush_pmf_N$xmin,
-                                                         brush_pmf_N$xmax)
+                                           brush_pmf_N$xmax)
       ranges_design_gs_bern_pmf_N$y   <- c(brush_pmf_N$ymin,
-                                                         brush_pmf_N$ymax)
+                                           brush_pmf_N$ymax)
     } else {
       ranges_design_gs_bern_pmf_N$x   <-
         ranges_design_gs_bern_pmf_N$y <- NULL
@@ -4731,10 +4731,10 @@ server <- function(input, output, session) {
     input$design_gs_bern_update
     N <- int_des_gs_bern()$N
     shiny::withMathJax(
-     shiny::includeHTML(
-       path = file.path(tempdir(),
-                        "/design_gs_bern_summary_modified.html")
-       )
+      shiny::includeHTML(
+        path = file.path(tempdir(),
+                         "/design_gs_bern_summary_modified.html")
+      )
     )
   })
 
@@ -5148,9 +5148,9 @@ server <- function(input, output, session) {
       input$design_gs_norm_equal_sample_size_brush
     if (!is.null(brush_sample_size)) {
       ranges_design_gs_norm_equal_sample_size$x   <- c(brush_sample_size$xmin,
-                                                 brush_sample_size$xmax)
+                                                       brush_sample_size$xmax)
       ranges_design_gs_norm_equal_sample_size$y   <- c(brush_sample_size$ymin,
-                                                 brush_sample_size$ymax)
+                                                       brush_sample_size$ymax)
     } else {
       ranges_design_gs_norm_equal_sample_size$x   <-
         ranges_design_gs_norm_equal_sample_size$y <- NULL
@@ -5162,9 +5162,9 @@ server <- function(input, output, session) {
       input$design_gs_norm_shifted_power_brush
     if (!is.null(brush_shifted_power)) {
       ranges_design_gs_norm_shifted_power$x   <- c(brush_shifted_power$xmin,
-                                             brush_shifted_power$xmax)
+                                                   brush_shifted_power$xmax)
       ranges_design_gs_norm_shifted_power$y   <- c(brush_shifted_power$ymin,
-                                             brush_shifted_power$ymax)
+                                                   brush_shifted_power$ymax)
     } else {
       ranges_design_gs_norm_shifted_power$x   <-
         ranges_design_gs_norm_shifted_power$y <- NULL
@@ -5176,9 +5176,9 @@ server <- function(input, output, session) {
       input$design_gs_norm_shifted_sample_size_brush
     if (!is.null(brush_shifted_sample_size)) {
       ranges_design_gs_norm_shifted_sample_size$x   <- c(brush_shifted_sample_size$xmin,
-                                                   brush_shifted_sample_size$xmax)
+                                                         brush_shifted_sample_size$xmax)
       ranges_design_gs_norm_shifted_sample_size$y   <- c(brush_shifted_sample_size$ymin,
-                                                   brush_shifted_sample_size$ymax)
+                                                         brush_shifted_sample_size$ymax)
     } else {
       ranges_design_gs_norm_shifted_sample_size$x   <-
         ranges_design_gs_norm_shifted_sample_size$y <- NULL
@@ -5190,9 +5190,9 @@ server <- function(input, output, session) {
       input$design_gs_norm_pmf_N_brush
     if (!is.null(brush_pmf_N)) {
       ranges_design_gs_norm_pmf_N$x   <- c(brush_pmf_N$xmin,
-                                                         brush_pmf_N$xmax)
+                                           brush_pmf_N$xmax)
       ranges_design_gs_norm_pmf_N$y   <- c(brush_pmf_N$ymin,
-                                                         brush_pmf_N$ymax)
+                                           brush_pmf_N$ymax)
     } else {
       ranges_design_gs_norm_pmf_N$x   <-
         ranges_design_gs_norm_pmf_N$y <- NULL
@@ -5786,9 +5786,9 @@ server <- function(input, output, session) {
       input$design_dtl_bern_equal_error_brush
     if (!is.null(brush_error)) {
       ranges_design_dtl_bern_equal_error$x   <- c(brush_error$xmin,
-                                                 brush_error$xmax)
+                                                  brush_error$xmax)
       ranges_design_dtl_bern_equal_error$y   <- c(brush_error$ymin,
-                                                 brush_error$ymax)
+                                                  brush_error$ymax)
     } else {
       ranges_design_dtl_bern_equal_error$x   <-
         ranges_design_dtl_bern_equal_error$y <- NULL
@@ -5800,9 +5800,9 @@ server <- function(input, output, session) {
       input$design_dtl_bern_equal_power_brush
     if (!is.null(brush_power)) {
       ranges_design_dtl_bern_equal_power$x   <- c(brush_power$xmin,
-                                                 brush_power$xmax)
+                                                  brush_power$xmax)
       ranges_design_dtl_bern_equal_power$y   <- c(brush_power$ymin,
-                                                 brush_power$ymax)
+                                                  brush_power$ymax)
     } else {
       ranges_design_dtl_bern_equal_power$x   <-
         ranges_design_dtl_bern_equal_power$y <- NULL
@@ -5814,9 +5814,9 @@ server <- function(input, output, session) {
       input$design_dtl_bern_equal_other_brush
     if (!is.null(brush_other)) {
       ranges_design_dtl_bern_equal_other$x   <- c(brush_other$xmin,
-                                                 brush_other$xmax)
+                                                  brush_other$xmax)
       ranges_design_dtl_bern_equal_other$y   <- c(brush_other$ymin,
-                                                 brush_other$ymax)
+                                                  brush_other$ymax)
     } else {
       ranges_design_dtl_bern_equal_other$x   <-
         ranges_design_dtl_bern_equal_other$y <- NULL
@@ -5828,9 +5828,9 @@ server <- function(input, output, session) {
       input$design_dtl_bern_shifted_power_brush
     if (!is.null(brush_shifted_power)) {
       ranges_design_dtl_bern_shifted_power$x   <- c(brush_shifted_power$xmin,
-                                             brush_shifted_power$xmax)
+                                                    brush_shifted_power$xmax)
       ranges_design_dtl_bern_shifted_power$y   <- c(brush_shifted_power$ymin,
-                                             brush_shifted_power$ymax)
+                                                    brush_shifted_power$ymax)
     } else {
       ranges_design_dtl_bern_shifted_power$x   <-
         ranges_design_dtl_bern_shifted_power$y <- NULL
@@ -6023,9 +6023,9 @@ server <- function(input, output, session) {
   output$design_dtl_bern_table_key   <- DT::renderDT({
     table_key                                      <-
       int_des_dtl_bern()$data[, c(1:(int_des_dtl_bern()$K + 1),
-                                 (int_des_dtl_bern()$K + 3):
-                                   (2*int_des_dtl_bern()$K + 3),
-                                 4*int_des_dtl_bern()$K + 3)]
+                                  (int_des_dtl_bern()$K + 3):
+                                    (2*int_des_dtl_bern()$K + 3),
+                                  4*int_des_dtl_bern()$K + 3)]
     colnames(table_key)[2*int_des_dtl_bern()$K + 2] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
@@ -6037,8 +6037,8 @@ server <- function(input, output, session) {
   output$design_dtl_bern_table_error <- DT::renderDT({
     DT::datatable(
       round(int_des_dtl_bern()$data[, c(1:int_des_dtl_bern()$K,
-                                       (2*int_des_dtl_bern()$K + 3):
-                                         (4*int_des_dtl_bern()$K + 3))], 3),
+                                        (2*int_des_dtl_bern()$K + 3):
+                                          (4*int_des_dtl_bern()$K + 3))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -6047,7 +6047,7 @@ server <- function(input, output, session) {
   output$design_dtl_bern_table_other <- DT::renderDT({
     DT::datatable(
       round(int_des_dtl_bern()$data[, -((2*int_des_dtl_bern()$K + 3):
-                                         (4*int_des_dtl_bern()$K + 3))], 3),
+                                          (4*int_des_dtl_bern()$K + 3))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -6376,9 +6376,9 @@ server <- function(input, output, session) {
       input$design_dtl_norm_equal_error_brush
     if (!is.null(brush_error)) {
       ranges_design_dtl_norm_equal_error$x   <- c(brush_error$xmin,
-                                                 brush_error$xmax)
+                                                  brush_error$xmax)
       ranges_design_dtl_norm_equal_error$y   <- c(brush_error$ymin,
-                                                 brush_error$ymax)
+                                                  brush_error$ymax)
     } else {
       ranges_design_dtl_norm_equal_error$x   <-
         ranges_design_dtl_norm_equal_error$y <- NULL
@@ -6390,9 +6390,9 @@ server <- function(input, output, session) {
       input$design_dtl_norm_equal_power_brush
     if (!is.null(brush_power)) {
       ranges_design_dtl_norm_equal_power$x   <- c(brush_power$xmin,
-                                                 brush_power$xmax)
+                                                  brush_power$xmax)
       ranges_design_dtl_norm_equal_power$y   <- c(brush_power$ymin,
-                                                 brush_power$ymax)
+                                                  brush_power$ymax)
     } else {
       ranges_design_dtl_norm_equal_power$x   <-
         ranges_design_dtl_norm_equal_power$y <- NULL
@@ -6404,9 +6404,9 @@ server <- function(input, output, session) {
       input$design_dtl_norm_equal_other_brush
     if (!is.null(brush_other)) {
       ranges_design_dtl_norm_equal_other$x   <- c(brush_other$xmin,
-                                                 brush_other$xmax)
+                                                  brush_other$xmax)
       ranges_design_dtl_norm_equal_other$y   <- c(brush_other$ymin,
-                                                 brush_other$ymax)
+                                                  brush_other$ymax)
     } else {
       ranges_design_dtl_norm_equal_other$x   <-
         ranges_design_dtl_norm_equal_other$y <- NULL
@@ -6418,9 +6418,9 @@ server <- function(input, output, session) {
       input$design_dtl_norm_shifted_power_brush
     if (!is.null(brush_shifted_power)) {
       ranges_design_dtl_norm_shifted_power$x   <- c(brush_shifted_power$xmin,
-                                             brush_shifted_power$xmax)
+                                                    brush_shifted_power$xmax)
       ranges_design_dtl_norm_shifted_power$y   <- c(brush_shifted_power$ymin,
-                                             brush_shifted_power$ymax)
+                                                    brush_shifted_power$ymax)
     } else {
       ranges_design_dtl_norm_shifted_power$x   <-
         ranges_design_dtl_norm_shifted_power$y <- NULL
@@ -6619,9 +6619,9 @@ server <- function(input, output, session) {
   output$design_dtl_norm_table_key   <- DT::renderDT({
     table_key                                      <-
       int_des_dtl_norm()$data[, c(1:(int_des_dtl_norm()$K + 1),
-                                 (int_des_dtl_norm()$K + 3):
-                                   (2*int_des_dtl_norm()$K + 3),
-                                 4*int_des_dtl_norm()$K + 3)]
+                                  (int_des_dtl_norm()$K + 3):
+                                    (2*int_des_dtl_norm()$K + 3),
+                                  4*int_des_dtl_norm()$K + 3)]
     colnames(table_key)[2*int_des_dtl_norm()$K + 2] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
@@ -6633,8 +6633,8 @@ server <- function(input, output, session) {
   output$design_dtl_norm_table_error <- DT::renderDT({
     DT::datatable(
       round(int_des_dtl_norm()$data[, c(1:int_des_dtl_norm()$K,
-                                       (2*int_des_dtl_norm()$K + 3):
-                                         (4*int_des_dtl_norm()$K + 3))], 3),
+                                        (2*int_des_dtl_norm()$K + 3):
+                                          (4*int_des_dtl_norm()$K + 3))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -6643,7 +6643,7 @@ server <- function(input, output, session) {
   output$design_dtl_norm_table_other <- DT::renderDT({
     DT::datatable(
       round(int_des_dtl_norm()$data[, -((2*int_des_dtl_norm()$K + 3):
-                                         (4*int_des_dtl_norm()$K + 3))], 3),
+                                          (4*int_des_dtl_norm()$K + 3))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -6782,7 +6782,7 @@ server <- function(input, output, session) {
       HTML('<a href="mailto:michael.grayling@newcastle.ac.uk">michael.grayling@newcastle.ac.uk</a>'),
       p(),
       sever::reload_button("Reconnect", "default")
-      ),
+    ),
     bg_color = "rgba(0,0,0,.5)",
     box      = TRUE,
     color    = "black")
