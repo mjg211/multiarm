@@ -369,14 +369,14 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <div class="sourceCode" id="cb4"><pre class="downlit">
 <span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">sim</span>
 <span class="co">#&gt; # A tibble: 4 x 16</span>
-<span class="co">#&gt;    tau1  tau2   Pdis   Pcon     P1     P2 FWERI1 FWERI2 FWERII1 FWERII2    PHER</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0   0.0248 0.0018 0.0131 0.0134 0.0248 0.0018  0       0      0.0133 </span>
-<span class="co">#&gt; 2   0.5   0.5 0.968  0.832  0.901  0.899  0      0       0.168   0.0317 0      </span>
-<span class="co">#&gt; 3   0.5   0   0.903  0.0133 0.903  0.0133 0.0133 0       0.097   0      0.00664</span>
-<span class="co">#&gt; 4   0     0.5 0.901  0.0139 0.0139 0.901  0.0139 0       0.0992  0      0.00694</span>
-<span class="co">#&gt; # … with 5 more variables: FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
+<span class="co">#&gt;    tau1  tau2   Pdis    Pcon     P1     P2 FWERI1  FWERI2 FWERII1 FWERII2</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0     0   0.0250 0.00214 0.0135 0.0136 0.0250 0.00214  0       0     </span>
+<span class="co">#&gt; 2   0.5   0.5 0.968  0.832   0.899  0.900  0      0        0.168   0.0324</span>
+<span class="co">#&gt; 3   0.5   0   0.901  0.0134  0.901  0.0134 0.0134 0        0.0985  0     </span>
+<span class="co">#&gt; 4   0     0.5 0.901  0.0133  0.0133 0.901  0.0133 0        0.0992  0     </span>
+<span class="co">#&gt; # … with 6 more variables: PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
 </pre></div>
 </div>
 <div id="example-2" class="section level2">
@@ -408,8 +408,8 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt; # A tibble: 5 x 20</span>
 <span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0     0   0.0243 9.65e-5 0.00856 0.00854 0.00852 0.0243 1.22e-3</span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  3.32e-1 0.822   0.615   0.449   0      0.     </span>
+<span class="co">#&gt; 1   0     0     0   0.0243 9.64e-5 0.00856 0.00855 0.00852 0.0243 1.22e-3</span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.901  3.32e-1 0.822   0.614   0.449   0      0.     </span>
 <span class="co">#&gt; 3   0.5   0     0   0.788  9.67e-4 0.787   0.0124  0.0124  0.0238 9.71e-4</span>
 <span class="co">#&gt; 4   0     0.5   0   0.535  1.03e-3 0.0117  0.532   0.0114  0.0221 1.07e-3</span>
 <span class="co">#&gt; 5   0     0     0.5 0.348  9.96e-4 0.0108  0.0106  0.341   0.0203 1.12e-3</span>

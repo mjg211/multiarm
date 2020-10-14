@@ -28,8 +28,9 @@ suppressPackageStartupMessages(library(multiarm))
 
 `multiarm` provides functions to assist with the design of single- and multi-stage multi-arm clinical trials.
 In either case the available functions allow for sample size determination, trial simulation, analytical operating characteristic calculation, and the production of several informative plots.
-An R Shiny graphical user interface is also provided to aid design determination.
-Further details on single-stage design can be found in [Grayling and Wason (2020)](https://doi.org/10.1186/s12885-020-6525-0).
+
+Note that an R Shiny graphical user interface is also available for designing single-stage trials; it can be accessed within R using `multiarm::gui()`, or online at [https://mjgrayling.shinyapps.io/multiarm](https://mjgrayling.shinyapps.io/multiarm).
+Additional information on this app can be found in [Grayling and Wason (2020)](https://doi.org/10.1186/s12885-020-6525-0).
 
 ## Getting started
 

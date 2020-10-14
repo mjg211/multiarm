@@ -14,9 +14,13 @@
 multi-stage multi-arm clinical trials. In either case the available
 functions allow for sample size determination, trial simulation,
 analytical operating characteristic calculation, and the production of
-several informative plots. An R Shiny graphical user interface is also
-provided to aid design determination. Further details on single-stage
-design can be found in [Grayling and Wason
+several informative plots.
+
+Note that an R Shiny graphical user interface is also available for
+designing single-stage trials; it can be accessed within R using
+`multiarm::gui()`, or online at
+<https://mjgrayling.shinyapps.io/multiarm>. Additional information on
+this app can be found in [Grayling and Wason
 (2020)](https://doi.org/10.1186/s12885-020-6525-0).
 
 ## Getting started
@@ -107,7 +111,7 @@ Then, the total required sample size is:
 
 ``` r
 des$N
-#> [1] 67.45189
+#> [1] 67.40703
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -119,11 +123,11 @@ des$opchar
 #> # A tibble: 5 x 20
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2  FWERI3
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
-#> 1     0     0     0 0.0500 0.00109 0.0196 0.0196 0.0196 0.0500 0.00773 0.00109
+#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00772 0.00108
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0       0      
-#> 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0359 0.00329 0      
-#> 4     0     1     0 0.800  0.00330 0.0196 0.800  0.0196 0.0359 0.00330 0      
-#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00329 0      
+#> 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0359 0.00330 0      
+#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.00330 0      
+#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00330 0      
 #> # … with 9 more variables: FWERII1 <dbl>, FWERII2 <dbl>, FWERII3 <dbl>,
 #> #   PHER <dbl>, FDR <dbl>, pFDR <dbl>, FNDR <dbl>, Sens <dbl>, Spec <dbl>
 ```
