@@ -399,9 +399,12 @@ integer_dtl                        <- function(comp) {
   if (comp$integer) {
     if (comp$type == "variable") {
       comp$n_factor   <- ceiling(comp$n_factor)
+      while (comp$n_factor*comp$r != 0) {
+        comp$n_factor <- comp$n_factor + 1
+      }
     } else {
       comp$n_factor   <- ceiling(comp$n_factor)
-      while (any(comp$n_factor%%(1 + comp$r*comp$Kv) != 0)) {
+      while (any(comp$n_factor%%(1 + comp$r*comp$seq_K) != 0)) {
         comp$n_factor <- comp$n_factor + 1
       }
     }
@@ -453,6 +456,14 @@ opchar_dtl_internal_2              <- function(comp, i) {
     Rfast::rowsums(comp$outcomes[, comp$seq_K + comp$K]*neg_mat)
   false_non_discoveries           <-
     Rfast::rowsums(comp$inv_psi*pos_mat)
+  pFDR                            <-
+    sum(comp$outcomes[comp$disjunctive, comp$twoKp1]*
+          false_discoveries[comp$disjunctive]/
+          comp$discoveries[comp$disjunctive])/
+    sum(comp$outcomes[comp$disjunctive, comp$twoKp1])
+  if (is.nan(pFDR)) {
+    pFDR                                          <- 0
+  }
   c(sum(comp$outcomes[comp$disjunctive, comp$twoKp1]),
     sum(comp$outcomes[comp$conjunctive, comp$twoKp1]),
     sapply(comp$seq_K,
@@ -466,10 +477,7 @@ opchar_dtl_internal_2              <- function(comp, i) {
                                            comp$twoKp1]) }),
     sum(comp$outcomes[, comp$twoKp1]*false_discoveries)/comp$K,
     sum(comp$outcomes[, comp$twoKp1]*false_discoveries/comp$mod_discoveries),
-    sum(comp$outcomes[comp$disjunctive, comp$twoKp1]*
-          false_discoveries[comp$disjunctive]/
-          comp$discoveries[comp$disjunctive])/
-      sum(comp$outcomes[comp$disjunctive, comp$twoKp1]),
+    pFDR,
     sum(comp$outcomes[, comp$twoKp1]*
           false_non_discoveries/comp$mod_non_discoveries),
     sum(comp$outcomes[, comp$twoKp1]*

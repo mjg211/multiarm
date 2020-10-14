@@ -307,7 +307,6 @@ plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
     ggplot2::theme_bw() +
     ggplot2::geom_hline(yintercept = alpha, linetype = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta, linetype = 2) +
-    ggplot2::geom_vline(xintercept = pi0, linetype = 2) +
     ggplot2::geom_vline(xintercept = pi0 + delta1, linetype = 2)
   if (print_plots) {
     print(plots$shifted_power)
@@ -326,7 +325,6 @@ plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
     ggplot2::theme(legend.position  = "bottom",
                    legend.title     = ggplot2::element_blank(),
                    legend.spacing.x = grid::unit(0.2, "cm")) +
-    ggplot2::geom_vline(xintercept = pi0, linetype = 2) +
     ggplot2::geom_vline(xintercept = pi0 + delta1, linetype = 2)
   if (print_plots) {
     print(plots$shifted_sample_size)

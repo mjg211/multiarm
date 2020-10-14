@@ -1138,6 +1138,7 @@ ui <- function(request) {
                   size    = "m",
                   colour  = "black"
                 ),
+              shiny::uiOutput("design_gs_bern_warning_ratio"),
               shinyWidgets::prettySwitch(
                 inputId = "design_gs_bern_plots",
                 label   = "Plot power curves",
@@ -1677,6 +1678,7 @@ ui <- function(request) {
                   size    = "m",
                   colour  = "black"
                 ),
+              shiny::uiOutput("design_gs_norm_warning_ratio"),
               shinyWidgets::prettySwitch(
                 inputId = "design_gs_norm_plots",
                 label   = "Plot power curves",
@@ -2142,6 +2144,7 @@ ui <- function(request) {
                   size    = "m",
                   colour  = "black"
                 ),
+              shiny::uiOutput("design_dtl_bern_warning_ratio"),
               shinyWidgets::prettySwitch(
                 inputId = "design_dtl_bern_plots",
                 label   = "Plot power curves",
@@ -2544,6 +2547,7 @@ ui <- function(request) {
                   size    = "m",
                   colour  = "black"
                 ),
+              shiny::uiOutput("design_dtl_norm_warning_ratio"),
               shinyWidgets::prettySwitch(
                 inputId = "design_dtl_norm_plots",
                 label   = "Plot power curves",
@@ -4401,6 +4405,17 @@ server <- function(input, output, session) {
     }
   })
 
+  output$design_gs_bern_warning_ratio <- renderUI({
+    if (all(any(all(input$design_gs_bern_ratio_type == "equal_exp",
+                    input$design_gs_bern_ratio_1 != 1),
+                input$design_gs_bern_ratio_type == "root_K"),
+            input$design_gs_bern_integer == TRUE)) {
+      shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
+               "with unequal allocation between the control arm and the ",
+               "experimental arms can cause confusing results.")
+    }
+  })
+
   output$design_gs_bern_warning <- renderUI({
     if (any(input$design_gs_bern_K %in% c(4, 5),
             all(input$design_gs_bern_K == 3, input$design_gs_bern_plots))) {
@@ -4564,6 +4579,23 @@ server <- function(input, output, session) {
     } else if (input$design_gs_bern_ratio_type == "root_K") {
       ratio               <- 1/sqrt(K)
     }
+    print("before")
+    print(K)
+    print(J)
+    print(stopping)
+    print(swss)
+    print(input$design_gs_bern_alpha)
+    print(input$design_gs_bern_beta)
+    print(input$design_gs_bern_pi0)
+    print(input$design_gs_bern_delta1)
+    print(input$design_gs_bern_delta0)
+    print(ratio)
+    print(power)
+    print(lower)
+    print(upper)
+    print(ffix)
+    print(efix)
+    print(integer)
     design                <-
       multiarm:::des_gs_bern(K        = K,
                              J        = J,
@@ -4581,6 +4613,7 @@ server <- function(input, output, session) {
                              ffix     = ffix,
                              efix     = efix,
                              integer  = input$design_gs_bern_integer)
+    print("after")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_gs_bern_plots),
                  message = "Rendering design summary")
     rmarkdown::render(
@@ -5065,6 +5098,17 @@ server <- function(input, output, session) {
         max     = NA,
         step    = 0.25
       )
+    }
+  })
+
+  output$design_gs_norm_warning_ratio <- renderUI({
+    if (all(any(all(input$design_gs_norm_ratio_type == "equal_exp",
+                    input$design_gs_norm_ratio_1 != 1),
+                input$design_gs_norm_ratio_type == "root_K"),
+            input$design_gs_norm_integer == TRUE)) {
+      shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
+               "with unequal allocation between the control arm and the ",
+               "experimental arms can cause confusing results.")
     }
   })
 
@@ -5748,6 +5792,17 @@ server <- function(input, output, session) {
     }
   })
 
+  output$design_dtl_norm_warning_ratio <- renderUI({
+    if (all(any(all(input$design_dtl_norm_ratio_type == "equal_exp",
+                    input$design_dtl_norm_ratio_1 != 1),
+                input$design_dtl_norm_ratio_type == "root_K"),
+            input$design_dtl_norm_integer == TRUE)) {
+      shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
+               "with unequal allocation between the control arm and the ",
+               "experimental arms can cause confusing results.")
+    }
+  })
+
   output$design_dtl_bern_warning <- renderUI({
     if (all(input$design_dtl_bern_K %in% c(4, 5),
             input$design_dtl_bern_plots)) {
@@ -6335,6 +6390,17 @@ server <- function(input, output, session) {
         max     = NA,
         step    = 0.25
       )
+    }
+  })
+
+  output$design_dtl_bern_warning_ratio <- renderUI({
+    if (all(any(all(input$design_dtl_bern_ratio_type == "equal_exp",
+                    input$design_dtl_bern_ratio_1 != 1),
+                input$design_dtl_bern_ratio_type == "root_K"),
+            input$design_dtl_bern_integer == TRUE)) {
+      shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
+               "with unequal allocation between the control arm and the ",
+               "experimental arms can cause confusing results.")
     }
   })
 

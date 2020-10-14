@@ -178,7 +178,7 @@ plot.multiarm_des_gs_norm <- function(x = des_gs_norm(), delta_min = -x$delta1,
                    legend.spacing.x = grid::unit(0.2, "cm")) +
     ggplot2::geom_hline(yintercept = alpha, linetype = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta, linetype = 2) +
-    ggplot2::geom_vline(xintercept = delta0, linetype = 2) +
+    ggplot2::geom_vline(xintercept = 0, linetype = 2) +
     ggplot2::geom_vline(xintercept = delta1, linetype = 2)
   if (K == 2) {
     plots$equal_error          <- plots$equal_error +
@@ -220,7 +220,7 @@ plot.multiarm_des_gs_norm <- function(x = des_gs_norm(), delta_min = -x$delta1,
                    legend.spacing.x = grid::unit(0.2, "cm")) +
     ggplot2::geom_hline(yintercept = alpha, linetype = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta, linetype = 2) +
-    ggplot2::geom_vline(xintercept = delta0, linetype = 2) +
+    ggplot2::geom_vline(xintercept = 0, linetype = 2) +
     ggplot2::geom_vline(xintercept = delta1, linetype = 2)
   if (K == 2) {
     plots$equal_other         <- plots$equal_other +
@@ -295,7 +295,6 @@ plot.multiarm_des_gs_norm <- function(x = des_gs_norm(), delta_min = -x$delta1,
     ggplot2::theme_bw() +
     ggplot2::geom_hline(yintercept = alpha, linetype = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta, linetype = 2) +
-    ggplot2::geom_vline(xintercept = delta0, linetype = 2) +
     ggplot2::geom_vline(xintercept = delta1, linetype = 2)
   if (print_plots) {
     print(plots$shifted_power)
@@ -314,7 +313,6 @@ plot.multiarm_des_gs_norm <- function(x = des_gs_norm(), delta_min = -x$delta1,
     ggplot2::theme(legend.position  = "bottom",
                    legend.title     = ggplot2::element_blank(),
                    legend.spacing.x = grid::unit(0.2, "cm")) +
-    ggplot2::geom_vline(xintercept = delta0, linetype = 2) +
     ggplot2::geom_vline(xintercept = delta1, linetype = 2)
   if (print_plots) {
     print(plots$shifted_sample_size)

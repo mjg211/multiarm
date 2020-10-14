@@ -269,7 +269,6 @@ plot.multiarm_des_dtl_bern <- function(x = des_dtl_bern(),
     ggplot2::theme_bw() +
     ggplot2::geom_hline(yintercept = alpha, linetype = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta, linetype = 2) +
-    ggplot2::geom_vline(xintercept = pi0, linetype = 2) +
     ggplot2::geom_vline(xintercept = pi0 + delta1, linetype = 2)
   if (print_plots) {
     print(plots$shifted_power)

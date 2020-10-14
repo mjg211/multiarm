@@ -55,7 +55,10 @@
 #' \code{"3"}.
 #' @param integer A \code{\link{logical}} variable indicating whether the
 #' computed possible sample sizes required in each arm in each stage should be
-#' forced to be whole numbers. Defaults to \code{FALSE}.
+#' forced to be whole numbers. Defaults to \code{FALSE}. WARNING: If you set
+#' \code{integer = TRUE} and \code{ratio != 1}, obscure results can occur due to
+#' difficulties in identifying a suitable whole number sample size that meets
+#' the allocation ratio requirement.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
 #' \code{FALSE}.

@@ -358,6 +358,8 @@ opchar_ss_single           <- function(i, comp) {
       mvtnorm::pmvnorm(comp$ls[[i]][j, ], comp$us[[i]][j, ], comp$EZ[i, ],
                        sigma = comp$CovZ[[i]])[1]
   }
+  P[is.nan(P)] <- 0
+  P            <- P/sum(P)
   neg_mat                                         <-
     matrix(comp$EZ[i, ] <= 0, comp$nrow_outcomes, comp$K, byrow = TRUE)
   pos_mat                                         <- !neg_mat
@@ -368,14 +370,19 @@ opchar_ss_single           <- function(i, comp) {
   which_discoveries                               <- which(comp$discoveries > 0)
   comp$discoveries[-which_discoveries]            <- 1
   comp$non_discoveries[comp$non_discoveries == 0] <- 1
+  pFDR                                            <-
+    sum(P[which_discoveries]*false_discoveries[which_discoveries]/
+          comp$discoveries[which_discoveries])/sum(P[which_discoveries])
+  if (is.nan(pFDR)) {
+    pFDR                                          <- 0
+  }
   c(sum(P[-1]), P[comp$nrow_outcomes],
     sapply(comp$seq_K, function(k) { sum(P[comp$outcomes[, k] > 0]) }),
     sapply(comp$seq_K, function(k) { sum(P[false_discoveries >= k]) }),
     sapply(comp$seq_K, function(k) { sum(P[false_non_discoveries >= k]) }),
     sum(P*false_discoveries)/comp$K,
     sum(P*false_discoveries/comp$discoveries),
-    sum(P[which_discoveries]*false_discoveries[which_discoveries]/
-          comp$discoveries[which_discoveries])/sum(P[which_discoveries]),
+    pFDR,
     sum(P*false_non_discoveries/comp$non_discoveries),
     sum(P*Rfast::rowsums(comp$outcomes*pos_mat))/max(sum(comp$EZ[i, ] > 0), 1),
     sum(P*Rfast::rowsums(comp$inv_outcomes*neg_mat))/
@@ -389,6 +396,8 @@ opchar_ss_step             <- function(i, comp) {
       mvtnorm::pmvnorm(comp$ls[[i]][[j]], mean  = comp$means[[i]][[j]],
                        sigma = comp$Lambdas[[i]][[j]])[1]
   }
+  P[is.nan(P)] <- 0
+  P            <- P/sum(P)
   neg_mat                                         <-
     matrix(comp$EZ[i, ] <= 0, comp$nrow_outcomes, comp$K, byrow = TRUE)
   pos_mat                                         <- !neg_mat
@@ -399,14 +408,19 @@ opchar_ss_step             <- function(i, comp) {
   which_discoveries                               <- which(comp$discoveries > 0)
   comp$discoveries[-which_discoveries]            <- 1
   comp$non_discoveries[comp$non_discoveries == 0] <- 1
+  pFDR                                            <-
+    sum(P[which_discoveries]*false_discoveries[which_discoveries]/
+          comp$discoveries[which_discoveries])/sum(P[which_discoveries])
+  if (is.nan(pFDR)) {
+    pFDR                                          <- 0
+  }
   c(sum(P[which_discoveries]), sum(P[comp$discoveries == comp$K]),
     sapply(comp$seq_K, function(k) { sum(P[comp$outcomes[, comp$K + k] > 0]) }),
     sapply(comp$seq_K, function(k) { sum(P[false_discoveries >= k]) }),
     sapply(comp$seq_K, function(k) { sum(P[false_non_discoveries >= k]) }),
     sum(P*false_discoveries)/comp$K,
     sum(P*false_discoveries/comp$discoveries),
-    sum(P[which_discoveries]*false_discoveries[which_discoveries]/
-          comp$discoveries[which_discoveries])/sum(P[which_discoveries]),
+    pFDR,
     sum(P*false_non_discoveries/comp$non_discoveries),
     sum(P*Rfast::rowsums(comp$outcomes[, -comp$seq_K]*pos_mat))/
       max(sum(comp$EZ[i, ] > 0), 1),

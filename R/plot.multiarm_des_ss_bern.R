@@ -304,7 +304,6 @@ plot.multiarm_des_ss_bern <- function(x = des_ss_bern(),
                    legend.spacing.x = grid::unit(0.2, "cm")) +
     ggplot2::geom_hline(yintercept = alpha, linetype = 2) +
     ggplot2::geom_hline(yintercept = 1 - beta, linetype = 2) +
-    ggplot2::geom_vline(xintercept = pi0, linetype = 2) +
     ggplot2::geom_vline(xintercept = pi0 + delta1, linetype = 2)
   if (print_plots) {
     print(plots$shifted_power)
