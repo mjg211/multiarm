@@ -11,9 +11,9 @@ for a Bernoulli distributed primary outcome}
   delta_max = 1 - x$pi0 - 1e-06,
   delta = x$delta1 - x$delta0,
   density = 100,
-  output = F,
-  print_plots = T,
-  summary = F,
+  output = FALSE,
+  print_plots = TRUE,
+  summary = FALSE,
   ...
 )
 }
@@ -42,14 +42,14 @@ increased run time. Defaults to \code{100}.}
 
 \item{output}{A \code{\link{logical}} variable indicating whether the
 available outputs from the function (see below) should be returned. Defaults
-to \code{F}.}
+to \code{FALSE}.}
 
 \item{print_plots}{A \code{\link{logical}} variable indicating whether to
-print produced plots. Defaults to \code{T}.}
+print produced plots. Defaults to \code{TRUE}.}
 
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-\code{F}.}
+\code{FALSE}.}
 
 \item{...}{Not currently used.}
 }

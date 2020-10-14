@@ -6,10 +6,10 @@
 multi-arm clinical trial for a Bernoulli distributed primary outcome}
 \usage{
 sim_ss_bern(
-  des = des_ss_bern(integer = T),
+  des = des_ss_bern(integer = TRUE),
   pi,
   replicates = 1e+05,
-  summary = F
+  summary = FALSE
 )
 }
 \arguments{
@@ -17,7 +17,7 @@ sim_ss_bern(
 returned by \code{\link{build_ss_bern}} or \code{\link{des_ss_bern}} (i.e., a
 single-stage multi-arm clinical trial design for a Bernoulli distributed
 outcome). \strong{Note:} The sample sizes in all arms must be whole numbers.
-Defaults to \code{des_ss_bern(integer = T)}.}
+Defaults to \code{des_ss_bern(integer = TRUE)}.}
 
 \item{pi}{A \code{\link{matrix}} whose rows indicate values of
 \ifelse{html}{\out{<b><i>&pi;</i></b>}}{\eqn{\bold{\pi}}} at which to
@@ -32,7 +32,7 @@ simulations to use for each value of
 
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-\code{F}.}
+\code{FALSE}.}
 }
 \value{
 A \code{\link{list}} containing the following elements

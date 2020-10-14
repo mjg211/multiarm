@@ -85,7 +85,7 @@
       <h1 data-toc-skip>Single-stage multi-arm clinical trials</h1>
                         <h4 class="author">Michael J. Grayling, Newcastle University (<a href="mailto:michael.grayling@newcastle.ac.uk" class="email">michael.grayling@newcastle.ac.uk</a>)</h4>
             
-            <h4 class="date">13/10/2020</h4>
+            <h4 class="date">14/10/2020</h4>
       
       <small class="dont-index">Source: <a href="http://github.com/mjg211/multiarm/blob/master/vignettes/single_stage.Rmd"><code>vignettes/single_stage.Rmd</code></a></small>
       <div class="hidden name"><code>single_stage.Rmd</code></div>
@@ -351,14 +351,9 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <div class="sourceCode" id="cb2"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw">des</span>)
 </pre></div>
-<p><img src="single_stage_files/figure-html/unnamed-chunk-2-1.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
-<pre><code>#&gt; Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
-#&gt; Using compatibility `.name_repair`.
-#&gt; This warning is displayed once every 8 hours.
-#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<p><img src="single_stage_files/figure-html/unnamed-chunk-2-3.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-4.png" width="700"></p>
+<p><img src="single_stage_files/figure-html/unnamed-chunk-2-1.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-2.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-3.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-4.png" width="700"></p>
 <p><code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code> contains a summary of the operating characteristics of the identified design:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
+<div class="sourceCode" id="cb3"><pre class="downlit">
 <span class="kw">des</span><span class="op">$</span><span class="kw">opchar</span>
 <span class="co">#&gt; # A tibble: 4 x 16</span>
 <span class="co">#&gt;    tau1  tau2   Pdis    Pcon     P1     P2 FWERI1  FWERI2 FWERII1 FWERII2</span>
@@ -371,17 +366,17 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
 </pre></div>
 <p>We can validate these using <code><a href="../reference/sim_ss_norm.html">sim_ss_norm()</a></code> with:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
+<div class="sourceCode" id="cb4"><pre class="downlit">
 <span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">sim</span>
 <span class="co">#&gt; # A tibble: 4 x 16</span>
-<span class="co">#&gt;    tau1  tau2   Pdis    Pcon     P1     P2 FWERI1  FWERI2 FWERII1 FWERII2</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0   0.0252 0.00194 0.0136 0.0136 0.0252 0.00194  0       0     </span>
-<span class="co">#&gt; 2   0.5   0.5 0.969  0.833   0.901  0.902  0      0        0.167   0.0310</span>
-<span class="co">#&gt; 3   0.5   0   0.901  0.0137  0.901  0.0137 0.0137 0        0.0987  0     </span>
-<span class="co">#&gt; 4   0     0.5 0.900  0.0127  0.0127 0.900  0.0127 0        0.0998  0     </span>
-<span class="co">#&gt; # … with 6 more variables: PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
+<span class="co">#&gt;    tau1  tau2   Pdis   Pcon     P1     P2 FWERI1 FWERI2 FWERII1 FWERII2    PHER</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0     0   0.0248 0.0018 0.0131 0.0134 0.0248 0.0018  0       0      0.0133 </span>
+<span class="co">#&gt; 2   0.5   0.5 0.968  0.832  0.901  0.899  0      0       0.168   0.0317 0      </span>
+<span class="co">#&gt; 3   0.5   0   0.903  0.0133 0.903  0.0133 0.0133 0       0.097   0      0.00664</span>
+<span class="co">#&gt; 4   0     0.5 0.901  0.0139 0.0139 0.901  0.0139 0       0.0992  0      0.00694</span>
+<span class="co">#&gt; # … with 5 more variables: FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
 </pre></div>
 </div>
 <div id="example-2" class="section level2">
@@ -389,7 +384,7 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <a href="#example-2" class="anchor"></a>4.2. Example 2</h2>
 <p>Now, lets make use of some of the additional functionality from <strong>multiarm</strong>.</p>
 <p>First, let’s find a design for a scenario with <span class="math inline">\(K=3\)</span>, using the Holm-Bonferroni correction, desiring to control the disjunctive power, choosing the allocation ratios for <span class="math inline">\(D\)</span>-optimality, in a scenario where the standard deviations differ across the arms:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
+<div class="sourceCode" id="cb5"><pre class="downlit">
 <span class="kw">des</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/des_ss_norm.html">des_ss_norm</a></span>(K          = <span class="fl">3</span>,
                    sigma      = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">2</span>),
                    ratio      = <span class="st">"D"</span>,
@@ -398,23 +393,23 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
                    integer    = <span class="fl">TRUE</span>)
 </pre></div>
 <p>Thus the total required sample size by the design is:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
+<div class="sourceCode" id="cb6"><pre class="downlit">
 <span class="kw">des</span><span class="op">$</span><span class="kw">N</span>
 <span class="co">#&gt; [1] 230</span>
 </pre></div>
 <p>And, the allocation ratios are:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
+<div class="sourceCode" id="cb7"><pre class="downlit">
 <span class="kw">des</span><span class="op">$</span><span class="kw">ratio</span>
 <span class="co">#&gt; [1] 1.705882 1.970588 2.088235</span>
 </pre></div>
 <p>Next, note that the operating characeristics of the truly optimal design are:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
+<div class="sourceCode" id="cb8"><pre class="downlit">
 <span class="kw">des</span><span class="op">$</span><span class="kw">opchar</span>
 <span class="co">#&gt; # A tibble: 5 x 20</span>
 <span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
 <span class="co">#&gt; 1   0     0     0   0.0243 9.65e-5 0.00856 0.00854 0.00852 0.0243 1.22e-3</span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.901  3.32e-1 0.822   0.614   0.449   0      0.     </span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  3.32e-1 0.822   0.615   0.449   0      0.     </span>
 <span class="co">#&gt; 3   0.5   0     0   0.788  9.67e-4 0.787   0.0124  0.0124  0.0238 9.71e-4</span>
 <span class="co">#&gt; 4   0     0.5   0   0.535  1.03e-3 0.0117  0.532   0.0114  0.0221 1.07e-3</span>
 <span class="co">#&gt; 5   0     0     0.5 0.348  9.96e-4 0.0108  0.0106  0.341   0.0203 1.12e-3</span>
@@ -423,22 +418,21 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
 </pre></div>
 <p>We can validate these with:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
+<div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">sim</span>
 <span class="co">#&gt; # A tibble: 5 x 20</span>
-<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0     0   0.0245 0.00011 0.00825 0.00864 0.00869 0.0245 0.00101</span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.901  0.331   0.820   0.613   0.448   0      0      </span>
-<span class="co">#&gt; 3   0.5   0     0   0.790  0.00109 0.788   0.0128  0.0129  0.0246 0.00109</span>
-<span class="co">#&gt; 4   0     0.5   0   0.535  0.00094 0.0115  0.531   0.0116  0.0221 0.00097</span>
-<span class="co">#&gt; 5   0     0     0.5 0.345  0.00095 0.0104  0.0100  0.339   0.0194 0.00109</span>
-<span class="co">#&gt; # … with 10 more variables: FWERI3 &lt;dbl&gt;, FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   FWERII3 &lt;dbl&gt;, PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
+<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1     P2      P3 FWERI1  FWERI2  FWERI3</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0     0     0   0.0239 1.50e-4 0.00842 0.0086 0.00829 0.0239 0.00123 1.50e-4</span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.900  3.32e-1 0.820   0.613  0.447   0      0       0.     </span>
+<span class="co">#&gt; 3   0.5   0     0   0.787  8.60e-4 0.786   0.0124 0.0127  0.0242 0.00086 0.     </span>
+<span class="co">#&gt; 4   0     0.5   0   0.536  9.60e-4 0.0118  0.532  0.0120  0.0228 0.00102 0.     </span>
+<span class="co">#&gt; 5   0     0     0.5 0.349  9.40e-4 0.0105  0.0107 0.342   0.0202 0.00109 0.     </span>
+<span class="co">#&gt; # … with 9 more variables: FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;, FWERII3 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
 </pre></div>
 <p>Or recreate them with <code><a href="../reference/opchar_ss_norm.html">opchar_ss_norm()</a></code> via:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
+<div class="sourceCode" id="cb10"><pre class="downlit">
 <span class="fu"><a href="../reference/opchar_ss_norm.html">opchar_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">opchar</span>
 <span class="co">#&gt; # A tibble: 5 x 20</span>
 <span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
@@ -453,7 +447,7 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
 </pre></div>
 <p>And, as earlier, we can produce power-curve plots with:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
+<div class="sourceCode" id="cb11"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw">des</span>)
 </pre></div>
 <p><img src="single_stage_files/figure-html/unnamed-chunk-11-1.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-11-2.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-11-3.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-11-4.png" width="700"></p>

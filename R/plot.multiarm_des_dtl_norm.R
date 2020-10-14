@@ -1,11 +1,59 @@
+#' Plot operating characteristics of a multi-stage drop-the-losers multi-arm
+#' clinical trial for a normally distributed primary outcome
+#'
+#' \code{plot.multiarm_des_dtl_norm()} produces power curve plots for a
+#' specified multi-stage drop-the-losers multi-arm clinical trial design
+#' assuming the primary outcome is normally distributed.
+#'
+#' @param x A \code{\link{list}} of class \code{"multiarm_des_dtl_norm"}, as
+#' returned by \code{\link{build_dtl_norm}} or \code{\link{des_dtl_norm}} (i.e.,
+#' a multi-stage drop-the-losers multi-arm clinical trial design for a normally
+#' distributed outcome). Defaults to \code{des_dtl_norm()}.
+#' @param delta_min A \code{\link{numeric}} specifying the chosen minimum value
+#' for the treatment effects to include on the produced plots. Defaults to
+#' \code{-x$delta1}.
+#' @param delta_max A \code{\link{numeric}} specifying the chosen maximum
+#' value for the treatment effects to include on the produced plots. Defaults to
+#' \code{2*x$delta1}.
+#' @param delta A \code{\link{numeric}} specifying the chosen treatment effect
+#' shift to use in the 'shifted treatment effects plot'. Defaults to
+#' \code{x$delta1 - x$delta0}.
+#' @param density A \code{\link{numeric}} variable indicating the number of
+#' treatment effect scenarios to consider for each power curve. Increasing
+#' \code{density} increases the smoothness of the produced plots, at the cost of
+#' increased run time. Defaults to \code{100}.
+#' @param output A \code{\link{logical}} variable indicating whether the
+#' available outputs from the function (see below) should be returned. Defaults
+#' to \code{FALSE}.
+#' @param print_plots A \code{\link{logical}} variable indicating whether to
+#' print produced plots. Defaults to \code{TRUE}.
+#' @param summary A \code{\link{logical}} variable indicating whether a summary
+#' of the function's progress should be printed to the console. Defaults to
+#' \code{FALSE}.
+#' @param ... Not currently used.
+#' @return If \code{output = T}, a list containing the following elements
+#' \itemize{
+#' \item A \code{\link{list}} in the slot \code{$plots} containing the produced
+#' plots.
+#' \item Each of the input variables.
+#' }
+#' @examples
+#' \dontrun{
+#' # The design for the default parameters
+#' des        <- des_dtl_norm()
+#' plot(des)
+#' }
+#' @seealso \code{\link{build_dtl_norm}}, \code{\link{des_dtl_norm}},
+#' \code{\link{gui}}, \code{\link{opchar_dtl_norm}}, \code{\link{sim_dtl_norm}}.
 #' @method plot multiarm_des_dtl_norm
 #' @export
 plot.multiarm_des_dtl_norm <- function(x = des_dtl_norm(),
                                        delta_min = -x$delta1,
                                        delta_max = 2*x$delta1,
                                        delta = x$delta1 - x$delta0,
-                                       density = 100, output = F,
-                                       print_plots = T, summary = F, ...) {
+                                       density = 100, output = FALSE,
+                                       print_plots = TRUE, summary = FALSE,
+                                       ...) {
 
   ##### Check input variables ##################################################
 

@@ -10,7 +10,7 @@
 #' returned by \code{\link{build_ss_norm}} or \code{\link{des_ss_norm}} (i.e., a
 #' single-stage multi-arm clinical trial design for a normally distributed
 #' outcome). \strong{Note:} The sample sizes in all arms must be whole numbers.
-#' Defaults to \code{des_ss_norm(integer = T)}.
+#' Defaults to \code{des_ss_norm(integer = TRUE)}.
 #' @param tau A \code{\link{matrix}} whose rows indicate values of
 #' \ifelse{html}{\out{<b><i>&tau;</i></b>}}{\eqn{\bold{\tau}}} at which to
 #' evaluate the operating characteristics. Defaults internally to the global
@@ -22,7 +22,7 @@
 #' \code{1e5}.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
-#' \code{F}.
+#' \code{FALSE}.
 #' @return A \code{\link{list}} containing the following elements
 #' \itemize{
 #' \item A \code{\link{tibble}} in the slot \code{$sim} giving the estimated
@@ -43,8 +43,8 @@
 #' @seealso \code{\link{build_ss_norm}}, \code{\link{des_ss_norm}},
 #' \code{\link{opchar_ss_norm}}, \code{\link{plot.multiarm_des_ss_norm}}.
 #' @export
-sim_ss_norm <- function(des = des_ss_norm(integer = T), tau, replicates = 1e5,
-                        summary = F) {
+sim_ss_norm <- function(des = des_ss_norm(integer = TRUE), tau,
+                        replicates = 1e5, summary = FALSE) {
 
   ##### Check input variables ##################################################
 

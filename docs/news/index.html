@@ -126,6 +126,36 @@
       <small>Source: <a href='http://github.com/mjg211/multiarm/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="multiarm-011" class="section level1">
+<h1 class="page-header" data-toc-text="0.11">
+<a href="#multiarm-011" class="anchor"></a>multiarm 0.11</h1>
+<ul>
+<li>Analysis functions removed; focus purely on design for now.</li>
+<li>Support added for group-sequential multi-arm multi-stage clinical trials with normally or Bernoulli distributed outcomes (<code><a href="../reference/build_gs_bern.html">build_gs_bern()</a></code>, <code><a href="../reference/build_gs_norm.html">build_gs_norm()</a></code>, <code><a href="../reference/des_gs_bern.html">des_gs_bern()</a></code>, <code><a href="../reference/des_gs_norm.html">des_gs_norm()</a></code>, <code><a href="../reference/opchar_gs_bern.html">opchar_gs_bern()</a></code>, <code><a href="../reference/opchar_gs_norm.html">opchar_gs_norm()</a></code>, <code><a href="../reference/plot.multiarm_des_gs_bern.html">plot.multiarm_des_gs_bern()</a></code>, <code><a href="../reference/plot.multiarm_des_gs_norm.html">plot.multiarm_des_gs_norm()</a></code>, <code><a href="../reference/sim_gs_bern.html">sim_gs_bern()</a></code>, <code><a href="../reference/sim_gs_norm.html">sim_gs_norm()</a></code>).</li>
+<li>Corresponding support also added for multi-stage drop-the-losers designs (<code><a href="../reference/build_dtl_bern.html">build_dtl_bern()</a></code>, <code><a href="../reference/build_dtl_norm.html">build_dtl_norm()</a></code>, <code><a href="../reference/des_dtl_bern.html">des_dtl_bern()</a></code>, <code><a href="../reference/des_dtl_norm.html">des_dtl_norm()</a></code>, <code><a href="../reference/opchar_dtl_bern.html">opchar_dtl_bern()</a></code>, <code><a href="../reference/opchar_dtl_norm.html">opchar_dtl_norm()</a></code>, <code><a href="../reference/plot.multiarm_des_dtl_bern.html">plot.multiarm_des_dtl_bern()</a></code>, <code><a href="../reference/plot.multiarm_des_dtl_norm.html">plot.multiarm_des_dtl_norm()</a></code>, <code><a href="../reference/sim_dtl_bern.html">sim_dtl_bern()</a></code>, <code><a href="../reference/sim_dtl_norm.html">sim_dtl_norm()</a></code>).</li>
+<li>Suffix of <code>_norm</code> added to all relevant functions given below to indicate outcome variable.</li>
+<li>
+<code>_ma_</code> replaced in function names with <code>_ss_</code>.</li>
+<li>
+<code>des_int_ma()</code> removed for simplicity; does not add much over <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code>.</li>
+</ul>
+</div>
+    <div id="multiarm-010" class="section level1">
+<h1 class="page-header" data-toc-text="0.10">
+<a href="#multiarm-010" class="anchor"></a>multiarm 0.10</h1>
+<ul>
+<li>Corresponding support added for trials with Bernoulli outcomes (<code>an_ma_bern()</code>, <code>build_ma_bern()</code>, <code>des_ma_bern()</code>, <code>opchar_ma()</code>, <code>plot.multiarm_des_ma_bern()</code>, <code>sim_ma_bern()</code>).</li>
+<li>
+<code>gui_ma()</code> renamed <code><a href="../reference/gui.html">gui()</a></code> to reflect use for multiple types of outcome.</li>
+</ul>
+</div>
+    <div id="multiarm-09" class="section level1">
+<h1 class="page-header" data-toc-text="0.9">
+<a href="#multiarm-09" class="anchor"></a>multiarm 0.9</h1>
+<ul>
+<li>Package launched with support for the design (<code>build_ma()</code>, <code>des_ma()</code>, <code>des_int_ma()</code>), assessment (<code>opchar_ma()</code>), analysis (<code>an_ma()</code>), simulation (<code>sim_ma()</code>), and visualisation (<code>plot.multiarm_des_ma()</code>) of single-stage multi-arm clinical trials with normally distributed outcomes. An R Shiny graphical user interface is also provided (<code>gui_ma()</code>).</li>
+</ul>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

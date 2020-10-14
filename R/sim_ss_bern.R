@@ -10,7 +10,7 @@
 #' returned by \code{\link{build_ss_bern}} or \code{\link{des_ss_bern}} (i.e., a
 #' single-stage multi-arm clinical trial design for a Bernoulli distributed
 #' outcome). \strong{Note:} The sample sizes in all arms must be whole numbers.
-#' Defaults to \code{des_ss_bern(integer = T)}.
+#' Defaults to \code{des_ss_bern(integer = TRUE)}.
 #' @param pi A \code{\link{matrix}} whose rows indicate values of
 #' \ifelse{html}{\out{<b><i>&pi;</i></b>}}{\eqn{\bold{\pi}}} at which to
 #' evaluate the operating characteristics. Defaults internally to the global
@@ -22,7 +22,7 @@
 #' \code{1e5}.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
-#' \code{F}.
+#' \code{FALSE}.
 #' @return A \code{\link{list}} containing the following elements
 #' \itemize{
 #' \item A \code{\link{tibble}} in the slot \code{$sim} giving the estimated
@@ -43,8 +43,8 @@
 #' @seealso \code{\link{build_ss_bern}}, \code{\link{des_ss_bern}},
 #' \code{\link{opchar_ss_bern}}, \code{\link{plot.multiarm_des_ss_bern}}.
 #' @export
-sim_ss_bern <- function(des = des_ss_bern(integer = T), pi, replicates = 1e5,
-                        summary = F) {
+sim_ss_bern <- function(des = des_ss_bern(integer = TRUE), pi, replicates = 1e5,
+                        summary = FALSE) {
 
   ##### Check input variables ##################################################
 

@@ -17,7 +17,7 @@
 #' for the specified design \code{des}.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
-#' \code{F}.
+#' \code{FALSE}.
 #' @return A \code{\link{list}} containing the following elements
 #' \itemize{
 #' \item A \code{\link{tibble}} in the slot \code{$opchar} giving the determined
@@ -42,7 +42,7 @@
 #' @seealso \code{\link{build_ss_bern}}, \code{\link{des_ss_bern}},
 #' \code{\link{plot.multiarm_des_ss_bern}}, \code{\link{sim_ss_bern}}.
 #' @export
-opchar_ss_bern <- function(des = des_ss_bern(), pi, summary = F) {
+opchar_ss_bern <- function(des = des_ss_bern(), pi, summary = FALSE) {
 
   ##### Check input variables ##################################################
 

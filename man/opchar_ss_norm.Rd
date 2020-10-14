@@ -5,7 +5,7 @@
 \title{Analytically determine the operating characteristics of a single-stage
 multi-arm clinical trial for a normally distributed primary outcome}
 \usage{
-opchar_ss_norm(des = des_ss_norm(), tau, summary = F)
+opchar_ss_norm(des = des_ss_norm(), tau, summary = FALSE)
 }
 \arguments{
 \item{des}{A \code{\link{list}} of class \code{"multiarm_des_ss_norm"}, as
@@ -21,7 +21,7 @@ for the specified design \code{des}.}
 
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-\code{F}.}
+\code{FALSE}.}
 }
 \value{
 A \code{\link{list}} containing the following elements

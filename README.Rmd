@@ -40,7 +40,8 @@ devtools::install_github("mjg211/multiarm")
 ```
 
 An introductory example of how to make use of some of the package's core functionality can be found below.
-More detailed support is available in the package vignette, which can be accessed with `vignette("multiarm")`.
+More detailed support, for single-stage designs, is available in the package vignette, which can be accessed with `vignette("single-stage", package = "multiarm")`.
+See also [Grayling and Wason (2020)](https://doi.org/10.1186/s12885-020-6525-0).
 For further help, please email michael.grayling@newcastle.ac.uk.
 
 ## Details
@@ -56,7 +57,7 @@ For use when a specific design is of interest.
 - `opchar_###_###()`: Determine the operating characteristics (power, family-wise error-rates, etc.) of a supplied multi-arm clinical trial design, via multivariate normal integration.
 - `plot.multiarm_des_###_###()`: Produce informative plots (power, false discovery rate curves, etc.) relating to a supplied multi-arm clinical trial design.
 - `sim_###_###()`: Empirically estimate the operating characteristics (power, family-wise error-rates, etc.) of a supplied multi-arm clinical trial design, via simulation.
- 
+
 The second indicates the design:
 
 - `###_dtl_###()`: Relate to multi-stage drop-the-losers designs. See, e.g., [Wason *et al* (2017)](https://doi.org/10.1177/0962280214550759).

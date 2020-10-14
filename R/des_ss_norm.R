@@ -13,10 +13,10 @@
 #' arms. Defaults to \code{2}.
 #' @param alpha A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&alpha;</i>}}{\eqn{\alpha}}, the significance level.
-#' Defaults to \code{0.05}.
+#' Defaults to \code{0.025}.
 #' @param beta A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&beta;</i>}}{\eqn{\beta}}, used in the definition of
-#' the desired power. Defaults to \code{0.2}.
+#' the desired power. Defaults to \code{0.1}.
 #' @param delta1 A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&delta;</i><sub>1</sub>}}{\eqn{\delta_1}}, the
 #' 'interesting' treatment effect. Defaults to \code{0.5}.
@@ -48,10 +48,10 @@
 #' @param integer A \code{\link{logical}} variable indicating whether the
 #' computed values in \ifelse{html}{\out{<b><i>n</i></b>}}{\eqn{\bold{n}}}, the
 #' vector of sample sizes required in each arm, should be forced to be whole
-#' numbers. Defaults to \code{F}.
+#' numbers. Defaults to \code{FALSE}.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
-#' \code{F}.
+#' \code{FALSE}.
 #' @return A \code{\link{list}}, with additional class
 #' \code{"multiarm_des_ss_norm"}, containing the following elements:
 #' \itemize{
@@ -95,8 +95,8 @@
 #' @export
 des_ss_norm <- function(K = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
                         delta0 = 0, sigma = rep(1, K + 1), ratio = rep(1, K),
-                        correction = "dunnett", power = "marginal", integer = F,
-                        summary = F) {
+                        correction = "dunnett", power = "marginal",
+                        integer = FALSE, summary = FALSE) {
 
   ##### Check input variables ##################################################
 

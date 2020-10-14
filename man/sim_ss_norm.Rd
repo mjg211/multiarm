@@ -6,10 +6,10 @@
 multi-arm clinical trial for a normally distributed primary outcome}
 \usage{
 sim_ss_norm(
-  des = des_ss_norm(integer = T),
+  des = des_ss_norm(integer = TRUE),
   tau,
   replicates = 1e+05,
-  summary = F
+  summary = FALSE
 )
 }
 \arguments{
@@ -17,7 +17,7 @@ sim_ss_norm(
 returned by \code{\link{build_ss_norm}} or \code{\link{des_ss_norm}} (i.e., a
 single-stage multi-arm clinical trial design for a normally distributed
 outcome). \strong{Note:} The sample sizes in all arms must be whole numbers.
-Defaults to \code{des_ss_norm(integer = T)}.}
+Defaults to \code{des_ss_norm(integer = TRUE)}.}
 
 \item{tau}{A \code{\link{matrix}} whose rows indicate values of
 \ifelse{html}{\out{<b><i>&tau;</i></b>}}{\eqn{\bold{\tau}}} at which to
@@ -32,7 +32,7 @@ simulations to use for each value of
 
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-\code{F}.}
+\code{FALSE}.}
 }
 \value{
 A \code{\link{list}} containing the following elements

@@ -13,10 +13,10 @@
 #' arms. Defaults to \code{2}.
 #' @param alpha A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&alpha;</i>}}{\eqn{\alpha}}, the significance level.
-#' Defaults to \code{0.05}.
+#' Defaults to \code{0.052}.
 #' @param beta A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&beta;</i>}}{\eqn{\beta}}, used in the definition of
-#' the desired power. Defaults to \code{0.2}.
+#' the desired power. Defaults to \code{0.1}.
 #' @param pi0 A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>&pi;</i><sub>0</sub>}}{\eqn{\pi_0}}, the
 #' response rate in the control arm. Defaults to \code{0.3}.
@@ -47,14 +47,14 @@
 #' @param integer A \code{\link{logical}} variable indicating whether the
 #' computed values in \ifelse{html}{\out{<b><i>n</i></b>}}{\eqn{\bold{n}}}, the
 #' vector of sample sizes required in each arm, should be forced to be whole
-#' numbers. Defaults to \code{F}.
+#' numbers. Defaults to \code{FALSE}.
 #' @param ratio_scenario Only used if \code{ratio} is a \code{\link{character}}
 #' string. A \code{\link{character}} string indicating the chosen response rate
 #' scenario for which to optimise the allocation ratios. Can be one of
 #' \code{"HG"} and \code{"HA"}. Defaults to \code{"HG"}.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
-#' \code{F}.
+#' \code{FALSE}.
 #' @return A \code{\link{list}} of class \code{"multiarm_des_ss_bern"}
 #' containing the following elements
 #' \itemize{
@@ -94,8 +94,9 @@
 #' @export
 des_ss_bern <- function(K = 2, alpha = 0.025, beta = 0.1, pi0 = 0.3,
                         delta1 = 0.2, delta0 = 0, ratio = rep(1, K),
-                        correction = "dunnett", power = "marginal", integer = F,
-                        ratio_scenario = "HG", summary = F) {
+                        correction = "dunnett", power = "marginal",
+                        integer = FALSE, ratio_scenario = "HG",
+                        summary = FALSE) {
 
   ##### Check input variables ##################################################
 

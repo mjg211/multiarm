@@ -15,8 +15,8 @@ des_ss_norm(
   ratio = rep(1, K),
   correction = "dunnett",
   power = "marginal",
-  integer = F,
-  summary = F
+  integer = FALSE,
+  summary = FALSE
 )
 }
 \arguments{
@@ -26,11 +26,11 @@ arms. Defaults to \code{2}.}
 
 \item{alpha}{A \code{\link{numeric}} indicating the chosen value for
 \ifelse{html}{\out{<i>&alpha;</i>}}{\eqn{\alpha}}, the significance level.
-Defaults to \code{0.05}.}
+Defaults to \code{0.025}.}
 
 \item{beta}{A \code{\link{numeric}} indicating the chosen value for
 \ifelse{html}{\out{<i>&beta;</i>}}{\eqn{\beta}}, used in the definition of
-the desired power. Defaults to \code{0.2}.}
+the desired power. Defaults to \code{0.1}.}
 
 \item{delta1}{A \code{\link{numeric}} indicating the chosen value for
 \ifelse{html}{\out{<i>&delta;</i><sub>1</sub>}}{\eqn{\delta_1}}, the
@@ -69,11 +69,11 @@ power to design the trial for. Can be any of \code{"conjunctive"},
 \item{integer}{A \code{\link{logical}} variable indicating whether the
 computed values in \ifelse{html}{\out{<b><i>n</i></b>}}{\eqn{\bold{n}}}, the
 vector of sample sizes required in each arm, should be forced to be whole
-numbers. Defaults to \code{F}.}
+numbers. Defaults to \code{FALSE}.}
 
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-\code{F}.}
+\code{FALSE}.}
 }
 \value{
 A \code{\link{list}}, with additional class

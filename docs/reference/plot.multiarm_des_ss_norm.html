@@ -146,9 +146,9 @@ normally distributed.</p>
   delta_max = <span class='fl'>2</span> <span class='op'>*</span> <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta1</span>,
   delta = <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta1</span> <span class='op'>-</span> <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta0</span>,
   density = <span class='fl'>100</span>,
-  output = <span class='kw'>F</span>,
-  print_plots = <span class='kw'>T</span>,
-  summary = <span class='kw'>F</span>,
+  output = <span class='fl'>FALSE</span>,
+  print_plots = <span class='fl'>TRUE</span>,
+  summary = <span class='fl'>FALSE</span>,
   <span class='kw'>...</span>
 )</pre>
 
@@ -191,18 +191,18 @@ increased run time. Defaults to <code>100</code>.</p></td>
       <th>output</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/logical.html'>logical</a></code> variable indicating whether the
 available outputs from the function (see below) should be returned. Defaults
-to <code>F</code>.</p></td>
+to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>print_plots</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/logical.html'>logical</a></code> variable indicating whether to
-print produced plots. Defaults to <code>T</code>.</p></td>
+print produced plots. Defaults to <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>summary</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/logical.html'>logical</a></code> variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-<code>F</code>.</p></td>
+<code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>

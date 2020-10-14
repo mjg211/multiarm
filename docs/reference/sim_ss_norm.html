@@ -142,10 +142,10 @@ simulation.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sim_ss_norm</span>(
-  des = <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span>(integer = <span class='kw'>T</span>),
+  des = <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span>(integer = <span class='fl'>TRUE</span>),
   <span class='kw'>tau</span>,
   replicates = <span class='fl'>1e+05</span>,
-  summary = <span class='kw'>F</span>
+  summary = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -157,7 +157,7 @@ simulation.</p>
 returned by <code><a href='build_ss_norm.html'>build_ss_norm</a></code> or <code><a href='des_ss_norm.html'>des_ss_norm</a></code> (i.e., a
 single-stage multi-arm clinical trial design for a normally distributed
 outcome). <strong>Note:</strong> The sample sizes in all arms must be whole numbers.
-Defaults to <code><a href='des_ss_norm.html'>des_ss_norm(integer = T)</a></code>.</p></td>
+Defaults to <code><a href='des_ss_norm.html'>des_ss_norm(integer = TRUE)</a></code>.</p></td>
     </tr>
     <tr>
       <th>tau</th>
@@ -178,7 +178,7 @@ simulations to use for each value of
       <th>summary</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/logical.html'>logical</a></code> variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-<code>F</code>.</p></td>
+<code>FALSE</code>.</p></td>
     </tr>
     </table>
 

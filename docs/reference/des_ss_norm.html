@@ -155,8 +155,8 @@ arm, and returns information on key operating characteristics.</p>
   ratio = <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='kw'>K</span>),
   correction = <span class='st'>"dunnett"</span>,
   power = <span class='st'>"marginal"</span>,
-  integer = <span class='kw'>F</span>,
-  summary = <span class='kw'>F</span>
+  integer = <span class='fl'>FALSE</span>,
+  summary = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -172,13 +172,13 @@ arms. Defaults to <code>2</code>.</p></td>
       <th>alpha</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/numeric.html'>numeric</a></code> indicating the chosen value for
 <i>&alpha;</i>, the significance level.
-Defaults to <code>0.05</code>.</p></td>
+Defaults to <code>0.025</code>.</p></td>
     </tr>
     <tr>
       <th>beta</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/numeric.html'>numeric</a></code> indicating the chosen value for
 <i>&beta;</i>, used in the definition of
-the desired power. Defaults to <code>0.2</code>.</p></td>
+the desired power. Defaults to <code>0.1</code>.</p></td>
     </tr>
     <tr>
       <th>delta1</th>
@@ -231,13 +231,13 @@ power to design the trial for. Can be any of <code>"conjunctive"</code>,
       <td><p>A <code><a href='https://rdrr.io/r/base/logical.html'>logical</a></code> variable indicating whether the
 computed values in <b><i>n</i></b>, the
 vector of sample sizes required in each arm, should be forced to be whole
-numbers. Defaults to <code>F</code>.</p></td>
+numbers. Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>summary</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/logical.html'>logical</a></code> variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-<code>F</code>.</p></td>
+<code>FALSE</code>.</p></td>
     </tr>
     </table>
 

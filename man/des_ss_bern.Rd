@@ -15,9 +15,9 @@ des_ss_bern(
   ratio = rep(1, K),
   correction = "dunnett",
   power = "marginal",
-  integer = F,
+  integer = FALSE,
   ratio_scenario = "HG",
-  summary = F
+  summary = FALSE
 )
 }
 \arguments{
@@ -27,11 +27,11 @@ arms. Defaults to \code{2}.}
 
 \item{alpha}{A \code{\link{numeric}} indicating the chosen value for
 \ifelse{html}{\out{<i>&alpha;</i>}}{\eqn{\alpha}}, the significance level.
-Defaults to \code{0.05}.}
+Defaults to \code{0.052}.}
 
 \item{beta}{A \code{\link{numeric}} indicating the chosen value for
 \ifelse{html}{\out{<i>&beta;</i>}}{\eqn{\beta}}, used in the definition of
-the desired power. Defaults to \code{0.2}.}
+the desired power. Defaults to \code{0.1}.}
 
 \item{pi0}{A \code{\link{numeric}} indicating the chosen value for
 \ifelse{html}{\out{<i>&pi;</i><sub>0</sub>}}{\eqn{\pi_0}}, the
@@ -69,7 +69,7 @@ power to design the trial for. Can be one of \code{"conjunctive"},
 \item{integer}{A \code{\link{logical}} variable indicating whether the
 computed values in \ifelse{html}{\out{<b><i>n</i></b>}}{\eqn{\bold{n}}}, the
 vector of sample sizes required in each arm, should be forced to be whole
-numbers. Defaults to \code{F}.}
+numbers. Defaults to \code{FALSE}.}
 
 \item{ratio_scenario}{Only used if \code{ratio} is a \code{\link{character}}
 string. A \code{\link{character}} string indicating the chosen response rate
@@ -78,7 +78,7 @@ scenario for which to optimise the allocation ratios. Can be one of
 
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to
-\code{F}.}
+\code{FALSE}.}
 }
 \value{
 A \code{\link{list}} of class \code{"multiarm_des_ss_bern"}

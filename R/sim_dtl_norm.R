@@ -1,5 +1,45 @@
-sim_dtl_norm <- function(des = des_dtl_norm(integer = T), tau, replicates = 1e5,
-                         summary = F) {
+#' Empirically determine the operating characteristics of a multi-stage
+#' drop-the-losers multi-arm clinical trial for a normally distributed primary
+#' outcome
+#'
+#' \code{sim_dtl_norm()} determines the operating characteristics of a specified
+#' multi-stage drop-the-losers multi-arm clinical trial design assuming the
+#' primary outcome is normally distributed, for given values of the true
+#' treatment effects, using simulation.
+#'
+#' @param des A \code{\link{list}} of class \code{"multiarm_des_dtl_norm"}, as
+#' returned by \code{\link{build_dtl_norm}} or \code{\link{des_dtl_norm}} (i.e.,
+#' a multi-stage drop-the-losers multi-arm clinical trial design for a normally
+#' distributed outcome). \strong{Note:} The sample sizes in all arms must be
+#' whole numbers. Defaults to \code{des_dtl_norm(integer = TRUE)}.
+#' @param tau A \code{\link{matrix}} whose rows indicate values of
+#' \ifelse{html}{\out{<b><i>&tau;</i></b>}}{\eqn{\bold{\tau}}} at which to
+#' evaluate the operating characteristics. Defaults internally to the global
+#' null, global alternative, and each of the least favourable configurations if
+#' unspecified.
+#' @param replicates A \code{\link{numeric}} indicating the number of replicate
+#' simulations to use for each value of
+#' \ifelse{html}{\out{<b><i>&tau;</i></b>}}{\eqn{\bold{\tau}}}. Defaults to
+#' \code{1e5}.
+#' @param summary A \code{\link{logical}} variable indicating whether a summary
+#' of the function's progress should be printed to the console. Defaults to
+#' \code{FALSE}.
+#' @return A \code{\link{list}} containing the following elements
+#' \itemize{
+#' \item A \code{\link{tibble}} in the slot \code{$sim} giving the estimated
+#' operating characteristics.
+#' \item Each of the input variables.
+#' }
+#' @examples
+#' \dontrun{
+#' # The estimated operating characteristics for the default parameters
+#' sim   <- sim_dtl_norm()
+#' }
+#' @seealso \code{\link{build_dtl_norm}}, \code{\link{des_dtl_norm}},
+#' \code{\link{opchar_dtl_norm}}, \code{\link{plot.multiarm_des_dtl_norm}}.
+#' @export
+sim_dtl_norm <- function(des = des_dtl_norm(integer = TRUE), tau,
+                         replicates = 1e5, summary = FALSE) {
 
   ##### Check input variables ##################################################
 

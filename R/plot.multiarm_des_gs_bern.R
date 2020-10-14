@@ -1,11 +1,59 @@
+#' Plot operating characteristics of a multi-stage group-sequential multi-arm
+#' clinical trial for a Bernoulli distributed primary outcome
+#'
+#' \code{plot.multiarm_des_gs_bern()} produces power curve plots for a specified
+#' multi-stage group-sequential multi-arm clinical trial design assuming the
+#' primary outcome is Bernoulli distributed.
+#'
+#' @param x A \code{\link{list}} of class \code{"multiarm_des_gs_bern"}, as
+#' returned by \code{\link{build_gs_bern}} or \code{\link{des_gs_bern}} (i.e., a
+#' multi-stage group-sequential multi-arm clinical trial design for a Bernoulli
+#' distributed outcome). Defaults to \code{des_gs_bern()}.
+#' @param delta_min A \code{\link{numeric}} specifying the chosen minimum value
+#' for the treatment effects to include on the produced plots. Defaults to
+#' \code{-x$pi0 + 1e-6}.
+#' @param delta_max A \code{\link{numeric}} specifying the chosen maximum
+#' value for the treatment effects to include on the produced plots. Defaults to
+#' \code{1 - x$pi0 - 1e-6}.
+#' @param delta A \code{\link{numeric}} specifying the chosen treatment effect
+#' shift to use in the 'shifted treatment effects plot'. Defaults to
+#' \code{x$delta1 - x$delta0}.
+#' @param density A \code{\link{numeric}} variable indicating the number of
+#' treatment effect scenarios to consider for each power curve. Increasing
+#' \code{density} increases the smoothness of the produced plots, at the cost of
+#' increased run time. Defaults to \code{100}.
+#' @param output A \code{\link{logical}} variable indicating whether the
+#' available outputs from the function (see below) should be returned. Defaults
+#' to \code{FALSE}.
+#' @param print_plots A \code{\link{logical}} variable indicating whether to
+#' print produced plots. Defaults to \code{TRUE}.
+#' @param summary A \code{\link{logical}} variable indicating whether a summary
+#' of the function's progress should be printed to the console. Defaults to
+#' \code{FALSE}.
+#' @param ... Not currently used.
+#' @return If \code{output = T}, a list containing the following elements
+#' \itemize{
+#' \item A \code{\link{list}} in the slot \code{$plots} containing the produced
+#' plots.
+#' \item Each of the input variables.
+#' }
+#' @examples
+#' \dontrun{
+#' # The design for the default parameters
+#' des        <- des_gs_bern()
+#' plot(des)
+#' }
+#' @seealso \code{\link{build_gs_bern}}, \code{\link{des_gs_bern}},
+#' \code{\link{gui}}, \code{\link{opchar_gs_bern}}, \code{\link{sim_gs_bern}}.
 #' @method plot multiarm_des_gs_bern
 #' @export
 plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
                                       delta_min = -x$pi0 + 1e-6,
                                       delta_max = 1 - x$pi0 - 1e-6,
                                       delta = x$delta1 - x$delta0,
-                                      density = 100, output = F,
-                                      print_plots = T, summary = F, ...) {
+                                      density = 100, output = FALSE,
+                                      print_plots = TRUE, summary = FALSE,
+                                      ...) {
 
   ##### Check input variables ##################################################
 

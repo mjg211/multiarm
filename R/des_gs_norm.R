@@ -1,9 +1,109 @@
+#' Design a multi-stage group-sequential multi-arm clinical trial for a normally
+#' distributed primary outcome
+#'
+#' \code{des_gs_norm()} determines multi-stage group-sequential multi-arm
+#' clinical trial designs assuming the primary outcome variable is normally
+#' distributed. It computes required design components and returns information
+#' on key operating characteristics.
+#'
+#' @param K A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>K</i>}}{\eqn{K}}, the (initial) number of experimental
+#' treatment arms. Defaults to \code{2}.
+#' @param J A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>J</i>}}{\eqn{J}}, the (maximum) number of allowed
+#' stages. Defaults to \code{2}.
+#' @param alpha A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>&alpha;</i>}}{\eqn{\alpha}}, the significance level
+#' (family-wise error-rate). Defaults to \code{0.025}.
+#' @param beta A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>&beta;</i>}}{\eqn{\beta}}, used in the definition of
+#' the desired power. Defaults to \code{0.1}.
+#' @param delta1 A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>&delta;</i><sub>1</sub>}}{\eqn{\delta_1}}, the
+#' 'interesting' treatment effect. Defaults to \code{0.5}.
+#' @param delta0 A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>&delta;</i><sub>0</sub>}}{\eqn{\delta_0}}, the
+#' 'uninteresting' treatment effect. Defaults to \code{0}.
+#' @param sigma A \code{\link{numeric}} \code{\link{vector}} indicating the
+#' chosen values for
+#' \ifelse{html}{\out{<i>&sigma;</i><sub>0</sub>}}{\eqn{\sigma_0}} and
+#' \ifelse{html}{\out{<i>&sigma;</i><sub>1</sub>}}{\eqn{\sigma_1}}, the standard
+#' deviations of the responses in the control and experimental arms. Must be of
+#' \code{\link{length}} 1 or 2. If of \code{\link{length}} 1, it is assumed that
+#' \ifelse{html}{\out{<i>&sigma;</i><sub>0</sub>
+#' =<i>&sigma;</i><sub>1</sub>}}{\eqn{\sigma_0=\sigma_1}}.
+#' Defaults to \code{1}.
+#' @param ratio A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>r</i>}}{\eqn{r}}, the stage-wise allocation ratio to
+#' present experimental arms. Defaults to \code{1}.
+#' @param power A \code{\link{character}} string indicating the chosen type of
+#' power to design the trial for. Can be \code{"disjunctive"} or
+#' \code{"marginal"}. Defaults to \code{"marginal"}.
+#' @param stopping A \code{\link{character}} string indicating the chosen type
+#' of stopping rule. Can be \code{"separate"} or \code{"simultaneous"}. Defaults
+#' to \code{"simultaneous"}.
+#' @param type A \code{\link{character}} string indicating the choice for the
+#' stage-wise sample size. Can be \code{"variable"} or \code{"fixed"}. Defaults
+#' to \code{"variable"}.
+#' @param fshape A \code{\link{character}} string indicating the choice for the
+#' futility (lower) stopping boundaries. Can be any of \code{"fixed"},
+#' \code{"obf"}, \code{"pocock"}, and \code{"triangular"}. Defaults to
+#' \code{"pocock"}.
+#' @param eshape A \code{\link{character}} string indicating the choice for the
+#' efficacy (upper) stopping boundaries. Can be any of \code{"fixed"},
+#' \code{"obf"}, \code{"pocock"}, and \code{"triangular"}. Defaults to
+#' \code{"pocock"}.
+#' @param ffix A \code{\link{numeric}} indicating the chosen value for the fixed
+#' interim futility bounds. Only used when \code{fshape = "fixed"}. Defaults to
+#' \code{"-3"}.
+#' @param efix A \code{\link{numeric}} indicating the chosen value for the fixed
+#' interim efficacy bounds. Only used when \code{eshape = "fixed"}. Defaults to
+#' \code{"3"}.
+#' @param integer A \code{\link{logical}} variable indicating whether the
+#' computed possible sample sizes required in each arm in each stage should be
+#' forced to be whole numbers. Defaults to \code{FALSE}.
+#' @param summary A \code{\link{logical}} variable indicating whether a summary
+#' of the function's progress should be printed to the console. Defaults to
+#' \code{FALSE}.
+#' @return A \code{\link{list}}, with additional class
+#' \code{"multiarm_des_gs_norm"}, containing the following elements:
+#' \itemize{
+#' \item A \code{\link{tibble}} in the slot \code{$opchar} summarising the
+#' operating characteristics of the identified design.
+#' \item A \code{\link{tibble}} in the slot \code{$pmf_N} summarising the
+#' probability mass function of the random required sample size under key
+#' scenarios.
+#' \item A \code{\link{numeric}} \code{\link{vector}} in the slot \code{$e}
+#' specifying \ifelse{html}{\out{<b><i>e</i></b>}}{\eqn{\bold{e}}}, the trial's
+#' efficacy (upper) stopping boundaries.
+#' \item A \code{\link{numeric}} \code{\link{vector}} in the slot \code{$f}
+#' specifying \ifelse{html}{\out{<b><i>f</i></b>}}{\eqn{\bold{f}}}, the trial's
+#' futility (lower) stopping boundaries.
+#' \item A \code{\link{numeric}} in the slot \code{$maxN} specifying
+#' \ifelse{html}{\out{max <i>N</i>}}{max \eqn{N}}, the trial's maximum required
+#' sample size.
+#' \item A \code{\link{numeric}} in the slot \code{$n_factor}, for internal use
+#' in other functions.
+#' \item A \code{\link{numeric}} in the slot \code{$n1} specifying
+#' \ifelse{html}{\out{<i>n</i><sub>1</sub>}}{\eqn{n_1}}, the total sample size
+#' required in stage one of the trial.
+#' \item A \code{\link{numeric}} in the slot \code{$n10} specifying
+#' \ifelse{html}{\out{<i>n</i><sub>10</sub>}}{\eqn{n_{10}}}, the sample size
+#' required in the control arm in stage one of the trial.
+#' \item Each of the input variables.
+#' }
+#' @examples
+#' # The design for the default parameters
+#' des <- des_gs_norm()
+#' @seealso \code{\link{build_gs_norm}}, \code{\link{gui}},
+#' \code{\link{opchar_gs_norm}}, \code{\link{plot.multiarm_des_gs_norm}},
+#' \code{\link{sim_gs_norm}}.
 #' @export
 des_gs_norm <- function(K = 2, J = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
                         delta0 = 0, sigma = 1, ratio = 1, power = "marginal",
                         stopping = "simultaneous", type = "variable",
                         fshape = "pocock", eshape = "pocock", ffix = -3,
-                        efix = 3, integer = F, summary = F) {
+                        efix = 3, integer = FALSE, summary = FALSE) {
 
   ##### Check input variables ##################################################
 

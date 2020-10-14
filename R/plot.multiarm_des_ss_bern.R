@@ -24,12 +24,12 @@
 #' increased run time. Defaults to \code{100}.
 #' @param output A \code{\link{logical}} variable indicating whether the
 #' available outputs from the function (see below) should be returned. Defaults
-#' to \code{F}.
+#' to \code{FALSE}.
 #' @param print_plots A \code{\link{logical}} variable indicating whether to
-#' print produced plots. Defaults to \code{T}.
+#' print produced plots. Defaults to \code{TRUE}.
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
-#' \code{F}.
+#' \code{FALSE}.
 #' @param ... Not currently used.
 #' @return If \code{output = T}, a list containing the following elements
 #' \itemize{
@@ -61,8 +61,9 @@ plot.multiarm_des_ss_bern <- function(x = des_ss_bern(),
                                       delta_min = -x$pi0 + 1e-6,
                                       delta_max = 1 - x$pi0 - 1e-6,
                                       delta = x$delta1 - x$delta0,
-                                      density = 100, output = F,
-                                      print_plots = T, summary = F, ...) {
+                                      density = 100, output = FALSE,
+                                      print_plots = TRUE, summary = FALSE,
+                                      ...) {
 
   ##### Check input variables ##################################################
 

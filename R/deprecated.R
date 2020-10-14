@@ -406,6 +406,7 @@ trace_ma                  <- function(n, K, sigma) {
 #' @seealso \code{\link{build_ma_bern}}, \code{\link{des_ma_bern}},
 #' \code{\link{opchar_ma_bern}}, \code{\link{plot.multiarm_des_ma_bern}},
 #' \code{\link{sim_ma_bern}}.
+#' @noRd
 an_ma_bern <- function(des = des_ma_bern(), pval = rep(0.5*des$alpha, des$K),
                        alpha = des$alpha, correction = des$correction,
                        sigmas, summary = F) {
@@ -611,6 +612,7 @@ an_ma_bern <- function(des = des_ma_bern(), pval = rep(0.5*des$alpha, des$K),
 #' @seealso \code{\link{build_ma_norm}}, \code{\link{des_ma_norm}},
 #' \code{\link{opchar_ma_norm}}, \code{\link{plot.multiarm_des_ma_norm}},
 #'  \code{\link{sim_ma_norm}}.
+#' @noRd
 an_ma_norm <- function(des = des_ma_norm(), pval = rep(0.5*des$alpha, des$K),
                        alpha = des$alpha, correction = des$correction,
                        summary = F) {

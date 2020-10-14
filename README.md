@@ -29,8 +29,10 @@ devtools::install_github("mjg211/multiarm")
 ```
 
 An introductory example of how to make use of some of the package’s core
-functionality can be found below. More detailed support is available in
-the package vignette, which can be accessed with `vignette("multiarm")`.
+functionality can be found below. More detailed support, for
+single-stage designs, is available in the package vignette, which can be
+accessed with `vignette("single-stage", package = "multiarm")`. See also
+[Grayling and Wason (2020)](https://doi.org/10.1186/s12885-020-6525-0).
 For further help, please email <michael.grayling@newcastle.ac.uk>.
 
 ## Details
@@ -105,7 +107,7 @@ Then, the total required sample size is:
 
 ``` r
 des$N
-#> [1] 67.40181
+#> [1] 67.45189
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -117,10 +119,10 @@ des$opchar
 #> # A tibble: 5 x 20
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2  FWERI3
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
-#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00773 0.00108
+#> 1     0     0     0 0.0500 0.00109 0.0196 0.0196 0.0196 0.0500 0.00773 0.00109
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0       0      
 #> 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0359 0.00329 0      
-#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.00329 0      
+#> 4     0     1     0 0.800  0.00330 0.0196 0.800  0.0196 0.0359 0.00330 0      
 #> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00329 0      
 #> # … with 9 more variables: FWERII1 <dbl>, FWERII2 <dbl>, FWERII3 <dbl>,
 #> #   PHER <dbl>, FDR <dbl>, pFDR <dbl>, FNDR <dbl>, Sens <dbl>, Spec <dbl>
