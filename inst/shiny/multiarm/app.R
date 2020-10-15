@@ -94,7 +94,7 @@ ui <- function(request) {
         }"
         )
       ),
-      shinybusy::add_busy_bar(color = "white"),
+      shinybusy::add_busy_bar(color = "black"),
       sever::use_sever(),
       shinydashboard::tabItems(
         ##### Tab: Home ########################################################
@@ -4660,6 +4660,7 @@ server <- function(input, output, session) {
       density             <- as.numeric(input$design_gs_bern_density)
       plots               <- plot(design, density = density, output = TRUE,
                                   print_plots = FALSE)
+      design$boundaries   <- plots$plots$boundaries
       design$equal_power  <- plots$plots$equal_power
       design$equal_error  <- plots$plots$equal_error
       design$equal_other  <- plots$plots$equal_other
@@ -4683,7 +4684,7 @@ server <- function(input, output, session) {
         data.frame(design$opchar$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
-      design$equal_error  <- design$equal_power <- design$equal_other <-
+      design$boundaries <- design$equal_error  <- design$equal_power <- design$equal_other <-
         design$equal_sample_size <- design$shifted_power <- design$shifted_sample_size <-
         design$pmf_N <- design$delta <- NULL
     }
@@ -4808,6 +4809,13 @@ server <- function(input, output, session) {
 
   ##### Group-sequential (Bernoulli): Plots ####################################
 
+  output$design_gs_bern_stopping_boundaries <- shiny::renderPlot({
+    input$design_gs_bern_update
+    if (shiny::isolate(input$design_gs_bern_plots)) {
+      int_des_gs_bern()$boundaries
+    }
+  })
+
   output$design_gs_bern_equal_error <- shiny::renderPlot({
     input$design_gs_bern_update
     if (shiny::isolate(input$design_gs_bern_plots)) {
@@ -4918,6 +4926,7 @@ server <- function(input, output, session) {
                          stopping     = int_des_gs_bern()$stopping,
                          swss         = input$design_gs_bern_swss,
                          upper        = input$design_gs_bern_upper,
+                         boundaries   = int_des_gs_bern()$boundaries,
                          equal_error  = int_des_gs_bern()$equal_error,
                          equal_power  = int_des_gs_bern()$equal_power,
                          equal_other  = int_des_gs_bern()$equal_other,
@@ -5344,6 +5353,7 @@ server <- function(input, output, session) {
       density             <- as.numeric(input$design_gs_norm_density)
       plots               <- plot(design, density = density, output = TRUE,
                                   print_plots = FALSE)
+      design$boundaries   <- plots$plots$boundaries
       design$equal_power  <- plots$plots$equal_power
       design$equal_error  <- plots$plots$equal_error
       design$equal_other  <- plots$plots$equal_other
@@ -5366,7 +5376,7 @@ server <- function(input, output, session) {
         data.frame(design$opchar$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
-      design$equal_error  <- design$equal_power <- design$equal_other <- design$equal_sample_size <-
+      design$boundaries <- design$equal_error  <- design$equal_power <- design$equal_other <- design$equal_sample_size <-
         design$shifted_power <- design$shifted_sample_size <- design$pmf_N <- design$delta       <- NULL
     }
     colnames(design$data) <-
@@ -5491,6 +5501,13 @@ server <- function(input, output, session) {
 
   ##### Group-sequential (normal): Plots #######################################
 
+  output$design_gs_norm_stopping_boundaries <- shiny::renderPlot({
+    input$design_gs_norm_update
+    if (shiny::isolate(input$design_gs_norm_plots)) {
+      int_des_gs_norm()$boundaries
+    }
+  })
+
   output$design_gs_norm_equal_error <- shiny::renderPlot({
     input$design_gs_norm_update
     if (shiny::isolate(input$design_gs_norm_plots)) {
@@ -5602,6 +5619,7 @@ server <- function(input, output, session) {
                          stopping     = int_des_gs_norm()$stopping,
                          swss         = input$design_gs_norm_swss,
                          upper        = input$design_gs_norm_upper,
+                         boundaries   = int_des_gs_norm()$boundaries,
                          equal_error  = int_des_gs_norm()$equal_error,
                          equal_power  = int_des_gs_norm()$equal_power,
                          equal_other  = int_des_gs_norm()$equal_other,

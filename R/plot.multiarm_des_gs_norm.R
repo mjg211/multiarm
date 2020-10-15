@@ -87,6 +87,24 @@ plot.multiarm_des_gs_norm <- function(x = des_gs_norm(), delta_min = -x$delta1,
   delta1                      <- x$delta1
   seq_K                       <- 1:K
   plots                       <- list()
+  boundaries                  <-
+    tibble::tibble(Stage               = rep(1:x$J, 2),
+                   Type                = rep(c("Efficacy", "Futility"),
+                                             each = x$J),
+                   `Stopping boundary` = c(x$e, x$f))
+  plots$boundaries            <-
+    ggplot2::ggplot(boundaries,
+                    ggplot2::aes(x = Stage,
+                                 y = `Stopping boundary`,
+                                 colour = Type,
+                                 by = Type)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_line() +
+    ggplot2::scale_color_manual(values = c("forestgreen", "firebrick2")) +
+    ggplot2::scale_x_continuous(breaks = 1:x$J) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = "bottom",
+                   legend.title    = ggplot2::element_blank())
   tau                         <- matrix(0, density, K)
   if (all(delta_min < 0, delta_max > 0)) {
     tau[, 1]                  <- c(seq(delta_min, -1e-6,
@@ -333,7 +351,7 @@ plot.multiarm_des_gs_norm <- function(x = des_gs_norm(), delta_min = -x$delta1,
   pmf_N <- dplyr::mutate(pmf_N, n = factor(round(pmf_N$n, 1)))
   plots$pmf_N <- ggplot2::ggplot(data = pmf_N,
                                  mapping = ggplot2::aes(.data$n, .data$Prob)) +
-    ggplot2::geom_bar(stat = "identity") +
+    ggplot2::geom_bar(stat = "identity", fill = "black", colour = "black") +
     ggplot2::facet_wrap(.~Scenario, nrow = 1, ncol = 3,
                         labeller = ggplot2::label_parsed) +
     ggplot2::xlab(expression(italic(n))) +
