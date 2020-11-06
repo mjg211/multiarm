@@ -3316,7 +3316,7 @@ server <- function(input, output, session) {
     if (input$design_ss_bern_ratio_type == "equal_all") {
       ratio               <- rep(1, K)
     } else if (input$design_ss_bern_ratio_type == "equal_exp") {
-      ratio               <- rep(input$design_ss_bern_ratio_1, K)
+      ratio               <- rep(input$design_ss_bern_ratio1, K)
     } else if (input$design_ss_bern_ratio_type == "unequal") {
       ratio               <- numeric(K)
       for (i in seq_K) {
@@ -4394,7 +4394,7 @@ server <- function(input, output, session) {
   output$design_gs_bern_ratio   <- renderUI({
     if (input$design_gs_bern_ratio_type == "equal_exp") {
       shiny::numericInput(
-        inputId = "design_gs_bern_ratio_1",
+        inputId = "design_gs_bern_ratio1",
         label   = paste0("Allocation ratio for the experimental arms ",
                          "(arms 1, ..., ", input$design_gs_bern_K, ")"),
         value   = 1,
@@ -4407,7 +4407,7 @@ server <- function(input, output, session) {
 
   output$design_gs_bern_warning_ratio <- renderUI({
     if (all(any(all(input$design_gs_bern_ratio_type == "equal_exp",
-                    input$design_gs_bern_ratio_1 != 1),
+                    input$design_gs_bern_ratio1 != 1),
                 input$design_gs_bern_ratio_type == "root_K"),
             input$design_gs_bern_integer == TRUE)) {
       shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
@@ -4575,7 +4575,7 @@ server <- function(input, output, session) {
     if (input$design_gs_bern_ratio_type == "equal_all") {
       ratio               <- 1
     } else if (input$design_gs_bern_ratio_type == "equal_exp") {
-      ratio               <- input$design_gs_bern_ratio_1
+      ratio               <- input$design_gs_bern_ratio1
     } else if (input$design_gs_bern_ratio_type == "root_K") {
       ratio               <- 1/sqrt(K)
     }
@@ -4640,7 +4640,7 @@ server <- function(input, output, session) {
                            plots      = input$design_gs_norm_plots,
                            power      = design$power,
                            ratio_type = input$design_gs_norm_ratio_type,
-                           ratio_init = input$design_gs_norm_ratio_1,
+                           ratio_init = input$design_gs_norm_ratio1,
                            ratio      = design$ratio,
                            stopping   = stopping,
                            swss       = swss,
@@ -5099,7 +5099,7 @@ server <- function(input, output, session) {
   output$design_gs_norm_ratio   <- renderUI({
     if (input$design_gs_norm_ratio_type == "equal_exp") {
       shiny::numericInput(
-        inputId = "design_gs_norm_ratio_1",
+        inputId = "design_gs_norm_ratio1",
         label   = paste0("Allocation ratio for the experimental arms ",
                          "(arms 1, ..., ", input$design_gs_norm_K, ")"),
         value   = 1,
@@ -5112,7 +5112,7 @@ server <- function(input, output, session) {
 
   output$design_gs_norm_warning_ratio <- renderUI({
     if (all(any(all(input$design_gs_norm_ratio_type == "equal_exp",
-                    input$design_gs_norm_ratio_1 != 1),
+                    input$design_gs_norm_ratio1 != 1),
                 input$design_gs_norm_ratio_type == "root_K"),
             input$design_gs_norm_integer == TRUE)) {
       shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
@@ -5286,7 +5286,7 @@ server <- function(input, output, session) {
     if (input$design_gs_norm_ratio_type == "equal_all") {
       ratio               <- 1
     } else if (input$design_gs_norm_ratio_type == "equal_exp") {
-      ratio               <- input$design_gs_norm_ratio_1
+      ratio               <- input$design_gs_norm_ratio1
     } else if (input$design_gs_norm_ratio_type == "root_K") {
       ratio               <- 1/sqrt(K)
     }
@@ -5332,7 +5332,7 @@ server <- function(input, output, session) {
                            plots      = input$design_gs_norm_plots,
                            power      = design$power,
                            ratio_type = input$design_gs_norm_ratio_type,
-                           ratio_init = input$design_gs_norm_ratio_1,
+                           ratio_init = input$design_gs_norm_ratio1,
                            ratio      = design$ratio,
                            sigma      = design$sigma,
                            stopping   = stopping,
@@ -5799,7 +5799,7 @@ server <- function(input, output, session) {
   output$design_dtl_bern_ratio   <- renderUI({
     if (input$design_dtl_bern_ratio_type == "equal_exp") {
       shiny::numericInput(
-        inputId = "design_dtl_bern_ratio_1",
+        inputId = "design_dtl_bern_ratio1",
         label   = paste0("Allocation ratio for the experimental arms ",
                          "(arms 1, ..., ", input$design_dtl_bern_K, ")"),
         value   = 1,
@@ -5812,7 +5812,7 @@ server <- function(input, output, session) {
 
   output$design_dtl_norm_warning_ratio <- renderUI({
     if (all(any(all(input$design_dtl_norm_ratio_type == "equal_exp",
-                    input$design_dtl_norm_ratio_1 != 1),
+                    input$design_dtl_norm_ratio1 != 1),
                 input$design_dtl_norm_ratio_type == "root_K"),
             input$design_dtl_norm_integer == TRUE)) {
       shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
@@ -5930,7 +5930,7 @@ server <- function(input, output, session) {
     if (input$design_dtl_bern_ratio_type == "equal_all") {
       ratio               <- 1
     } else if (input$design_dtl_bern_ratio_type == "equal_exp") {
-      ratio               <- input$design_dtl_bern_ratio_1
+      ratio               <- input$design_dtl_bern_ratio1
     } else if (input$design_dtl_bern_ratio_type == "root_K") {
       ratio               <- 1/sqrt(K)
     }
@@ -5968,7 +5968,7 @@ server <- function(input, output, session) {
                            plots      = input$design_dtl_norm_plots,
                            power      = power,
                            ratio_type = input$design_dtl_norm_ratio_type,
-                           ratio_init = input$design_dtl_norm_ratio_1,
+                           ratio_init = input$design_dtl_norm_ratio1,
                            ratio      = design$ratio,
                            swss       = swss)
     )
@@ -6400,7 +6400,7 @@ server <- function(input, output, session) {
   output$design_dtl_norm_ratio   <- renderUI({
     if (input$design_dtl_norm_ratio_type == "equal_exp") {
       shiny::numericInput(
-        inputId = "design_dtl_norm_ratio_1",
+        inputId = "design_dtl_norm_ratio1",
         label   = paste0("Allocation ratio for the experimental arms ",
                          "(arms 1, ..., ", input$design_dtl_norm_K, ")"),
         value   = 1,
@@ -6413,7 +6413,7 @@ server <- function(input, output, session) {
 
   output$design_dtl_bern_warning_ratio <- renderUI({
     if (all(any(all(input$design_dtl_bern_ratio_type == "equal_exp",
-                    input$design_dtl_bern_ratio_1 != 1),
+                    input$design_dtl_bern_ratio1 != 1),
                 input$design_dtl_bern_ratio_type == "root_K"),
             input$design_dtl_bern_integer == TRUE)) {
       shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
@@ -6537,7 +6537,7 @@ server <- function(input, output, session) {
     if (input$design_dtl_norm_ratio_type == "equal_all") {
       ratio               <- 1
     } else if (input$design_dtl_norm_ratio_type == "equal_exp") {
-      ratio               <- input$design_dtl_norm_ratio_1
+      ratio               <- input$design_dtl_norm_ratio1
     } else if (input$design_dtl_norm_ratio_type == "root_K") {
       ratio               <- 1/sqrt(K)
     }
@@ -6574,7 +6574,7 @@ server <- function(input, output, session) {
                            plots      = input$design_dtl_norm_plots,
                            power      = power,
                            ratio_type = input$design_dtl_norm_ratio_type,
-                           ratio_init = input$design_dtl_norm_ratio_1,
+                           ratio_init = input$design_dtl_norm_ratio1,
                            ratio      = design$ratio,
                            sigma      = design$sigma,
                            swss       = swss)
