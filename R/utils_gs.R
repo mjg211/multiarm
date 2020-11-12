@@ -841,7 +841,7 @@ integer_gs                        <- function(comp) {
   if (comp$integer) {
     if (comp$type == "variable") {
       comp$n_factor   <- ceiling(comp$n_factor)
-      while (comp$n_factor*comp$r != 0) {
+      while (comp$n_factor*comp$r%%1 != 0) {
         comp$n_factor <- comp$n_factor + 1
       }
     } else {
