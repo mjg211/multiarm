@@ -1,0 +1,165 @@
+---
+title: "&nbsp;"
+output: html_document
+params:
+  K:              NA
+  alpha:          NA
+  beta:           NA
+  lambda0:        NA
+  delta1:         NA
+  delta0:         NA
+  ratio_type:     NA
+  ratio_init:     NA
+  ratio_scenario: NA
+  ratio:          NA
+  correction:     NA
+  power:          NA
+  integer:        NA
+  large_N:        NA
+  small_n:        NA
+  opchar:         NA
+  gamma:          NA
+  gammaO:         NA
+  plots:          NA
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(echo = FALSE, results = "asis")
+```
+
+#### Inputs
+
+```{r, echo = F, results = "asis"}
+K              <- params$K
+alpha          <- params$alpha
+beta           <- params$beta
+lambda0        <- params$lambda0
+delta1         <- params$delta1
+delta0         <- params$delta0
+ratio_type     <- params$ratio_type
+ratio_init     <- params$ratio_init
+ratio_scenario <- params$ratio_scenario
+ratio          <- params$ratio
+correction     <- params$correction
+power          <- params$power
+integer        <- params$integer
+N              <- params$large_N
+n              <- params$small_n
+opchar         <- params$opchar
+gamma          <- params$gamma
+gammaO         <- params$gammaO
+plots          <- params$plots
+```
+
+```{r, echo = F, results = "asis"}
+if (correction == "bonferroni") {
+  correction_text     <- "Bonferroni's correction"
+} else if (correction == "dunnett") {
+  correction_text     <- "Dunnett's correction"
+} else if (correction == "none") {
+  correction_text     <- "no multiple comparison correction"
+} else if (correction == "sidak") {
+  correction_text     <- "Sidak's correction"
+} else if (correction == "benjamini_hochberg") {
+  correction_text     <- "the Benjamini-Hochberg correction"
+} else if (correction == "benjamini_yekutieli") {
+  correction_text     <- "the Benjamini-Yekutieli correction"
+} else if (correction == "hochberg") {
+  correction_text     <- "Hochberg's correction"
+} else if (correction == "holm_bonferroni") {
+  correction_text     <- "the Holm-Bonferroni correction"
+} else if (correction == "holm_sidak") {
+  correction_text     <- "the Holm-Sidak correction"
+} else if (correction == "step_down_dunnett") {
+  correction_text     <- "the step-down version of Dunnett's correction"
+}
+
+if (power == "marginal") {
+  power_type_text     <- "marginal power for each null hypothesis"
+  power_scenario_text <-
+    "each of their respective least favourable configurations"
+} else {
+  power_scenario_text <- "the global alternative hypothesis"
+  if (power == "conjunctive") {
+    power_type_text   <- "conjunctive power"
+  } else if (power == "disjunctive") {
+    power_type_text   <- "disjunctive power"
+  }
+}
+
+if (ratio_type == "equal_all") {
+  ratio_text          <- "the same as the control arm"
+} else if (ratio_type == "equal_exp") {
+  ratio_text          <- paste0(ratio_init[1], " times that of the control arm")
+} else if (ratio_type == "unequal") {
+  ratio_text          <- paste0(paste(ratio_init[1:K], collapse = ", "),
+                                " times that of the control arm")
+} else if (ratio_type == "root_K") {
+  ratio_text          <- paste0(round(1/sqrt(K), 3),
+                                " times that of the control arm")
+} else {
+  ratio_text          <- paste0("chosen for ", ratio_type, "-optimality under",
+                                " the ", ratio_scenario, "-response rate ",
+                                "scenario")
+}
+
+if (integer) {
+  integer_text        <- "will"
+} else {
+  integer_text        <- "will not"
+}
+
+if (plots) {
+  plot_text           <- "will"
+} else {
+  plot_text           <- "will not"
+}
+```
+
+The following choices were made:
+
+- $K = \boldsymbol{`r K`}$ experimental treatments will be included in the trial.
+- A significance level of $\alpha = \boldsymbol{`r alpha`}$ will be used, in combination with __`r correction_text`__.
+- The event rate in the control arm will be assumed to be: $\lambda_0 = \boldsymbol{`r lambda0`}$.
+- The __`r power_type_text`__ will be controlled to level $1-\beta = \boldsymbol{`r 1 - beta`}$ under __`r power_scenario_text`__.
+- The interesting and uninteresting treatment effects will be: $\delta_1 = \boldsymbol{`r round(delta1, 3)`}$ and $\delta_0 = \boldsymbol{`r round(delta0, 3)`}$ respectively.
+- The target allocation to each of the experimental arms will be: __`r ratio_text`__.
+- The sample size in each arm __`r integer_text`__ be required to be an integer.
+- Plots __`r plot_text`__ be produced.
+
+#### Outputs
+
+```{r, echo = F, results = "asis"}
+FWER                  <- round(opchar$FWERI1[1], 3)
+if (correction %in% c("benjamini_hochberg", "benjamini_yekutieli", "hochberg",
+                      "holm_bonferroni", "holm_sidak", "step_down_dunnett")) {
+  punc_text_3         <- "s"
+  gamma_text          <- paste0("(", paste(round(gammaO, 3),
+                                           collapse = ", "), ")")
+} else {
+  punc_text_3         <- ""
+  gamma_text          <- round(gamma, 3)
+}
+
+if (power == "marginal") {
+  power_type_text     <- "minimum marginal power"
+  power_value         <-
+    round(min(diag(as.matrix(opchar[-(1:2), (K + 4):(2*K + 3)]))), 3)
+} else {
+  power_scenario_text <- "the global alternative hypothesis"
+  if (power == "conjunctive") {
+    power_type_text   <- "conjunctive power"
+    power_value       <- round(opchar$Pcon[2], 3)
+  } else if (power == "disjunctive") {
+    power_type_text   <- "disjunctive power"
+    power_value       <- round(opchar$Pdis[2], 3)
+  }
+}
+```
+
+- The total required sample size is: $N = \boldsymbol{`r round(N, 3)`}$.
+- The required sample size in each arm is: $(n_0,\dots,n_K) = \boldsymbol{(`r paste(round(n, 3), collapse = ", ")`)}$.
+- Therefore, the realised allocation ratios to the experimental arms are: $(r_1,\dots,r_K) = \boldsymbol{(`r paste(round(ratio, 3), collapse = ", ")`)}$.
+- The maximum familywise error-rate is: $\boldsymbol{`r FWER`}$.
+- The __`r power_type_text`__ is: $\boldsymbol{`r power_value`}$.
+- The following critical threshold`r punc_text_3` should be used with the chosen multiple comparison correction: $\boldsymbol{`r gamma_text`}$.

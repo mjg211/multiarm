@@ -1,40 +1,40 @@
 ---
-title: "Multi-stage group-sequential multi-arm clinical trial design for a Bernoulli distributed primary outcome"
+title: "Multi-stage group-sequential multi-arm clinical trial design for a Poisson distributed primary outcome"
 date: "`r format(Sys.time(), '%d/%m/%Y')`"
 params:
-  alpha:       NA
-  beta:        NA
-  delta0:      NA
-  delta1:      NA
-  e:           NA
-  efix:        NA
-  f:           NA
-  ffix:        NA
-  integer:     NA
-  J:           NA
-  K:           NA
-  lower:       NA
-  maxN:        NA
-  n10:         NA
-  n1:          NA
-  opchar:      NA
-  pi0:         NA
-  plots:       NA
-  power:       NA
-  ratio_type:  NA
-  ratio_init:  NA
-  ratio:       NA
-  stopping:    NA
-  swss:        NA
-  upper:       NA
-  boundaries:  NA
-  equal_error: NA
-  equal_power: NA
-  equal_other: NA
-  equal_sample_size: NA
-  shifted_power:     NA
-  shifted_sample_size:     NA
-  pmf_N:     NA
+  alpha:               NA
+  beta:                NA
+  delta0:              NA
+  delta1:              NA
+  e:                   NA
+  efix:                NA
+  f:                   NA
+  ffix:                NA
+  integer:             NA
+  J:                   NA
+  K:                   NA
+  lambda0:             NA
+  lower:               NA
+  maxN:                NA
+  n10:                 NA
+  n1:                  NA
+  opchar:              NA
+  plots:               NA
+  power:               NA
+  ratio_type:          NA
+  ratio_init:          NA
+  ratio:               NA
+  stopping:            NA
+  swss:                NA
+  upper:               NA
+  boundaries:          NA
+  equal_error:         NA
+  equal_power:         NA
+  equal_other:         NA
+  equal_sample_size:   NA
+  shifted_power:       NA
+  shifted_sample_size: NA
+  pmf_N:               NA
 ---
 
 ```{r, include = F}
@@ -43,14 +43,14 @@ knitr::opts_chunk$set(echo = F, results = "asis")
 
 # Design setting
 
-The trial will be designed to compare $K$ experimental treatments to a shared control arm. Response $X_{ik}$, from patient $i=1,\dots,n_k$ in arm $k=0,\dots,K$, will be assumed to be distributed as $X_{ik} \sim Bern(\pi_k)$. Then, the hypotheses to be tested will be:
-$$ H_k : \tau_k = \pi_k - \pi_0 \le 0,\ k=1,\dots,K.$$
+The trial will be designed to compare $K$ experimental treatments to a shared control arm. Response $X_{ik}$, from patient $i=1,\dots,n_k$ in arm $k=0,\dots,K$, will be assumed to be distributed as $X_{ik} \sim Po(\lambda_k)$. Then, the hypotheses to be tested will be:
+$$ H_k : \tau_k = \lambda_k - \lambda_0 \le 0,\ k=1,\dots,K.$$
 The *global null hypothesis*, $H_G$, will be:
-$$ \pi_0 = \cdots = \pi_K. $$
+$$ \lambda_0 = \cdots = \lambda_K. $$
 The *global alternative hypothesis*, $H_A$, will be:
-$$ \pi_1 = \cdots = \pi_K = \pi_0 + \delta_1. $$
+$$ \lambda_1 = \cdots = \lambda_K = \lambda_0 + \delta_1. $$
 The *least favourable configuration* for experimental arm $k$, $LFC_k$, will be:
-$$ \pi_k = \pi_0 + \delta_1,\ \pi_1 = \cdots = \pi_{k-1} = \pi_{k+1} = \cdots = \pi_K = \pi_0 + \delta_0. $$
+$$ \lambda_k = \lambda_0 + \delta_1,\ \lambda_1 = \cdots = \lambda_{k-1} = \lambda_{k+1} = \cdots = \lambda_K = \lambda_0 + \delta_0. $$
 Here, $\delta_1$ and $\delta_0$ are *interesting* and *uninteresting* treatment
 effects respectively.
 
@@ -68,12 +68,12 @@ ffix        <- params$ffix
 integer     <- params$integer
 J           <- params$J
 K           <- params$K
+lambda0     <- params$lambda0
 lower       <- params$lower
 maxN        <- params$maxN
 n10         <- params$n10
 n1          <- params$n1
 opchar      <- params$opchar
-pi0         <- params$pi0
 plots       <- params$plots
 power       <- params$power
 ratio_type  <- params$ratio_type
@@ -189,7 +189,7 @@ The following choices were made:
 - The upper stopping boundaries will be __`r upper_text`__.
 - A family-wise error-rate of $\alpha = \boldsymbol{`r alpha`}$ will be used.
 - The __`r power_type_text`__ will be controlled to level $1-\beta = \boldsymbol{`r 1 - beta`}$ under __`r power_scenario_text`__.
-- The response rate in the control arm will be assumed to be: $\pi_0 = \boldsymbol{`r pi0`}$.
+- The event rate in the control arm will be assumed to be: $\lambda_0 = \boldsymbol{`r lambda0`}$.
 - The interesting and uninteresting treatment effects will be: $\delta_1 = \boldsymbol{`r round(delta1, 3)`}$ and $\delta_0 = \boldsymbol{`r round(delta0, 3)`}$ respectively.
 - The target allocation to each of the experimental arms will be: __`r ratio_text`__.
 - The sample size in each arm __`r integer_text`__ be required to be an integer.

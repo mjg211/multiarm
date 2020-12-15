@@ -6,9 +6,10 @@ library(multiarm)
 options(shiny.sanitize.errors = TRUE)
 
 sapply(c("design_dtl_bern_setting.Rmd", "design_dtl_norm_setting.Rmd",
-         "design_gs_bern_setting.Rmd",  "design_gs_norm_setting.Rmd",
-         "design_ss_bern_setting.Rmd",  "design_ss_norm_setting.Rmd"), knit,
-       quiet = TRUE)
+         "design_dtl_pois_setting.Rmd", "design_gs_bern_setting.Rmd",
+         "design_gs_norm_setting.Rmd", "design_gs_pois_setting.Rmd",
+         "design_ss_bern_setting.Rmd", "design_ss_norm_setting.Rmd",
+         "design_ss_pois_setting.Rmd"), knit, quiet = TRUE)
 
 ##### UI #######################################################################
 ui <- function(request) {
@@ -38,6 +39,10 @@ ui <- function(request) {
           shinydashboard::menuSubItem(
             text    = "Normal",
             tabName = "design_ss_norm"
+          ),
+          shinydashboard::menuSubItem(
+            text    = "Poisson",
+            tabName = "design_ss_pois"
           )
         ),
         shinydashboard::menuItem(
@@ -51,6 +56,10 @@ ui <- function(request) {
           shinydashboard::menuSubItem(
             text    = "Normal",
             tabName = "design_gs_norm"
+          ),
+          shinydashboard::menuSubItem(
+            text    = "Poisson",
+            tabName = "design_gs_pois"
           )
         ),
         shinydashboard::menuItem(
@@ -64,6 +73,10 @@ ui <- function(request) {
           shinydashboard::menuSubItem(
             text    = "Normal",
             tabName = "design_dtl_norm"
+          ),
+          shinydashboard::menuSubItem(
+            text    = "Poisson",
+            tabName = "design_dtl_pois"
           )
         ),
         shinydashboard::menuItem(
@@ -927,6 +940,408 @@ ui <- function(request) {
               collapsible = TRUE,
               collapsed   = TRUE,
               shiny::verbatimTextOutput("design_ss_norm_debug")
+            )
+          )
+        ),
+        ##### Tab: Single-stage (Poisson) ######################################
+        shinydashboard::tabItem(
+          tabName = "design_ss_pois",
+          shiny::includeMarkdown("design_ss_pois_header.md"),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Design setting",
+              width       = 12,
+              solidHeader = TRUE,
+              status      = "primary",
+              shiny::withMathJax(
+                shiny::includeMarkdown("design_ss_pois_setting.md")
+              )
+            )
+          ),
+          ##### Row 1: Design parameters & Design summary ######################
+          shiny::fluidRow(
+            shinydashboard::box(
+              shiny::withMathJax(),
+              shinyalert::useShinyalert(),
+              shinyFeedback::useShinyFeedback(),
+              shinyjs::useShinyjs(),
+              id          = "design_ss_pois_parameters",
+              title       = "Design parameters",
+              width       = 4,
+              solidHeader = TRUE,
+              status      = "primary",
+              tags$style(type = "text/css",
+                         ".irs-grid-pol.small {height: 0px;}"),
+              shiny::sliderInput(
+                inputId = "design_ss_pois_K",
+                label   = "Number of experimental treatment arms:",
+                min     = 2,
+                max     = 5,
+                value   = 2,
+                step    = 1
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_K",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::selectInput(
+                inputId  = "design_ss_pois_correction",
+                label    = "Multiple comparison correction:",
+                choices  =
+                  list("Per-hypothesis type-I error-rate control"  =
+                         list("No multiple comparison correction" = "none"),
+                       "Family-wise error-rate control: Single-step" =
+                         list("Bonferroni" = "bonferroni",
+                              "Dunnett"    = "dunnett",
+                              "Sidak"      = "sidak"),
+                       "Family-wise error-rate control: Step-wise" =
+                         list("Hochberg"          = "hochberg",
+                              "Holm-Bonferroni"   = "holm_bonferroni",
+                              "Holm-Sidak"        = "holm_sidak",
+                              "Step-down Dunnett" = "step_down_dunnett"),
+                       "False discovery rate control"              =
+                         list("Benjamini-Hochberg"  = "benjamini_hochberg",
+                              "Benjamini-Yekutieli" = "benjamini_yekutieli")),
+                selected = "dunnett"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_correction",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::numericInput(
+                inputId = "design_ss_pois_alpha",
+                label   = "Significance level:",
+                value   = 0.05,
+                min     = 0,
+                max     = 1,
+                step    = 0.01
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_alpha",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::selectInput(
+                inputId  = "design_ss_pois_power",
+                label    = "Type of power to control:",
+                choices  = c("Conjunctive" = "conjunctive",
+                             "Disjunctive" = "disjunctive",
+                             "Marginal"    = "marginal"),
+                selected = "marginal"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_power",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::numericInput(
+                inputId = "design_ss_pois_beta",
+                label   = "Desired power:",
+                value   = 0.8,
+                min     = 0,
+                max     = 1,
+                step    = 0.025
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_beta",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::numericInput(
+                inputId = "design_ss_pois_lambda0",
+                label   = "Control arm event rate:",
+                value   = 5,
+                min     = 0,
+                step    = 0.1
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_lambda0",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_ss_pois_delta"),
+              shiny::selectInput(
+                inputId  = "design_ss_pois_ratio_type",
+                label    = "Allocation ratios:",
+                choices  =
+                  list("Explicit" =
+                         list("Equal across all arms"          = "equal_all",
+                              "Equal across experimental arms" = "equal_exp",
+                              "Unequal across all arms"        = "unequal",
+                              "root-K rule"                    = "root_K"),
+                       "Implicit" = list("A-optimal" = "A",
+                                         "D-optimal" = "D",
+                                         "E-optimal" = "E")),
+                selected = "equal_all"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_ratio_type",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_ss_pois_ratio"),
+              shinyWidgets::prettySwitch(
+                inputId = "design_ss_pois_integer",
+                label   = "Require integer sample sizes",
+                status  = "info",
+                value   = FALSE,
+                slim    = TRUE
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_integer",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shinyWidgets::prettySwitch(
+                inputId = "design_ss_pois_plots",
+                label   = "Plot power curves",
+                status  = "info",
+                value   = TRUE,
+                slim    = TRUE
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_plots",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::uiOutput("design_ss_pois_density"),
+              shiny::hr(),
+              shiny::actionButton(
+                inputId = "design_ss_pois_reset",
+                label   = "  Reset inputs  ",
+                icon    = shiny::icon(name = "eraser"),
+                width   = "100%"
+              ),
+              shiny::hr(),
+              shiny::uiOutput("design_ss_pois_warning"),
+              shiny::actionButton(
+                inputId = "design_ss_pois_update",
+                label   = "  Update outputs  ",
+                icon    = shiny::icon(name = "check-square-o"),
+                width   = "100%"
+              ),
+              shiny::hr(),
+              shiny::textInput(
+                inputId = "design_ss_pois_filename",
+                label   = "Report filename:",
+                value   = "single_stage_poisson"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_filename",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              tags$head(tags$style(".full_width{width:100%;}")),
+              shiny::radioButtons(
+                inputId  = "design_ss_pois_format",
+                label    = "Download format",
+                choices  = c("PDF"  = "pdf",
+                             "HTML" = "html",
+                             "Word" = "word"),
+                selected = "pdf",
+                inline   = TRUE
+              ),
+              shiny::downloadButton(
+                outputId = "design_ss_pois_report",
+                label    = "  Download report  ",
+                class    = "full_width"
+              )
+            ),
+            shinydashboard::box(
+              title       = "Design summary",
+              width       = 8,
+              solidHeader = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::withMathJax(
+                  shiny::htmlOutput("design_ss_pois_summary")
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          ##### Row 2: Value box outputs #######################################
+          shiny::fluidRow(
+            shinydashboard::valueBoxOutput("design_ss_pois_n_box"),
+            shinydashboard::valueBoxOutput("design_ss_pois_fwer_box"),
+            shinydashboard::valueBoxOutput("design_ss_pois_power_box")
+          ),
+          ##### Rows 3-5: Operating characteristics summary ####################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Operating characteristics summary: Key",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_ss_pois_table_key",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       =
+                "Operating characteristics summary: Error-rates",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_ss_pois_table_error",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       =
+                "Operating characteristics summary: Power & other quantities",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_ss_pois_table_other",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          ##### Rows 6 & 7: Operating characteristics plots ####################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Equal treatment effects: Error-rates",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_ss_pois_equal_error",
+                  dblclick = "design_ss_pois_equal_error_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_ss_pois_equal_error_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            ),
+            shinydashboard::box(
+              title       = "Equal treatment effects: Power",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_ss_pois_equal_power",
+                  dblclick = "design_ss_pois_equal_power_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_ss_pois_equal_power_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Equal treatment effects: Other",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_ss_pois_equal_other",
+                  dblclick = "design_ss_pois_equal_other_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_ss_pois_equal_other_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            ),
+            shinydashboard::box(
+              title       = "Shifted treatment effects: Power",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_ss_pois_shifted_power",
+                  dblclick = "design_ss_pois_shifted_power_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_ss_pois_shifted_power_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          ##### Row 8: Session information #####################################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Session Information",
+              status      = "primary",
+              solidHeader = TRUE,
+              width       = 12,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              shiny::verbatimTextOutput("design_ss_pois_debug")
             )
           )
         ),
@@ -1995,6 +2410,530 @@ ui <- function(request) {
             )
           )
         ),
+        ##### Tab: Group-sequential (Poisson) ##################################
+        shinydashboard::tabItem(
+          tabName = "design_gs_pois",
+          shiny::includeMarkdown("design_gs_pois_header.md"),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Design setting",
+              width       = 12,
+              solidHeader = TRUE,
+              status      = "primary",
+              shiny::withMathJax(
+                shiny::includeMarkdown("design_gs_pois_setting.md")
+              )
+            )
+          ),
+          ##### Row 1: Design parameters & Design summary ######################
+          shiny::fluidRow(
+            shinydashboard::box(
+              shiny::withMathJax(),
+              shinyalert::useShinyalert(),
+              shinyFeedback::useShinyFeedback(),
+              shinyjs::useShinyjs(),
+              id          = "design_gs_pois_parameters",
+              title       = "Design parameters",
+              width       = 4,
+              solidHeader = TRUE,
+              status      = "primary",
+              tags$style(type = "text/css",
+                         ".irs-grid-pol.small {height: 0px;}"),
+              shiny::sliderInput(
+                inputId = "design_gs_pois_K",
+                label   = "Initial number of experimental treatment arms:",
+                min     = 2,
+                max     = 5,
+                value   = 2,
+                step    = 1
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_K",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::sliderInput(
+                inputId = "design_gs_pois_J",
+                label   = "Number of stages:",
+                min     = 2,
+                max     = 4,
+                value   = 2,
+                step    = 1
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_J",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::selectInput(
+                inputId  = "design_gs_pois_stopping",
+                label    = "Stopping rule:",
+                choices  = c("Simultaneous" = "simultaneous",
+                             "Separate"     = "separate"),
+                selected = "separate"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_stopping",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::selectInput(
+                inputId  = "design_gs_pois_swss",
+                label    = "Stage-wise sample size:",
+                choices  = c("Fixed"    = "fixed",
+                             "Variable" = "variable"),
+                selected = "variable"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_swss",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::selectInput(
+                inputId  = "design_gs_pois_lower",
+                label    = "Lower stopping boundaries:",
+                choices  = c("Fixed"           = "fixed",
+                             "O'Brien-Fleming" = "obf",
+                             "Pocock"          = "pocock",
+                             "Triangular"      = "triangular"),
+                selected = "obf"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_lower",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              uiOutput("design_gs_pois_lower_fixed"),
+              shiny::selectInput(
+                inputId  = "design_gs_pois_upper",
+                label    = "Upper stopping boundaries:",
+                choices  = c("Fixed"           = "fixed",
+                             "O'Brien-Fleming" = "obf",
+                             "Pocock"          = "pocock",
+                             "Triangular"      = "triangular"),
+                selected = "obf"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_upper",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              uiOutput("design_gs_pois_upper_fixed"),
+              shiny::numericInput(
+                inputId = "design_gs_pois_alpha",
+                label   = "Family-wise error-rate:",
+                value   = 0.05,
+                min     = 0,
+                max     = 1,
+                step    = 0.01
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_alpha",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::selectInput(
+                inputId  = "design_gs_pois_power",
+                label    = "Type of power to control:",
+                choices  = c("Conjunctive" = "conjunctive",
+                             "Disjunctive" = "disjunctive",
+                             "Marginal"    = "marginal"),
+                selected = "marginal"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_power",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::numericInput(
+                inputId = "design_gs_pois_beta",
+                label   = "Desired power:",
+                value   = 0.8,
+                min     = 0,
+                max     = 1,
+                step    = 0.025
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_beta",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::numericInput(
+                inputId = "design_gs_pois_lambda0",
+                label   = "Control arm event rate:",
+                value   = 5,
+                min     = 0,
+                step    = 0.1
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_lambda0",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_gs_pois_delta"),
+              shiny::selectInput(
+                inputId  = "design_gs_pois_ratio_type",
+                label    = "Allocation ratios:",
+                choices  =
+                  list("Equal across all arms"          = "equal_all",
+                       "Equal across experimental arms" = "equal_exp",
+                       "root-K rule"                    = "root_K"),
+                selected = "equal_all"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_ratio_type",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_gs_pois_ratio"),
+              shinyWidgets::prettySwitch(
+                inputId = "design_gs_pois_integer",
+                label   = "Require integer sample sizes",
+                status  = "info",
+                value   = FALSE,
+                slim    = TRUE
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_integer",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_gs_pois_warning_ratio"),
+              shinyWidgets::prettySwitch(
+                inputId = "design_gs_pois_plots",
+                label   = "Plot power curves",
+                status  = "info",
+                value   = TRUE,
+                slim    = TRUE
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_plots",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::uiOutput("design_gs_pois_density"),
+              shiny::hr(),
+              shiny::actionButton(
+                inputId = "design_gs_pois_reset",
+                label   = "  Reset inputs  ",
+                icon    = shiny::icon(name = "eraser"),
+                width   = "100%"
+              ),
+              shiny::hr(),
+              shiny::uiOutput("design_gs_pois_warning"),
+              shiny::actionButton(
+                inputId = "design_gs_pois_update",
+                label   = "  Update outputs  ",
+                icon    = shiny::icon(name = "check-square-o"),
+                width   = "100%"
+              ),
+              shiny::hr(),
+              shiny::textInput(
+                inputId = "design_gs_pois_filename",
+                label   = "Report filename:",
+                value   = "multi_stage_group_sequential_poisson"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_filename",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              tags$head(tags$style(".full_width{width:100%;}")),
+              shiny::radioButtons(
+                inputId  = "design_gs_pois_format",
+                label    = "Download format",
+                choices  = c("PDF"  = "pdf",
+                             "HTML" = "html",
+                             "Word" = "word"),
+                selected = "pdf",
+                inline   = TRUE
+              ),
+              shiny::downloadButton(
+                outputId = "design_gs_pois_report",
+                label    = "  Download report  ",
+                class    = "full_width"
+              )
+            ),
+            shinydashboard::box(
+              title       = "Design summary",
+              width       = 8,
+              solidHeader = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::withMathJax(
+                  shiny::htmlOutput("design_gs_pois_summary")
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          ##### Row 2: Value box outputs #######################################
+          shiny::fluidRow(
+            shinydashboard::valueBoxOutput("design_gs_pois_n_box"),
+            shinydashboard::valueBoxOutput("design_gs_pois_fwer_box"),
+            shinydashboard::valueBoxOutput("design_gs_pois_power_box")
+          ),
+          ##### Row 3: Stopping boundaries plot ################################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Stopping boundaries",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput("design_gs_pois_stopping_boundaries"),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          ##### Rows 4-6: Operating characteristics summary ####################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Operating characteristics summary: Key",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_gs_pois_table_key",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       =
+                "Operating characteristics summary: Error-rates",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_gs_pois_table_error",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       =
+                "Operating characteristics summary: Power & other quantities",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_gs_pois_table_other",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          ##### Rows 7-10: Operating characteristics plots #####################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Equal treatment effects: Error-rates",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_gs_pois_equal_error",
+                  dblclick = "design_gs_pois_equal_error_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_gs_pois_equal_error_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            ),
+            shinydashboard::box(
+              title       = "Equal treatment effects: Power",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_gs_pois_equal_power",
+                  dblclick = "design_gs_pois_equal_power_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_gs_pois_equal_power_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Equal treatment effects: Other",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_gs_pois_equal_other",
+                  dblclick = "design_gs_pois_equal_other_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_gs_pois_equal_other_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            ),
+            shinydashboard::box(
+              title       = "Equal treatment effects: Sample size",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_gs_pois_equal_sample_size",
+                  dblclick = "design_gs_pois_equal_sample_size_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_gs_pois_equal_sample_size_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Shifted treatment effects: Power",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_gs_pois_shifted_power",
+                  dblclick = "design_gs_pois_shifted_power_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_gs_pois_shifted_power_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            ),
+            shinydashboard::box(
+              title       = "Shifted treatment effects: Sample size",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_gs_pois_shifted_sample_size",
+                  dblclick = "design_gs_pois_shifted_sample_size_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_gs_pois_shifted_sample_size_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Sample size distribution",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_gs_pois_pmf_N",
+                  dblclick = "design_gs_pois_pmf_N_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_gs_pois_pmf_N_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          ##### Row 11: Session information ####################################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Session Information",
+              status      = "primary",
+              solidHeader = TRUE,
+              width       = 12,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              shiny::verbatimTextOutput("design_gs_pois_debug")
+            )
+          )
+        ),
         ##### Tab: Drop-the-losers (Bernoulli) #################################
         shinydashboard::tabItem(
           tabName = "design_dtl_bern",
@@ -2786,6 +3725,393 @@ ui <- function(request) {
             )
           )
         ),
+        ##### Tab: Drop-the-losers (Poisson) ###################################
+        shinydashboard::tabItem(
+          tabName = "design_dtl_pois",
+          shiny::includeMarkdown("design_dtl_pois_header.md"),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Design setting",
+              width       = 12,
+              solidHeader = TRUE,
+              status      = "primary",
+              shiny::withMathJax(
+                shiny::includeMarkdown("design_dtl_pois_setting.md")
+              )
+            )
+          ),
+          ##### Row 1: Design parameters & Design summary ######################
+          shiny::fluidRow(
+            shinydashboard::box(
+              shiny::withMathJax(),
+              shinyalert::useShinyalert(),
+              shinyFeedback::useShinyFeedback(),
+              shinyjs::useShinyjs(),
+              id          = "design_dtl_pois_parameters",
+              title       = "Design parameters",
+              width       = 4,
+              solidHeader = TRUE,
+              status      = "primary",
+              tags$style(type = "text/css",
+                         ".irs-grid-pol.small {height: 0px;}"),
+              shiny::sliderInput(
+                inputId = "design_dtl_pois_K",
+                label   = "Initial number of experimental treatment arms:",
+                min     = 2,
+                max     = 5,
+                value   = 2,
+                step    = 1
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_K",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_dtl_pois_J"),
+              shiny::uiOutput("design_dtl_pois_Kv_2"),
+              shiny::uiOutput("design_dtl_pois_Kv_3"),
+              shiny::uiOutput("design_dtl_pois_Kv_4"),
+              shiny::selectInput(
+                inputId  = "design_dtl_pois_swss",
+                label    = "Stage-wise sample size:",
+                choices  = c("Fixed"    = "fixed",
+                             "Variable" = "variable"),
+                selected = "variable"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_swss",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::numericInput(
+                inputId = "design_dtl_pois_alpha",
+                label   = "Family-wise error-rate:",
+                value   = 0.05,
+                min     = 0,
+                max     = 1,
+                step    = 0.01
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_alpha",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::selectInput(
+                inputId  = "design_dtl_pois_power",
+                label    = "Type of power to control:",
+                choices  = c("Disjunctive" = "disjunctive",
+                             "Marginal"    = "marginal"),
+                selected = "marginal"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_power",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::numericInput(
+                inputId = "design_dtl_pois_beta",
+                label   = "Desired power:",
+                value   = 0.8,
+                min     = 0,
+                max     = 1,
+                step    = 0.025
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_beta",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::numericInput(
+                inputId = "design_dtl_pois_lambda0",
+                label   = "Control arm event rate:",
+                value   = 5,
+                min     = 0,
+                step    = 0.1
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_lambda0",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_dtl_pois_delta"),
+              shiny::selectInput(
+                inputId  = "design_dtl_pois_ratio_type",
+                label    = "Allocation ratios:",
+                choices  =
+                  list("Equal across all arms"          = "equal_all",
+                       "Equal across experimental arms" = "equal_exp",
+                       "root-K rule"                    = "root_K"),
+                selected = "equal_all"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_ratio_type",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_dtl_pois_ratio"),
+              shinyWidgets::prettySwitch(
+                inputId = "design_dtl_pois_integer",
+                label   = "Require integer sample sizes",
+                status  = "info",
+                value   = FALSE,
+                slim    = TRUE
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_integer",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              shiny::uiOutput("design_dtl_pois_warning_ratio"),
+              shinyWidgets::prettySwitch(
+                inputId = "design_dtl_pois_plots",
+                label   = "Plot power curves",
+                status  = "info",
+                value   = TRUE,
+                slim    = TRUE
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_plots",
+                  size    = "m",
+                  colour  = "black"),
+              shiny::uiOutput("design_dtl_pois_density"),
+              shiny::hr(),
+              shiny::actionButton(
+                inputId = "design_dtl_pois_reset",
+                label   = "  Reset inputs  ",
+                icon    = shiny::icon(name = "eraser"),
+                width   = "100%"
+              ),
+              shiny::hr(),
+              shiny::uiOutput("design_dtl_pois_warning"),
+              shiny::actionButton(
+                inputId = "design_dtl_pois_update",
+                label   = "  Update outputs  ",
+                icon    = shiny::icon(name = "check-square-o"),
+                width   = "100%"
+              ),
+              shiny::hr(),
+              shiny::textInput(
+                inputId = "design_dtl_pois_filename",
+                label   = "Report filename:",
+                value   = "multi_stage_drop_the_losers_poisson"
+              ) %>%
+                shinyhelper::helper(
+                  type    = "markdown",
+                  title   = "",
+                  content = "design_filename",
+                  size    = "m",
+                  colour  = "black"
+                ),
+              tags$head(tags$style(".full_width{width:100%;}")),
+              shiny::radioButtons(
+                inputId  = "design_dtl_pois_format",
+                label    = "Download format",
+                choices  = c("PDF"  = "pdf",
+                             "HTML" = "html",
+                             "Word" = "word"),
+                selected = "pdf",
+                inline   = TRUE
+              ),
+              shiny::downloadButton(
+                outputId = "design_dtl_pois_report",
+                label    = "  Download report  ",
+                class    = "full_width"
+              )
+            ),
+            shinydashboard::box(
+              title       = "Design summary",
+              width       = 8,
+              solidHeader = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::withMathJax(
+                  shiny::htmlOutput("design_dtl_pois_summary")
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          ##### Row 2: Value box outputs #######################################
+          shiny::fluidRow(
+            shinydashboard::valueBoxOutput("design_dtl_pois_n_box"),
+            shinydashboard::valueBoxOutput("design_dtl_pois_fwer_box"),
+            shinydashboard::valueBoxOutput("design_dtl_pois_power_box")
+          ),
+          ##### Rows 3-5: Operating characteristics summary ####################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Operating characteristics summary: Key",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_dtl_pois_table_key",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       =
+                "Operating characteristics summary: Error-rates",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_dtl_pois_table_error",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       =
+                "Operating characteristics summary: Power & other quantities",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "center",
+                shinycssloaders::withSpinner(
+                  DT::DTOutput("design_dtl_pois_table_other",
+                               height = "500px"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
+          ##### Rows 6 & 7: Operating characteristics plots ####################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Equal treatment effects: Error-rates",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_dtl_pois_equal_error",
+                  dblclick = "design_dtl_pois_equal_error_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_dtl_pois_equal_error_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            ),
+            shinydashboard::box(
+              title       = "Equal treatment effects: Power",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_dtl_pois_equal_power",
+                  dblclick = "design_dtl_pois_equal_power_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_dtl_pois_equal_power_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Equal treatment effects: Other",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_dtl_pois_equal_other",
+                  dblclick = "design_dtl_pois_equal_other_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_dtl_pois_equal_other_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            ),
+            shinydashboard::box(
+              title       = "Shifted treatment effects: Power",
+              width       = 6,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              status      = "primary",
+              shinycssloaders::withSpinner(
+                shiny::plotOutput(
+                  "design_dtl_pois_shifted_power",
+                  dblclick = "design_dtl_pois_shifted_power_dblclick",
+                  brush    = shiny::brushOpts(
+                    id         = "design_dtl_pois_shifted_power_brush",
+                    resetOnNew = TRUE)
+                ),
+                type  = 6,
+                color = "#3C8DBC",
+                size  = 1/3
+              )
+            )
+          ),
+          ##### Row 8: Session information #####################################
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Session Information",
+              status      = "primary",
+              solidHeader = TRUE,
+              width       = 12,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              shiny::verbatimTextOutput("design_dtl_pois_debug")
+            )
+          )
+        ),
         ##### Tab: About #######################################################
         shinydashboard::tabItem(
           tabName = "about",
@@ -2804,12 +4130,11 @@ ui <- function(request) {
               solidHeader = TRUE,
               shinydashboardPlus::timelineBlock(
                 shinydashboardPlus::timelineEnd(color = "gray"),
-                shinydashboardPlus::timelineLabel("Dec 2020", color = "gray"),
                 shinydashboardPlus::timelineItem(
                   title = strong("SCT Webinar"),
                   icon  = "laptop",
                   color = "gray",
-                  time  = "11 Nov 2020",
+                  time  = "Feb 2021",
                   p("The latest functionality for multi-stage designs will be",
                     "presented during an upcoming Society for Clinical Trials",
                     "webinar entitled",
@@ -2817,6 +4142,22 @@ ui <- function(request) {
                        "New resources and easy-to-use software"),
                     ", being run by Graham Wheeler, Munya Dimairo, and ",
                     "Michael Grayling.")
+                ),
+                shinydashboardPlus::timelineLabel("Jan 2021", color = "gray"),
+                shinydashboardPlus::timelineItem(
+                  title = strong("Poisson distributed outcomes now supported"),
+                  icon  = "gears",
+                  color = "gray",
+                  time  = "15 Dec 2020",
+                  p("A major upgrade to the app is pushed online to provide",
+                    "support for Poisson distributed outcomes.")
+                ),
+                shinydashboardPlus::timelineItem(
+                  title  = strong("500 unique users reached"),
+                  border = FALSE,
+                  icon   = "users",
+                  color  = "gray",
+                  time   = "15 Oct 2020",
                 ),
                 shinydashboardPlus::timelineItem(
                   title = strong("Multi-stage designs now supported"),
@@ -2913,9 +4254,6 @@ ui <- function(request) {
                   label = "Add functionality for Bayesian designs",
                 ),
                 shinydashboardPlus::todoListItem(
-                  label = "Add functionality for count (Poisson) outcomes",
-                ),
-                shinydashboardPlus::todoListItem(
                   label =
                     "Add functionality for ordinal (multinomial) outcomes",
                 ),
@@ -2949,6 +4287,10 @@ ui <- function(request) {
                 ),
                 shinydashboardPlus::todoListItem(
                   label = "Switch simulation based calculations to Rcpp",
+                ),
+                shinydashboardPlus::todoListItem(
+                  checked = TRUE,
+                  label   = "Add functionality for count (Poisson) outcomes",
                 ),
                 shinydashboardPlus::todoListItem(
                   checked = TRUE,
@@ -3007,6 +4349,14 @@ server <- function(input, output, session) {
                                                                      y = NULL)
   ranges_design_ss_norm_shifted_power       <- shiny::reactiveValues(x = NULL,
                                                                      y = NULL)
+  ranges_design_ss_pois_equal_error         <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_ss_pois_equal_power         <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_ss_pois_equal_other         <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_ss_pois_shifted_power       <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
   ranges_design_gs_bern_equal_error         <- shiny::reactiveValues(x = NULL,
                                                                      y = NULL)
   ranges_design_gs_bern_equal_power         <- shiny::reactiveValues(x = NULL,
@@ -3035,6 +4385,20 @@ server <- function(input, output, session) {
                                                                      y = NULL)
   ranges_design_gs_norm_pmf_N               <- shiny::reactiveValues(x = NULL,
                                                                      y = NULL)
+  ranges_design_gs_pois_equal_error         <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_gs_pois_equal_power         <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_gs_pois_equal_other         <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_gs_pois_equal_sample_size   <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_gs_pois_shifted_power       <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_gs_pois_shifted_sample_size <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_gs_pois_pmf_N               <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
   ranges_design_dtl_bern_equal_error        <- shiny::reactiveValues(x = NULL,
                                                                      y = NULL)
   ranges_design_dtl_bern_equal_power        <- shiny::reactiveValues(x = NULL,
@@ -3050,6 +4414,14 @@ server <- function(input, output, session) {
   ranges_design_dtl_norm_equal_other        <- shiny::reactiveValues(x = NULL,
                                                                      y = NULL)
   ranges_design_dtl_norm_shifted_power      <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_dtl_pois_equal_error        <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_dtl_pois_equal_power        <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_dtl_pois_equal_other        <- shiny::reactiveValues(x = NULL,
+                                                                     y = NULL)
+  ranges_design_dtl_pois_shifted_power      <- shiny::reactiveValues(x = NULL,
                                                                      y = NULL)
 
   ##### Single-stage (Bernoulli): shinyFeedback warning messages ###############
@@ -4262,6 +5634,583 @@ server <- function(input, output, session) {
     }
   )
 
+  ##### Single-stage (Poisson): shinyFeedback warning messages #################
+
+  shiny::observeEvent(input$design_ss_pois_alpha, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_ss_pois_alpha",
+      show    = any(input$design_ss_pois_alpha <= 0,
+                    input$design_ss_pois_alpha >= 1),
+      text    = "Must be strictly between 0 and 1")
+  })
+
+  shiny::observeEvent(input$design_ss_pois_beta, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_ss_pois_beta",
+      show    = any(input$design_ss_pois_beta <= 0,
+                    input$design_ss_pois_beta >= 1),
+      text    = "Must be strictly between 0 and 1")
+  })
+
+  shiny::observeEvent(input$design_ss_pois_lambda0, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_ss_pois_lambda0",
+      show    = (input$design_ss_pois_lambda0 <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_ss_pois_delta1, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_ss_pois_delta1",
+      show    = (input$design_ss_pois_delta1 <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_ss_pois_delta0, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_ss_pois_delta0",
+      show    = any(input$design_ss_pois_delta0 >=
+                      input$design_ss_pois_delta1,
+                    input$design_ss_pois_delta0 <=
+                      -input$design_ss_pois_lambda0),
+      text    = paste0("Must be strictly between minus the control arm ",
+                       "event rate and the interesting treatment effect"))
+  })
+
+  shiny::observeEvent(c(input$design_ss_pois_ratio1,
+                        input$design_ss_pois_ratio2,
+                        input$design_ss_pois_ratio3,
+                        input$design_ss_pois_ratio4,
+                        input$design_ss_pois_ratio5), {
+    vals <- c(input$design_ss_pois_ratio1, input$design_ss_pois_ratio2,
+              input$design_ss_pois_ratio3, input$design_ss_pois_ratio4,
+              input$design_ss_pois_ratio5)
+    for (i in 1:5) {
+      shinyFeedback::feedbackDanger(
+        inputId = paste0("design_ss_pois_ratio", i),
+        show    = (vals[i] <= 0),
+        text    = "Must be strictly positive")
+    }
+  })
+
+  shiny::observeEvent(input$design_ss_pois_filename, {
+    shinyFeedback::feedbackWarning(
+      inputId = "design_ss_pois_filename",
+      show    = any(strsplit(input$design_ss_pois_filename,
+                             split = "")[[1]] %in%
+                      c('/', '\\', '?', "%", "*", ":", "|", "<", ">")),
+      text    = paste0('It is generally inadvisable to use the characters /',
+                       ', \\, ?, %, *, :, |, ", <, and > in a filename'))
+  })
+
+  ##### Single-stage (Poisson): Dynamic UI elements ############################
+
+  output$design_ss_pois_delta   <- renderUI({
+    inputTagList <-
+      shiny::tagList(
+        (shiny::numericInput(
+          inputId = "design_ss_pois_delta1",
+          label   = "Interesting treatment effect:",
+          value   = 1,
+          min     = 0,
+          step    = 0.1
+        ) %>%
+          shinyhelper:: helper(
+            type    = "markdown",
+            title   = "",
+            content = "design_delta1",
+            size    = "m",
+            colour  = "black"
+          ))
+      )
+    newInput     <- (shiny::numericInput(
+      inputId = "design_ss_pois_delta0",
+      label   = "Uninteresting treatment effect:",
+      value   = 0,
+      min     = -input$design_ss_pois_lambda0,
+      step    = 0.1
+    ) %>%
+      shinyhelper:: helper(
+        type    = "markdown",
+        title   = "",
+        content = "design_delta0",
+        size    = "m",
+        colour  = "black"
+      ))
+    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList
+  })
+
+  output$design_ss_pois_ratio   <- renderUI({
+    if (input$design_ss_pois_ratio_type == "equal_exp") {
+      shiny::numericInput(
+        inputId = "design_ss_pois_ratio1",
+        label   = paste0("Allocation ratio for the experimental arms ",
+                         "(arms 1, ..., ",
+                         input$design_ss_pois_K, "):"),
+        value   = 1,
+        min     = 0,
+        max     = NA,
+        step    = 0.25
+      )
+    } else if (input$design_ss_pois_ratio_type == "unequal") {
+      inputTagList   <-
+        shiny::tagList(
+          shiny::numericInput(
+            inputId = "design_ss_pois_ratio1",
+            label   = "Allocation ratio for experimental arm 1:",
+            value   = 1,
+            min     = 0,
+            max     = NA,
+            step    = 0.25
+          )
+        )
+      lapply(2:input$design_ss_pois_K, function(i) {
+        newInput     <-
+          shiny::numericInput(
+            inputId = paste0("design_ss_pois_ratio", i),
+            label   = paste0("Allocation ratio for experimental arm ", i, ":"),
+            value   = 1,
+            min     = 0,
+            max     = NA,
+            step    = 0.25)
+        inputTagList <<- tagAppendChild(inputTagList, newInput)
+      })
+      inputTagList
+    } else if (input$design_ss_pois_ratio_type %in% c("A", "D", "E")) {
+      shiny::selectInput(
+        inputId  = "design_ss_pois_ratio_scenario",
+        label    =
+          "Treatment effect scenario to optimise allocation ratios for:",
+        choices  = c("Global null hypothesis"        = "HG",
+                     "Global alternative hypothesis" = "HA"),
+        selected = "HG"
+      )
+    }
+  })
+
+  output$design_ss_pois_warning <- renderUI({
+    if (any(all(input$design_ss_pois_K %in% c(4, 5),
+                input$design_ss_pois_correction %in%
+                c("benjamini_hochberg", "benjamini_yekutieli", "hochberg",
+                  "holm_bonferroni", "holm_sidak", "step_down_dunnett")),
+            all(input$design_ss_pois_K == 5,
+                input$design_ss_pois_plots))) {
+      shiny::p(shiny::strong("WARNING:"), " Execution time may be long for ",
+               "chosen input parameters.")
+    }
+  })
+
+  output$design_ss_pois_density <- renderUI({
+    if (input$design_ss_pois_plots) {
+      shiny::selectInput(
+        inputId  = "design_ss_pois_density",
+        label    = "Plot quality:",
+        choices  = c("Very low" = 33, "Low" = 66, "Medium" = 100, "High" = 150,
+                     "Very high" = 200),
+        selected = 100
+      ) %>%
+        shinyhelper::helper(
+          type    = "markdown",
+          title   = "",
+          content = "design_density",
+          size    = "m",
+          colour  = "black"
+        )
+    }
+  })
+
+  shiny::observeEvent(input$design_ss_pois_reset, {
+    shinyjs::reset("design_ss_pois_parameters")
+  })
+
+  ##### Single-stage (Poisson): Plot zoom set-up ###############################
+
+  shiny::observeEvent(input$design_ss_pois_equal_error_dblclick, {
+    brush_error                             <-
+      input$design_ss_pois_equal_error_brush
+    if (!is.null(brush_error)) {
+      ranges_design_ss_pois_equal_error$x   <- c(brush_error$xmin,
+                                                 brush_error$xmax)
+      ranges_design_ss_pois_equal_error$y   <- c(brush_error$ymin,
+                                                 brush_error$ymax)
+    } else {
+      ranges_design_ss_pois_equal_error$x   <-
+        ranges_design_ss_pois_equal_error$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_ss_pois_equal_power_dblclick, {
+    brush_power                             <-
+      input$design_ss_pois_equal_power_brush
+    if (!is.null(brush_power)) {
+      ranges_design_ss_pois_equal_power$x   <- c(brush_power$xmin,
+                                                 brush_power$xmax)
+      ranges_design_ss_pois_equal_power$y   <- c(brush_power$ymin,
+                                                 brush_power$ymax)
+    } else {
+      ranges_design_ss_pois_equal_power$x   <-
+        ranges_design_ss_pois_equal_power$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_ss_pois_equal_other_dblclick, {
+    brush_other                             <-
+      input$design_ss_pois_equal_other_brush
+    if (!is.null(brush_other)) {
+      ranges_design_ss_pois_equal_other$x   <- c(brush_other$xmin,
+                                                 brush_other$xmax)
+      ranges_design_ss_pois_equal_other$y   <- c(brush_other$ymin,
+                                                 brush_other$ymax)
+    } else {
+      ranges_design_ss_pois_equal_other$x   <-
+        ranges_design_ss_pois_equal_other$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_ss_pois_shifted_power_dblclick, {
+    brush_shifted_power                       <-
+      input$design_ss_pois_shifted_power_brush
+    if (!is.null(brush_shifted_power)) {
+      ranges_design_ss_pois_shifted_power$x   <- c(brush_shifted_power$xmin,
+                                                   brush_shifted_power$xmax)
+      ranges_design_ss_pois_shifted_power$y   <- c(brush_shifted_power$ymin,
+                                                   brush_shifted_power$ymax)
+    } else {
+      ranges_design_ss_pois_shifted_power$x   <-
+        ranges_design_ss_pois_shifted_power$y <- NULL
+    }
+  })
+
+  ##### Single-stage (Poisson): int_des_ss_pois() ##############################
+
+  int_des_ss_pois <- shiny::eventReactive(input$design_ss_pois_update, {
+    K                     <- input$design_ss_pois_K
+    seq_K                 <- 1:K
+    progress              <- shiny::Progress$new()
+    on.exit(progress$close())
+    progress$set(message = "Identifying design", value = 0)
+    if (input$design_ss_pois_ratio_type == "equal_all") {
+      ratio               <- rep(1, K)
+    } else if (input$design_ss_pois_ratio_type == "equal_exp") {
+      ratio               <- rep(input$design_ss_pois_ratio1, K)
+    } else if (input$design_ss_pois_ratio_type == "unequal") {
+      ratio               <- numeric(K)
+      for (i in seq_K) {
+        ratio[i]          <- input[[paste0("design_ss_pois_ratio", i)]]
+      }
+    } else if (input$design_ss_pois_ratio_type == "root_K") {
+      ratio               <- rep(1/sqrt(K), K)
+    }
+    if (input$design_ss_pois_ratio_type %in% c("A", "D", "E")) {
+      ratio               <- input$design_ss_pois_ratio_type
+      ratio_scenario      <- input$design_ss_pois_ratio_scenario
+    } else {
+      ratio_scenario      <- "HG"
+    }
+    design                <-
+      multiarm::des_ss_pois(K              = input$design_ss_pois_K,
+                            alpha          = input$design_ss_pois_alpha,
+                            beta           = 1 - input$design_ss_pois_beta,
+                            lambda0        = input$design_ss_pois_lambda0,
+                            delta1         = input$design_ss_pois_delta1,
+                            delta0         = input$design_ss_pois_delta0,
+                            ratio          = ratio,
+                            correction     = input$design_ss_pois_correction,
+                            power          = input$design_ss_pois_power,
+                            integer        = input$design_ss_pois_integer,
+                            ratio_scenario = ratio_scenario)
+    progress$inc(amount = 0.25, message = "Rendering design summary")
+    rmarkdown::render(
+      input         = "design_ss_pois_summary.Rmd",
+      output_format = rmarkdown::html_document(),
+      output_file   = file.path(tempdir(), "design_ss_pois_summary.html"),
+      params        = list(K              = design$K,
+                           alpha          = design$alpha,
+                           beta           = design$beta,
+                           lambda0        = design$lambda0,
+                           delta1         = design$delta1,
+                           delta0         = design$delta0,
+                           ratio_type     = input$design_ss_pois_ratio_type,
+                           ratio_init     = c(input$design_ss_pois_ratio1,
+                                              input$design_ss_pois_ratio2,
+                                              input$design_ss_pois_ratio3,
+                                              input$design_ss_pois_ratio4,
+                                              input$design_ss_pois_ratio5),
+                           ratio_scenario = design$ratio_scenario,
+                           ratio          = design$ratio,
+                           correction     = design$correction,
+                           power          = design$power,
+                           integer        = design$integer,
+                           large_N        = design$N,
+                           small_n        = design$n,
+                           opchar         = design$opchar,
+                           gamma          = design$gamma,
+                           gammaO         = design$gammaO,
+                           plots          = input$design_ss_pois_plots)
+    )
+    xml2::write_html(
+      rvest::html_node(
+        xml2::read_html(
+          paste0(tempdir(), "/design_ss_pois_summary.html")
+        ),
+        "body"
+      ),
+      file = paste0(tempdir(), "/design_ss_pois_summary_modified.html")
+    )
+    design$data_og        <- design$opchar
+    if (input$design_ss_pois_plots) {
+      density             <- as.numeric(input$design_ss_pois_density)
+      progress$inc(amount  = 0.25,
+                   message = "Computing design operating characteristics")
+      plots               <- plot(design, density = density, output = TRUE,
+                                  print_plots = FALSE)
+      design$equal_power  <- plots$plots$equal_power
+      design$equal_error  <- plots$plots$equal_error
+      design$equal_other  <- plots$plots$equal_other
+      design$shifted_power <- plots$plots$shifted_power
+      progress$inc(amount = 0.25, message = "Rendering plots")
+      opchar              <-
+        as.matrix(dplyr::distinct(tibble::as_tibble(round(plots$opchar, 3),
+                                                    .name_repair = "minimal")))
+      rows_shifted        <- (nrow(opchar) - density)/K
+      design$data         <-
+        data.frame(rbind(design$opchar, opchar),
+                   row.names = c(paste0("<i>H<sub>", c("G", "A"), "</sub></i>"),
+                                 paste0("<i>LFC<sub>", seq_K, "</sub></i>"),
+                                 paste0("Equal #", 1:density),
+                                 paste0("Shifted <i>&lambda;</i><sub>",
+                                        rep(seq_K, each = rows_shifted),
+                                        "</sub>, #", rep(1:rows_shifted, K))))
+    } else {
+      design$data         <-
+        data.frame(design$opchar,
+                   row.names = c(paste0("<i>H<sub>", c("G", "A"), "</sub></i>"),
+                                 paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
+      design$equal_error  <- design$equal_power <- design$equal_other <-
+        design$shifted_power <- design$delta       <- NULL
+    }
+    colnames(design$data) <-
+      c(paste0("<i>&lambda;</i><sub>", c(0, seq_K), "</sub>"),
+        paste0("<i>P</i><sub>", c("dis", "con", seq_K), "</sub>"),
+        paste0("<i>FWER<sub>I</sub></i><sub>", seq_K, "</sub>"),
+        paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
+        "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
+        "<i>Sensitivity</i>", "<i>Specificity</i>")
+    progress$inc(amount  = 0.25 + as.numeric(!input$design_ss_pois_plots),
+                 message = "Outputting results")
+    design
+  })
+
+  ##### Single-stage (Poisson): Value boxes ####################################
+
+  output$design_ss_pois_n_box     <- shinydashboard::renderValueBox({
+    input$design_ss_pois_update
+    shinydashboard::valueBox(
+      value    = round(int_des_ss_pois()$N, 1),
+      subtitle = "Total required sample size",
+      icon     = shiny::icon(name = "users"),
+      color    = "light-blue"
+    )
+  })
+
+  output$design_ss_pois_fwer_box  <- shinydashboard::renderValueBox({
+    input$design_ss_pois_update
+    correction      <- shiny::isolate(input$design_ss_pois_correction)
+    if (!(correction %in% c("benjamini_hochberg", "benjamini_yekutieli",
+                            "none"))) {
+      if (int_des_ss_pois()$opchar$FWERI1[1] <=
+          shiny::isolate(input$design_ss_pois_alpha) + 1e-4) {
+        icon_choice <- "thumbs-up"
+      } else {
+        icon_choice <- "thumbs-down"
+      }
+    } else {
+      icon_choice   <- ""
+    }
+    shinydashboard::valueBox(
+      value    = round(int_des_ss_pois()$opchar$FWERI1[1], 3),
+      subtitle = "Maximum family-wise error-rate",
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
+    )
+  })
+
+  output$design_ss_pois_power_box <- shinydashboard::renderValueBox({
+    input$design_ss_pois_update
+    subtitle          <-
+      c("conjunctive" = "Conjunctive power",
+        "disjunctive" = "Disjunctive power",
+        "marginal"    =
+          "Minimum marginal power")[shiny::isolate(input$design_ss_pois_power)]
+    K                 <- isolate(input$design_ss_pois_K)
+    if (input$design_ss_pois_power == "conjunctive") {
+      value_power_box <- int_des_ss_pois()$opchar$Pcon[2]
+    } else if (input$design_ss_pois_power == "disjunctive") {
+      value_power_box <- int_des_ss_pois()$opchar$Pdis[2]
+    } else {
+      value_power_box <-
+        min(diag(as.matrix(int_des_ss_pois()$opchar[-(1:2),
+                                                    (K + 4):(2*K + 3)])))
+    }
+    if (value_power_box >=
+        shiny::isolate(input$design_ss_pois_beta) - 1e-3) {
+      icon_choice     <- "thumbs-up"
+    } else {
+      icon_choice     <- "thumbs-down"
+    }
+    shinydashboard::valueBox(
+      value    = round(value_power_box, 3),
+      subtitle = subtitle,
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
+    )
+  })
+
+  ##### Single-stage (Poisson): Summary ########################################
+
+  output$design_ss_pois_summary <- shiny::renderUI({
+    input$design_ss_pois_update
+    N <- int_des_ss_pois()$N
+    shiny::withMathJax(
+      shiny::includeHTML(
+        path = file.path(tempdir(),
+                         "/design_ss_pois_summary_modified.html")
+      )
+    )
+  })
+
+  ##### Single-stage (Poisson): Table ##########################################
+
+  output$design_ss_pois_table_key   <- DT::renderDT({
+    K                            <- int_des_ss_pois()$K
+    table_key                    <-
+      int_des_ss_pois()$data[, c(1:(K + 2), (K + 4):(2*K + 4), 4*K + 4)]
+    colnames(table_key)[2*K + 3] <- "<i>FWER</i>"
+    DT::datatable(
+      round(table_key, 3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  output$design_ss_pois_table_error <- DT::renderDT({
+    K                            <- int_des_ss_pois()$K
+    DT::datatable(
+      round(
+        int_des_ss_pois()$data[, c(1:(K + 1), (2*K + 4):(4*K + 4))],
+        3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  output$design_ss_pois_table_other <- DT::renderDT({
+    K                            <- int_des_ss_pois()$K
+    DT::datatable(
+      round(
+        int_des_ss_pois()$data[, -((2*K + 4):(4*K + 4))],
+        3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  ##### Single-stage (Poisson): Plots ##########################################
+
+  output$design_ss_pois_equal_error <- shiny::renderPlot({
+    input$design_ss_pois_update
+    if (shiny::isolate(input$design_ss_pois_plots)) {
+      int_des_ss_pois()$equal_error +
+        ggplot2::coord_cartesian(xlim   = ranges_design_ss_pois_equal_error$x,
+                                 ylim   = ranges_design_ss_pois_equal_error$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_ss_pois_equal_power <- shiny::renderPlot({
+    input$design_ss_pois_update
+    if (shiny::isolate(input$design_ss_pois_plots)) {
+      int_des_ss_pois()$equal_power +
+        ggplot2::coord_cartesian(xlim   = ranges_design_ss_pois_equal_power$x,
+                                 ylim   = ranges_design_ss_pois_equal_power$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_ss_pois_equal_other <- shiny::renderPlot({
+    input$design_ss_pois_update
+    if (shiny::isolate(input$design_ss_pois_plots)) {
+      int_des_ss_pois()$equal_other +
+        ggplot2::coord_cartesian(xlim   = ranges_design_ss_pois_equal_other$x,
+                                 ylim   = ranges_design_ss_pois_equal_other$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_ss_pois_shifted_power <- shiny::renderPlot({
+    input$design_ss_pois_update
+    if (shiny::isolate(input$design_ss_pois_plots)) {
+      int_des_ss_pois()$shifted_power +
+        ggplot2::coord_cartesian(xlim   = ranges_design_ss_pois_shifted_power$x,
+                                 ylim   = ranges_design_ss_pois_shifted_power$y,
+                                 expand = TRUE)
+    }
+  })
+
+  ##### Single-stage (Poisson): Report #########################################
+
+  output$design_ss_pois_report <- shiny::downloadHandler(
+    filename = function() {
+      paste(input$design_ss_pois_filename, sep = '.',
+            switch(input$design_ss_pois_format,
+                   pdf  = "pdf",
+                   html = "html",
+                   word = "docx"
+            )
+      )
+    },
+    content  = function(file) {
+      tempReport <- file.path(tempdir(), "design_ss_pois_report.Rmd")
+      file.copy("design_ss_pois_report.Rmd", tempReport, overwrite = TRUE)
+      params     <- list(K              = int_des_ss_pois()$K,
+                         alpha          = int_des_ss_pois()$alpha,
+                         beta           = int_des_ss_pois()$beta,
+                         lambda0        = int_des_ss_pois()$lambda0,
+                         delta1         = int_des_ss_pois()$delta1,
+                         delta0         = int_des_ss_pois()$delta0,
+                         ratio_type     = input$design_ss_pois_ratio_type,
+                         ratio_init     = c(input$design_ss_pois_ratio1,
+                                            input$design_ss_pois_ratio2,
+                                            input$design_ss_pois_ratio3,
+                                            input$design_ss_pois_ratio4,
+                                            input$design_ss_pois_ratio5),
+                         ratio_scenario = int_des_ss_pois()$ratio_scenario,
+                         ratio          = int_des_ss_pois()$ratio,
+                         correction     = int_des_ss_pois()$correction,
+                         power          = int_des_ss_pois()$power,
+                         integer        = int_des_ss_pois()$integer,
+                         large_N        = int_des_ss_pois()$N,
+                         small_n        = int_des_ss_pois()$n,
+                         opchar         = int_des_ss_pois()$opchar,
+                         gamma          = int_des_ss_pois()$gamma,
+                         gammaO         = int_des_ss_pois()$gammaO,
+                         plots          = input$design_ss_pois_plots,
+                         equal_error    = int_des_ss_pois()$equal_error,
+                         equal_power    = int_des_ss_pois()$equal_power,
+                         equal_other    = int_des_ss_pois()$equal_other,
+                         shifted_power  = int_des_ss_pois()$shifted_power,
+                         data           = int_des_ss_pois()$data_og)
+      rmarkdown::render(tempReport,
+                        output_format = paste0(input$design_ss_pois_format,
+                                               "_document"),
+                        output_file   = file,
+                        params        = params,
+                        envir         = new.env(parent = globalenv())
+      )
+    }
+  )
+
   ##### Group-sequential (Bernoulli): shinyFeedback warning messages ###########
 
   shiny::observeEvent(input$design_gs_bern_alpha, {
@@ -4579,23 +6528,6 @@ server <- function(input, output, session) {
     } else if (input$design_gs_bern_ratio_type == "root_K") {
       ratio               <- 1/sqrt(K)
     }
-    print("before")
-    print(K)
-    print(J)
-    print(stopping)
-    print(swss)
-    print(input$design_gs_bern_alpha)
-    print(input$design_gs_bern_beta)
-    print(input$design_gs_bern_pi0)
-    print(input$design_gs_bern_delta1)
-    print(input$design_gs_bern_delta0)
-    print(ratio)
-    print(power)
-    print(lower)
-    print(upper)
-    print(ffix)
-    print(efix)
-    print(integer)
     design                <-
       multiarm:::des_gs_bern(K        = K,
                              J        = J,
@@ -4613,7 +6545,6 @@ server <- function(input, output, session) {
                              ffix     = ffix,
                              efix     = efix,
                              integer  = input$design_gs_bern_integer)
-    print("after")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_gs_bern_plots),
                  message = "Rendering design summary")
     rmarkdown::render(
@@ -4637,10 +6568,10 @@ server <- function(input, output, session) {
                            n1         = design$n1,
                            opchar     = design$opchar,
                            pi0        = input$pi0,
-                           plots      = input$design_gs_norm_plots,
+                           plots      = input$design_gs_bern_plots,
                            power      = design$power,
-                           ratio_type = input$design_gs_norm_ratio_type,
-                           ratio_init = input$design_gs_norm_ratio1,
+                           ratio_type = input$design_gs_bern_ratio_type,
+                           ratio_init = input$design_gs_bern_ratio1,
                            ratio      = design$ratio,
                            stopping   = stopping,
                            swss       = swss,
@@ -4935,7 +6866,7 @@ server <- function(input, output, session) {
                          shifted_sample_size = int_des_gs_bern()$shifted_sample_size,
                          pmf_N = int_des_gs_bern()$pmf_N)
       rmarkdown::render(tempReport,
-                        output_format = paste0(input$design_gs_norm_format,
+                        output_format = paste0(input$design_gs_bern_format,
                                                "_document"),
                         output_file   = file,
                         params        = params,
@@ -5637,6 +7568,665 @@ server <- function(input, output, session) {
     }
   )
 
+  ##### Group-sequential (Poisson): shinyFeedback warning messages #############
+
+  shiny::observeEvent(input$design_gs_pois_alpha, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_gs_pois_alpha",
+      show    = any(input$design_gs_pois_alpha <= 0,
+                    input$design_gs_pois_alpha >= 1),
+      text    = "Must be strictly between 0 and 1")
+  })
+
+  shiny::observeEvent(input$design_gs_pois_beta, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_gs_pois_beta",
+      show    = any(input$design_gs_pois_beta <= 0,
+                    input$design_gs_pois_beta >= 1),
+      text    = "Must be strictly between 0 and 1")
+  })
+
+  shiny::observeEvent(input$design_gs_pois_lambda0, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_gs_pois_lambda0",
+      show    = (input$design_gs_pois_lambda0 <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_gs_pois_delta1, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_gs_pois_delta1",
+      show    = (input$design_gs_pois_delta1 <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_gs_pois_delta0, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_gs_pois_delta0",
+      show    = any(input$design_gs_pois_delta0 >=
+                      input$design_gs_pois_delta1,
+                    input$design_gs_pois_delta0 <=
+                      -input$design_gs_pois_lambda0),
+      text    = paste0("Must be strictly between minus the control arm ",
+                       "event rate and the interesting treatment effect"))
+  })
+
+  shiny::observeEvent(input$design_gs_pois_ratio, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_gs_pois_ratio",
+      show    = (input$design_gs_pois_ratio <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_gs_pois_filename, {
+    shinyFeedback::feedbackWarning(
+      inputId = "design_gs_pois_filename",
+      show    = any(strsplit(input$design_gs_pois_filename,
+                             split = "")[[1]] %in%
+                      c('/', '\\', '?', "%", "*", ":", "|", "<", ">")),
+      text    = paste0('It is generally inadvisable to use the characters /',
+                       ', \\, ?, %, *, :, |, ", <, and > in a filename'))
+  })
+
+  ##### Group-sequential (Poisson): Dynamic UI elements ########################
+
+  output$design_gs_pois_lower_fixed <- renderUI({
+    if (input$design_gs_pois_lower == "fixed") {
+      shiny::numericInput(
+        inputId = "design_gs_pois_lower_fixed",
+        label   = "Lower fixed stopping boundary:",
+        value   = 0,
+        min     = -3,
+        max     = 1.5,
+        step    = 0.1
+      )
+    }
+  })
+
+  output$design_gs_pois_upper_fixed <- renderUI({
+    if (input$design_gs_pois_upper == "fixed") {
+      shiny::numericInput(
+        inputId = "design_gs_pois_upper_fixed",
+        label   = "Upper fixed stopping boundary:",
+        value   = 3,
+        min     = 2,
+        max     = 3,
+        step    = 0.1
+      )
+    }
+  })
+
+  output$design_gs_pois_delta   <- renderUI({
+    inputTagList <-
+      shiny::tagList(
+        (shiny::numericInput(
+          inputId = "design_gs_pois_delta1",
+          label   = "Interesting treatment effect:",
+          value   = 1,
+          min     = 0,
+          step    = 0.1
+        ) %>%
+          shinyhelper:: helper(
+            type    = "markdown",
+            title   = "",
+            content = "design_delta1",
+            size    = "m",
+            colour  = "black"
+          ))
+      )
+    newInput     <- (shiny::numericInput(
+      inputId = "design_gs_pois_delta0",
+      label   = "Uninteresting treatment effect:",
+      value   = 0,
+      min     = -input$design_gs_pois_lambda0,
+      step    = 0.1
+    ) %>%
+      shinyhelper:: helper(
+        type    = "markdown",
+        title   = "",
+        content = "design_delta0",
+        size    = "m",
+        colour  = "black"
+      ))
+    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList
+  })
+
+  output$design_gs_pois_ratio   <- renderUI({
+    if (input$design_gs_pois_ratio_type == "equal_exp") {
+      shiny::numericInput(
+        inputId = "design_gs_pois_ratio1",
+        label   = paste0("Allocation ratio for the experimental arms ",
+                         "(arms 1, ..., ", input$design_gs_pois_K, ")"),
+        value   = 1,
+        min     = 0,
+        max     = NA,
+        step    = 0.25
+      )
+    }
+  })
+
+  output$design_gs_pois_warning_ratio <- renderUI({
+    if (all(any(all(input$design_gs_pois_ratio_type == "equal_exp",
+                    input$design_gs_pois_ratio1 != 1),
+                input$design_gs_pois_ratio_type == "root_K"),
+            input$design_gs_pois_integer == TRUE)) {
+      shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
+               "with unequal allocation between the control arm and the ",
+               "experimental arms can cause confusing results.")
+    }
+  })
+
+  output$design_gs_pois_warning <- renderUI({
+    if (any(input$design_gs_pois_K %in% c(4, 5),
+            all(input$design_gs_pois_K == 3, input$design_gs_pois_plots))) {
+      shiny::p(shiny::strong("WARNING:"), " Execution time may be long for ",
+               "chosen input parameters.")
+    }
+  })
+
+  output$design_gs_pois_density <- renderUI({
+    if (input$design_gs_pois_plots) {
+      shiny::selectInput(
+        inputId  = "design_gs_pois_density",
+        label    = "Plot quality:",
+        choices  = c("Very low" = 33, "Low" = 66, "Medium" = 100, "High" = 150,
+                     "Very high" = 200),
+        selected = 100
+      ) %>%
+        shinyhelper::helper(
+          type    = "markdown",
+          title   = "",
+          content = "design_density",
+          size    = "m",
+          colour  = "black"
+        )
+    }
+  })
+
+  shiny::observeEvent(input$design_gs_pois_reset, {
+    shinyjs::reset("design_gs_pois_parameters")
+  })
+
+  ##### Group-sequential (Poisson): Plot zoom set-up ###########################
+
+  shiny::observeEvent(input$design_gs_pois_equal_error_dblclick, {
+    brush_error                             <-
+      input$design_gs_pois_equal_error_brush
+    if (!is.null(brush_error)) {
+      ranges_design_gs_pois_equal_error$x   <- c(brush_error$xmin,
+                                                 brush_error$xmax)
+      ranges_design_gs_pois_equal_error$y   <- c(brush_error$ymin,
+                                                 brush_error$ymax)
+    } else {
+      ranges_design_gs_pois_equal_error$x   <-
+        ranges_design_gs_pois_equal_error$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_gs_pois_equal_power_dblclick, {
+    brush_power                             <-
+      input$design_gs_pois_equal_power_brush
+    if (!is.null(brush_power)) {
+      ranges_design_gs_pois_equal_power$x   <- c(brush_power$xmin,
+                                                 brush_power$xmax)
+      ranges_design_gs_pois_equal_power$y   <- c(brush_power$ymin,
+                                                 brush_power$ymax)
+    } else {
+      ranges_design_gs_pois_equal_power$x   <-
+        ranges_design_gs_pois_equal_power$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_gs_pois_equal_other_dblclick, {
+    brush_other                             <-
+      input$design_gs_pois_equal_other_brush
+    if (!is.null(brush_other)) {
+      ranges_design_gs_pois_equal_other$x   <- c(brush_other$xmin,
+                                                 brush_other$xmax)
+      ranges_design_gs_pois_equal_other$y   <- c(brush_other$ymin,
+                                                 brush_other$ymax)
+    } else {
+      ranges_design_gs_pois_equal_other$x   <-
+        ranges_design_gs_pois_equal_other$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_gs_pois_equal_sample_size_dblclick, {
+    brush_sample_size                             <-
+      input$design_gs_pois_equal_sample_size_brush
+    if (!is.null(brush_sample_size)) {
+      ranges_design_gs_pois_equal_sample_size$x   <- c(brush_sample_size$xmin,
+                                                       brush_sample_size$xmax)
+      ranges_design_gs_pois_equal_sample_size$y   <- c(brush_sample_size$ymin,
+                                                       brush_sample_size$ymax)
+    } else {
+      ranges_design_gs_pois_equal_sample_size$x   <-
+        ranges_design_gs_pois_equal_sample_size$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_gs_pois_shifted_power_dblclick, {
+    brush_shifted_power                 <-
+      input$design_gs_pois_shifted_power_brush
+    if (!is.null(brush_shifted_power)) {
+      ranges_design_gs_pois_shifted_power$x   <- c(brush_shifted_power$xmin,
+                                                   brush_shifted_power$xmax)
+      ranges_design_gs_pois_shifted_power$y   <- c(brush_shifted_power$ymin,
+                                                   brush_shifted_power$ymax)
+    } else {
+      ranges_design_gs_pois_shifted_power$x   <-
+        ranges_design_gs_pois_shifted_power$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_gs_pois_shifted_sample_size_dblclick, {
+    brush_shifted_sample_size                 <-
+      input$design_gs_pois_shifted_sample_size_brush
+    if (!is.null(brush_shifted_sample_size)) {
+      ranges_design_gs_pois_shifted_sample_size$x   <- c(brush_shifted_sample_size$xmin,
+                                                         brush_shifted_sample_size$xmax)
+      ranges_design_gs_pois_shifted_sample_size$y   <- c(brush_shifted_sample_size$ymin,
+                                                         brush_shifted_sample_size$ymax)
+    } else {
+      ranges_design_gs_pois_shifted_sample_size$x   <-
+        ranges_design_gs_pois_shifted_sample_size$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_gs_pois_pmf_N_dblclick, {
+    brush_pmf_N                 <-
+      input$design_gs_pois_pmf_N_brush
+    if (!is.null(brush_pmf_N)) {
+      ranges_design_gs_pois_pmf_N$x   <- c(brush_pmf_N$xmin,
+                                           brush_pmf_N$xmax)
+      ranges_design_gs_pois_pmf_N$y   <- c(brush_pmf_N$ymin,
+                                           brush_pmf_N$ymax)
+    } else {
+      ranges_design_gs_pois_pmf_N$x   <-
+        ranges_design_gs_pois_pmf_N$y <- NULL
+    }
+  })
+
+  ##### Group-sequential (Poisson): int_des_gs_pois() ##########################
+
+  int_des_gs_pois <- shiny::eventReactive(input$design_gs_pois_update, {
+    K                     <- input$design_gs_pois_K
+    seq_K                 <- 1:K
+    J                     <- input$design_gs_pois_J
+    lambda0               <- input$design_gs_pois_lambda0
+    power                 <- input$design_gs_pois_power
+    lower                 <- input$design_gs_pois_lower
+    upper                 <- input$design_gs_pois_upper
+    if (lower == "fixed") {
+      ffix                <- input$design_gs_pois_lower_fixed
+    } else {
+      ffix                <- -3
+    }
+    if (upper == "fixed") {
+      efix                <- input$design_gs_pois_upper_fixed
+    } else {
+      efix                <- 3
+    }
+    swss                  <- input$design_gs_pois_swss
+    stopping              <- input$design_gs_pois_stopping
+    progress              <- shiny::Progress$new()
+    on.exit(progress$close())
+    progress$set(message = "Building outputs", value = 0)
+    if (input$design_gs_pois_ratio_type == "equal_all") {
+      ratio               <- 1
+    } else if (input$design_gs_pois_ratio_type == "equal_exp") {
+      ratio               <- input$design_gs_pois_ratio1
+    } else if (input$design_gs_pois_ratio_type == "root_K") {
+      ratio               <- 1/sqrt(K)
+    }
+    design                <-
+      multiarm:::des_gs_pois(K        = K,
+                             J        = J,
+                             stopping = stopping,
+                             type     = swss,
+                             alpha    = input$design_gs_pois_alpha,
+                             beta     = 1 - input$design_gs_pois_beta,
+                             lambda0  = input$design_gs_pois_lambda0,
+                             delta1   = input$design_gs_pois_delta1,
+                             delta0   = input$design_gs_pois_delta0,
+                             ratio    = ratio,
+                             power    = power,
+                             fshape   = lower,
+                             eshape   = upper,
+                             ffix     = ffix,
+                             efix     = efix,
+                             integer  = input$design_gs_pois_integer)
+    progress$inc(amount  = 0.25 + as.numeric(!input$design_gs_pois_plots),
+                 message = "Rendering design summary")
+    rmarkdown::render(
+      input         = "design_gs_pois_summary.Rmd",
+      output_format = rmarkdown::html_document(),
+      output_file   = file.path(tempdir(), "design_gs_pois_summary.html"),
+      params        = list(alpha      = design$alpha,
+                           beta       = design$beta,
+                           delta0     = design$delta0,
+                           delta1     = design$delta1,
+                           e          = design$e,
+                           efix       = design$efix,
+                           f          = design$f,
+                           ffix       = design$ffix,
+                           integer    = design$integer,
+                           J          = design$J,
+                           K          = design$K,
+                           lower      = lower,
+                           maxN       = design$maxN,
+                           n10        = design$n10,
+                           n1         = design$n1,
+                           opchar     = design$opchar,
+                           lambda0    = input$lambda0,
+                           plots      = input$design_gs_pois_plots,
+                           power      = design$power,
+                           ratio_type = input$design_gs_pois_ratio_type,
+                           ratio_init = input$design_gs_pois_ratio1,
+                           ratio      = design$ratio,
+                           stopping   = stopping,
+                           swss       = swss,
+                           upper      = upper)
+    )
+    xml2::write_html(
+      rvest::html_node(
+        xml2::read_html(
+          paste0(tempdir(), "/design_gs_pois_summary.html")
+        ),
+        "body"
+      ),
+      file = paste0(tempdir(), "/design_gs_pois_summary_modified.html")
+    )
+    design$data_og        <- design$opchar
+    if (input$design_gs_pois_plots) {
+      density             <- as.numeric(input$design_gs_pois_density)
+      plots               <- plot(design, density = density, output = TRUE,
+                                  print_plots = FALSE)
+      design$boundaries   <- plots$plots$boundaries
+      design$equal_power  <- plots$plots$equal_power
+      design$equal_error  <- plots$plots$equal_error
+      design$equal_other  <- plots$plots$equal_other
+      design$equal_sample_size <- plots$plots$equal_sample_size
+      design$shifted_power <- plots$plots$shifted_power
+      design$shifted_sample_size <- plots$plots$shifted_sample_size
+      design$pmf_N <- plots$plots$pmf_N
+      progress$inc(amount = 0.25, message = "Rendering plots")
+      opchar              <-
+        as.matrix(dplyr::distinct(tibble::as_tibble(round(plots$opchar, 3),
+                                                    .name_repair = "minimal")))
+      design$data         <-
+        data.frame(rbind(design$opchar, opchar),
+                   row.names = c(paste0("<i>H<sub>", c("G", "A"), "</sub></i>"),
+                                 paste0("<i>LFC<sub>", seq_K, "</sub></i>"),
+                                 paste0("Equal #", 1:density),
+                                 paste0("Shifted #",
+                                        1:(nrow(opchar) - density))))
+    } else {
+      design$data         <-
+        data.frame(design$opchar$opchar,
+                   row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
+                                 paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
+      design$boundaries <- design$equal_error  <- design$equal_power <- design$equal_other <-
+        design$equal_sample_size <- design$shifted_power <- design$shifted_sample_size <-
+        design$pmf_N <- design$delta <- NULL
+    }
+    colnames(design$data) <-
+      c(paste0("<i>&lambda;</i><sub>", c(0, seq_K), "</sub>"),
+        paste0("<i>P</i><sub>", c("dis", "con", seq_K), "</sub>"),
+        paste0("<i>FWER<sub>I</sub></i><sub>", seq_K, "</sub>"),
+        paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
+        "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
+        "<i>Sensitivity</i>", "<i>Specificity</i>")
+    progress$inc(amount  = 0.25 + as.numeric(!input$design_gs_pois_plots),
+                 message = "Outputting results")
+    design
+  })
+
+  ##### Group-sequential (Poisson): Value boxes ################################
+
+  output$design_gs_pois_n_box     <- shinydashboard::renderValueBox({
+    input$design_gs_pois_update
+    shinydashboard::valueBox(
+      value    = round(int_des_gs_pois()$maxN, 1),
+      subtitle = "Maximal possible sample size",
+      icon     = shiny::icon(name = "users"),
+      color    = "light-blue"
+    )
+  })
+
+  output$design_gs_pois_fwer_box  <- shinydashboard::renderValueBox({
+    input$design_gs_pois_update
+    if (int_des_gs_pois()$opchar$FWERI1[1] <=
+        shiny::isolate(input$design_gs_pois_alpha) + 1e-4) {
+      icon_choice <- "thumbs-up"
+    } else {
+      icon_choice <- "thumbs-down"
+    }
+    shinydashboard::valueBox(
+      value    = round(int_des_gs_pois()$opchar$FWERI1[1], 3),
+      subtitle = "Maximum family-wise error-rate",
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
+    )
+  })
+
+  output$design_gs_pois_power_box <- shinydashboard::renderValueBox({
+    input$design_gs_pois_update
+    subtitle          <-
+      c("conjunctive" = "Conjunctive power",
+        "disjunctive" = "Disjunctive power",
+        "marginal"    =
+          "Minimum marginal power")[shiny::isolate(
+            input$design_gs_pois_power)]
+    K                 <- isolate(input$design_gs_pois_K)
+    if (int_des_gs_pois()$power == "conjunctive") {
+      value_power_box <- int_des_gs_pois()$opchar$Pcon[2]
+    } else if (int_des_gs_pois()$power == "disjunctive") {
+      value_power_box <- int_des_gs_pois()$opchar$Pdis[2]
+    } else {
+      value_power_box <-
+        min(diag(as.matrix(int_des_gs_pois()$opchar[-(1:2),
+                                                    (K + 4):(2*K + 3)])))
+    }
+    if (value_power_box >= shiny::isolate(input$design_gs_pois_beta) - 1e-3) {
+      icon_choice     <- "thumbs-up"
+    } else {
+      icon_choice     <- "thumbs-down"
+    }
+    shinydashboard::valueBox(
+      value    = round(value_power_box, 3),
+      subtitle = subtitle,
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
+    )
+  })
+
+  ##### Group-sequential (Poisson): Summary ####################################
+
+  output$design_gs_pois_summary <- shiny::renderUI({
+    input$design_gs_pois_update
+    N <- int_des_gs_pois()$N
+    shiny::withMathJax(
+      shiny::includeHTML(
+        path = file.path(tempdir(),
+                         "/design_gs_pois_summary_modified.html")
+      )
+    )
+  })
+
+  ##### Group-sequential (Poisson): Table ######################################
+
+  output$design_gs_pois_table_key   <- DT::renderDT({
+    table_key                                      <-
+      int_des_gs_pois()$data[, c(1:(int_des_gs_pois()$K + 1),
+                                 (int_des_gs_pois()$K + 3):
+                                   (2*int_des_gs_pois()$K + 3),
+                                 4*int_des_gs_pois()$K + 3)]
+    colnames(table_key)[2*int_des_gs_pois()$K + 2] <- "<i>FWER</i>"
+    DT::datatable(
+      round(table_key, 3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  output$design_gs_pois_table_error <- DT::renderDT({
+    DT::datatable(
+      round(int_des_gs_pois()$data[, c(1:int_des_gs_pois()$K,
+                                       (2*int_des_gs_pois()$K + 3):
+                                         (4*int_des_gs_pois()$K + 3))], 3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  output$design_gs_pois_table_other <- DT::renderDT({
+    DT::datatable(
+      round(int_des_gs_pois()$data[, -((2*int_des_gs_pois()$K + 3):
+                                         (4*int_des_gs_pois()$K + 3))], 3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  ##### Group-sequential (Poisson): Plots ######################################
+
+  output$design_gs_pois_stopping_boundaries <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$boundaries
+    }
+  })
+
+  output$design_gs_pois_equal_error <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$equal_error +
+        ggplot2::coord_cartesian(xlim   = ranges_design_gs_pois_equal_error$x,
+                                 ylim   = ranges_design_gs_pois_equal_error$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_gs_pois_equal_power <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$equal_power +
+        ggplot2::coord_cartesian(xlim   = ranges_design_gs_pois_equal_power$x,
+                                 ylim   = ranges_design_gs_pois_equal_power$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_gs_pois_equal_other <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$equal_other +
+        ggplot2::coord_cartesian(xlim   = ranges_design_gs_pois_equal_other$x,
+                                 ylim   = ranges_design_gs_pois_equal_other$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_gs_pois_equal_sample_size <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$equal_sample_size +
+        ggplot2::coord_cartesian(xlim   = ranges_design_gs_pois_equal_sample_size$x,
+                                 ylim   = ranges_design_gs_pois_equal_sample_size$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_gs_pois_shifted_power     <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$shifted_power +
+        ggplot2::coord_cartesian(xlim   = ranges_design_gs_pois_shifted_power$x,
+                                 ylim   = ranges_design_gs_pois_shifted_power$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_gs_pois_shifted_sample_size     <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$shifted_sample_size +
+        ggplot2::coord_cartesian(xlim   = ranges_design_gs_pois_shifted_sample_size$x,
+                                 ylim   = ranges_design_gs_pois_shifted_sample_size$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_gs_pois_pmf_N     <- shiny::renderPlot({
+    input$design_gs_pois_update
+    if (shiny::isolate(input$design_gs_pois_plots)) {
+      int_des_gs_pois()$pmf_N +
+        ggplot2::coord_cartesian(xlim   = ranges_design_gs_pois_pmf_N$x,
+                                 ylim   = ranges_design_gs_pois_pmf_N$y,
+                                 expand = TRUE)
+    }
+  })
+
+  ##### Group-sequential (Poisson): Report #####################################
+
+  output$design_gs_pois_report <- shiny::downloadHandler(
+    filename = function() {
+      paste(input$design_gs_pois_filename, sep = '.',
+            switch(input$design_gs_pois_format,
+                   pdf  = "pdf",
+                   html = "html",
+                   word = "docx"
+            )
+      )
+    },
+    content  = function(file) {
+      tempReport <- file.path(tempdir(), "design_gs_pois_report.Rmd")
+      file.copy("design_gs_pois_report.Rmd", tempReport, overwrite = T)
+      params     <- list(alpha        = int_des_gs_pois()$alpha,
+                         beta         = int_des_gs_pois()$beta,
+                         delta0       = int_des_gs_pois()$delta0,
+                         delta1       = int_des_gs_pois()$delta1,
+                         e            = int_des_gs_pois()$e,
+                         efix         = int_des_gs_pois()$efix,
+                         f            = int_des_gs_pois()$f,
+                         ffix         = int_des_gs_pois()$ffix,
+                         integer      = int_des_gs_pois()$integer,
+                         J            = int_des_gs_pois()$J,
+                         K            = int_des_gs_pois()$K,
+                         lambda0      = int_des_gs_pois()$lambda0,
+                         lower        = input$design_gs_pois_lower,
+                         maxN         = int_des_gs_pois()$maxN,
+                         n10          = int_des_gs_pois()$n10,
+                         n1           = int_des_gs_pois()$n1,
+                         opchar       = int_des_gs_pois()$opchar,
+                         plots        = input$design_gs_pois_plots,
+                         power        = int_des_gs_pois()$power,
+                         ratio_type   = input$design_gs_pois_ratio_type,
+                         ratio_init   = input$design_gs_pois_ratio1,
+                         ratio        = int_des_gs_pois()$ratio,
+                         stopping     = int_des_gs_pois()$stopping,
+                         swss         = input$design_gs_pois_swss,
+                         upper        = input$design_gs_pois_upper,
+                         boundaries   = int_des_gs_pois()$boundaries,
+                         equal_error  = int_des_gs_pois()$equal_error,
+                         equal_power  = int_des_gs_pois()$equal_power,
+                         equal_other  = int_des_gs_pois()$equal_other,
+                         equal_sample_size  = int_des_gs_pois()$equal_sample_size,
+                         shifted_power = int_des_gs_pois()$shifted_power,
+                         shifted_sample_size = int_des_gs_pois()$shifted_sample_size,
+                         pmf_N = int_des_gs_pois()$pmf_N)
+      rmarkdown::render(tempReport,
+                        output_format = paste0(input$design_gs_pois_format,
+                                               "_document"),
+                        output_file   = file,
+                        params        = params,
+                        envir         = new.env(parent = globalenv())
+      )
+    }
+  )
+
   ##### Drop-the-losers (Bernoulli): shinyFeedback warning messages ############
 
   shiny::observeEvent(input$design_dtl_bern_alpha, {
@@ -5810,11 +8400,11 @@ server <- function(input, output, session) {
     }
   })
 
-  output$design_dtl_norm_warning_ratio <- renderUI({
-    if (all(any(all(input$design_dtl_norm_ratio_type == "equal_exp",
-                    input$design_dtl_norm_ratio1 != 1),
-                input$design_dtl_norm_ratio_type == "root_K"),
-            input$design_dtl_norm_integer == TRUE)) {
+  output$design_dtl_bern_warning_ratio <- renderUI({
+    if (all(any(all(input$design_dtl_bern_ratio_type == "equal_exp",
+                    input$design_dtl_bern_ratio1 != 1),
+                input$design_dtl_bern_ratio_type == "root_K"),
+            input$design_dtl_bern_integer == TRUE)) {
       shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
                "with unequal allocation between the control arm and the ",
                "experimental arms can cause confusing results.")
@@ -5965,10 +8555,10 @@ server <- function(input, output, session) {
                            n1         = design$n1,
                            opchar     = design$opchar,
                            pi0        = design$pi0,
-                           plots      = input$design_dtl_norm_plots,
+                           plots      = input$design_dtl_bern_plots,
                            power      = power,
-                           ratio_type = input$design_dtl_norm_ratio_type,
-                           ratio_init = input$design_dtl_norm_ratio1,
+                           ratio_type = input$design_dtl_bern_ratio_type,
+                           ratio_init = input$design_dtl_bern_ratio1,
                            ratio      = design$ratio,
                            swss       = swss)
     )
@@ -6207,7 +8797,7 @@ server <- function(input, output, session) {
                          equal_other  = int_des_dtl_bern()$equal_other,
                          shifted_power      = int_des_dtl_bern()$shifted_power)
       rmarkdown::render(tempReport,
-                        output_format = paste0(input$design_gs_norm_format,
+                        output_format = paste0(input$design_dtl_bern_format,
                                                "_document"),
                         output_file   = file,
                         params        = params,
@@ -6814,7 +9404,580 @@ server <- function(input, output, session) {
                          equal_other  = int_des_dtl_norm()$equal_other,
                          shifted_power      = int_des_dtl_norm()$shifted_power)
       rmarkdown::render(tempReport,
-                        output_format = paste0(input$design_gs_norm_format,
+                        output_format = paste0(input$design_dtl_norm_format,
+                                               "_document"),
+                        output_file   = file,
+                        params        = params,
+                        envir         = new.env(parent = globalenv())
+      )
+    }
+  )
+
+  ##### Drop-the-losers (Poisson): shinyFeedback warning messages ##############
+
+  shiny::observeEvent(input$design_dtl_pois_alpha, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_dtl_pois_alpha",
+      show    = any(input$design_dtl_pois_alpha <= 0,
+                    input$design_dtl_pois_alpha >= 1),
+      text    = "Must be strictly between 0 and 1")
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_beta, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_dtl_pois_beta",
+      show    = any(input$design_dtl_pois_beta <= 0,
+                    input$design_dtl_pois_beta >= 1),
+      text    = "Must be strictly between 0 and 1")
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_lambda0, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_dtl_pois_lambda0",
+      show    = (input$design_dtl_pois_lambda0 <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_delta1, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_dtl_pois_delta1",
+      show    = (input$design_dtl_pois_delta1 <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_delta0, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_dtl_pois_delta0",
+      show    = any(input$design_dtl_pois_delta0 >=
+                      input$design_dtl_pois_delta1,
+                    input$design_dtl_pois_delta0 <=
+                      -input$design_dtl_pois_lambda0),
+      text    = paste0("Must be strictly between minus the control arm ",
+                       "event rate and the interesting treatment effect"))
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_ratio, {
+    shinyFeedback::feedbackDanger(
+      inputId = "design_dtl_pois_ratio",
+      show    = (input$design_dtl_pois_ratio <= 0),
+      text    = "Must be strictly positive")
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_filename, {
+    shinyFeedback::feedbackWarning(
+      inputId = "design_dtl_pois_filename",
+      show    = any(strsplit(input$design_dtl_pois_filename,
+                             split = "")[[1]] %in%
+                      c('/', '\\', '?', "%", "*", ":", "|", "<", ">")),
+      text    = paste0('It is generally inadvisable to use the characters /',
+                       ', \\, ?, %, *, :, |, ", <, and > in a filename'))
+  })
+
+  ##### Drop-the-losers (Poisson): Dynamic UI elements #########################
+
+  output$design_dtl_pois_J <- renderUI({
+    shiny::sliderInput(
+      inputId = "design_dtl_pois_J",
+      label   = "Number of stages:",
+      min     = 2,
+      max     = min(input$design_dtl_pois_K, 4),
+      value   = 2,
+      step    = 1
+    ) %>%
+      shinyhelper::helper(
+        type    = "markdown",
+        title   = "",
+        content = "design_J",
+        size    = "m",
+        colour  = "black"
+      )
+  })
+
+  output$design_dtl_pois_Kv_2     <- renderUI({
+    shiny::sliderInput(
+      inputId = "design_dtl_pois_Kv_2",
+      label   = "Number of experimental arms in stage 2:",
+      value   = input$design_dtl_pois_K - 1,
+      min     = input$design_dtl_pois_J - 1,
+      max     = input$design_dtl_pois_K - 1,
+      step    = 1
+    )
+  })
+
+  output$design_dtl_pois_Kv_3     <- renderUI({
+    if (input$design_dtl_pois_J >= 3) {
+      shiny::sliderInput(
+        inputId = "design_dtl_pois_Kv_3",
+        label   = "Number of experimental arms in stage 3:",
+        value   = input$design_dtl_pois_Kv_2 - 1,
+        min     = input$design_dtl_pois_J - 2,
+        max     = input$design_dtl_pois_Kv_2 - 1,
+        step    = 1
+      )
+    }
+  })
+
+  output$design_dtl_pois_Kv_4     <- renderUI({
+    if (input$design_dtl_pois_J >= 4) {
+      shiny::sliderInput(
+        inputId = "design_dtl_pois_Kv_4",
+        label   = "Number of experimental arms in stage 4:",
+        value   = input$design_dtl_pois_Kv_3 - 1,
+        min     = 1,
+        max     = input$design_dtl_pois_Kv_3 - 1,
+        step    = 1
+      )
+    }
+  })
+
+  output$design_dtl_pois_delta   <- renderUI({
+    inputTagList <-
+      shiny::tagList(
+        (shiny::numericInput(
+          inputId = "design_dtl_pois_delta1",
+          label   = "Interesting treatment effect:",
+          value   = 1,
+          min     = 0,
+          step    = 0.1
+        ) %>%
+          shinyhelper:: helper(
+            type    = "markdown",
+            title   = "",
+            content = "design_delta1",
+            size    = "m",
+            colour  = "black"
+          ))
+      )
+    newInput     <- (shiny::numericInput(
+      inputId = "design_dtl_pois_delta0",
+      label   = "Uninteresting treatment effect:",
+      value   = 0,
+      min     = -input$design_dtl_pois_lambda0,
+      step    = 0.1
+    ) %>%
+      shinyhelper:: helper(
+        type    = "markdown",
+        title   = "",
+        content = "design_delta0",
+        size    = "m",
+        colour  = "black"
+      ))
+    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList
+  })
+
+  output$design_dtl_pois_ratio   <- renderUI({
+    if (input$design_dtl_pois_ratio_type == "equal_exp") {
+      shiny::numericInput(
+        inputId = "design_dtl_pois_ratio1",
+        label   = paste0("Allocation ratio for the experimental arms ",
+                         "(arms 1, ..., ", input$design_dtl_pois_K, ")"),
+        value   = 1,
+        min     = 0,
+        max     = NA,
+        step    = 0.25
+      )
+    }
+  })
+
+  output$design_dtl_pois_warning_ratio <- renderUI({
+    if (all(any(all(input$design_dtl_pois_ratio_type == "equal_exp",
+                    input$design_dtl_pois_ratio1 != 1),
+                input$design_dtl_pois_ratio_type == "root_K"),
+            input$design_dtl_pois_integer == TRUE)) {
+      shiny::p(shiny::strong("WARNING:"), " Requiring integer sample size ",
+               "with unequal allocation between the control arm and the ",
+               "experimental arms can cause confusing results.")
+    }
+  })
+
+  output$design_dtl_pois_warning <- renderUI({
+    if (all(input$design_dtl_pois_K %in% c(4, 5),
+            input$design_dtl_pois_plots)) {
+      shiny::p(shiny::strong("WARNING:"), " Execution time may be long for ",
+               "chosen input parameters.")
+    }
+  })
+
+  output$design_dtl_pois_density <- renderUI({
+    if (input$design_dtl_pois_plots) {
+      shiny::selectInput(
+        inputId  = "design_dtl_pois_density",
+        label    = "Plot quality:",
+        choices  = c("Very low" = 33, "Low" = 66, "Medium" = 100, "High" = 150,
+                     "Very high" = 200),
+        selected = 100
+      ) %>%
+        shinyhelper::helper(
+          type    = "markdown",
+          title   = "",
+          content = "design_density",
+          size    = "m",
+          colour  = "black"
+        )
+    }
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_reset, {
+    shinyjs::reset("design_dtl_pois_parameters")
+  })
+
+  ##### Drop-the-losers (Poisson): Plot zoom set-up ##########################
+
+  shiny::observeEvent(input$design_dtl_pois_equal_error_dblclick, {
+    brush_error                             <-
+      input$design_dtl_pois_equal_error_brush
+    if (!is.null(brush_error)) {
+      ranges_design_dtl_pois_equal_error$x   <- c(brush_error$xmin,
+                                                  brush_error$xmax)
+      ranges_design_dtl_pois_equal_error$y   <- c(brush_error$ymin,
+                                                  brush_error$ymax)
+    } else {
+      ranges_design_dtl_pois_equal_error$x   <-
+        ranges_design_dtl_pois_equal_error$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_equal_power_dblclick, {
+    brush_power                             <-
+      input$design_dtl_pois_equal_power_brush
+    if (!is.null(brush_power)) {
+      ranges_design_dtl_pois_equal_power$x   <- c(brush_power$xmin,
+                                                  brush_power$xmax)
+      ranges_design_dtl_pois_equal_power$y   <- c(brush_power$ymin,
+                                                  brush_power$ymax)
+    } else {
+      ranges_design_dtl_pois_equal_power$x   <-
+        ranges_design_dtl_pois_equal_power$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_equal_other_dblclick, {
+    brush_other                             <-
+      input$design_dtl_pois_equal_other_brush
+    if (!is.null(brush_other)) {
+      ranges_design_dtl_pois_equal_other$x   <- c(brush_other$xmin,
+                                                  brush_other$xmax)
+      ranges_design_dtl_pois_equal_other$y   <- c(brush_other$ymin,
+                                                  brush_other$ymax)
+    } else {
+      ranges_design_dtl_pois_equal_other$x   <-
+        ranges_design_dtl_pois_equal_other$y <- NULL
+    }
+  })
+
+  shiny::observeEvent(input$design_dtl_pois_shifted_power_dblclick, {
+    brush_shifted_power                       <-
+      input$design_dtl_pois_shifted_power_brush
+    if (!is.null(brush_shifted_power)) {
+      ranges_design_dtl_pois_shifted_power$x   <- c(brush_shifted_power$xmin,
+                                                    brush_shifted_power$xmax)
+      ranges_design_dtl_pois_shifted_power$y   <- c(brush_shifted_power$ymin,
+                                                    brush_shifted_power$ymax)
+    } else {
+      ranges_design_dtl_pois_shifted_power$x   <-
+        ranges_design_dtl_pois_shifted_power$y <- NULL
+    }
+  })
+
+  ##### Drop-the-losers (Poisson): int_des_dtl_pois() ##########################
+
+  int_des_dtl_pois <- shiny::eventReactive(input$design_dtl_pois_update, {
+    K                     <- input$design_dtl_pois_K
+    J                     <- input$design_dtl_pois_J
+    seq_K                 <- 1:K
+    Kv                    <- c(K, numeric(J - 1))
+    for (j in 2:J) {
+      Kv[j]               <-
+        input[[paste0("design_dtl_pois_Kv_", j)]]
+    }
+    lambda0               <- input$design_dtl_pois_lambda0
+    power                 <- input$design_dtl_pois_power
+    swss                  <- input$design_dtl_pois_swss
+    progress              <- shiny::Progress$new()
+    on.exit(progress$close())
+    progress$set(message = "Building outputs", value = 0)
+    if (input$design_dtl_pois_ratio_type == "equal_all") {
+      ratio               <- 1
+    } else if (input$design_dtl_pois_ratio_type == "equal_exp") {
+      ratio               <- input$design_dtl_pois_ratio1
+    } else if (input$design_dtl_pois_ratio_type == "root_K") {
+      ratio               <- 1/sqrt(K)
+    }
+    design                <-
+      multiarm:::des_dtl_pois(Kv      = Kv,
+                              type    = swss,
+                              alpha   = input$design_dtl_pois_alpha,
+                              beta    = 1 - input$design_dtl_pois_beta,
+                              lambda0 = input$design_dtl_pois_lambda0,
+                              delta1  = input$design_dtl_pois_delta1,
+                              delta0  = input$design_dtl_pois_delta0,
+                              ratio   = ratio,
+                              power   = power,
+                              integer = input$design_dtl_pois_integer)
+    design$K               <- K
+    progress$inc(amount  = 0.25 + as.numeric(!input$design_dtl_pois_plots),
+                 message = "Rendering design summary")
+    rmarkdown::render(
+      input         = "design_dtl_pois_summary.Rmd",
+      output_format = rmarkdown::html_document(),
+      output_file   = file.path(tempdir(), "design_dtl_pois_summary.html"),
+      params        = list(alpha      = design$alpha,
+                           beta       = design$beta,
+                           delta0     = design$delta0,
+                           delta1     = design$delta1,
+                           integer    = design$integer,
+                           J          = design$J,
+                           K          = design$K,
+                           Kv         = design$Kv,
+                           maxN       = design$maxN,
+                           n10        = design$n10,
+                           n1         = design$n1,
+                           opchar     = design$opchar,
+                           lambda0    = design$lambda0,
+                           plots      = input$design_dtl_pois_plots,
+                           power      = power,
+                           ratio_type = input$design_dtl_pois_ratio_type,
+                           ratio_init = input$design_dtl_pois_ratio1,
+                           ratio      = design$ratio,
+                           swss       = swss)
+    )
+    xml2::write_html(
+      rvest::html_node(
+        xml2::read_html(
+          paste0(tempdir(), "/design_dtl_pois_summary.html")
+        ),
+        "body"
+      ),
+      file = paste0(tempdir(), "/design_dtl_pois_summary_modified.html")
+    )
+    design$data_og        <- design$opchar
+    if (input$design_dtl_pois_plots) {
+      density             <- as.numeric(input$design_dtl_pois_density)
+      plots               <- plot(design, density = density, output = TRUE,
+                                  print_plots = FALSE)
+      design$equal_power  <- plots$plots$equal_power
+      design$equal_error  <- plots$plots$equal_error
+      design$equal_other  <- plots$plots$equal_other
+      design$shifted_power      <- plots$plots$shifted_power
+      progress$inc(amount = 0.25, message = "Rendering plots")
+      opchar              <-
+        as.matrix(dplyr::distinct(tibble::as_tibble(round(plots$opchar, 3),
+                                                    .name_repair = "minimal")))
+      design$data         <-
+        data.frame(rbind(design$opchar, opchar),
+                   row.names = c(paste0("<i>H<sub>", c("G", "A"), "</sub></i>"),
+                                 paste0("<i>LFC<sub>", seq_K, "</sub></i>"),
+                                 paste0("Equal #", 1:density),
+                                 paste0("Shifted #",
+                                        1:(nrow(opchar) - density))))
+    } else {
+      design$data         <-
+        data.frame(design$opchar$opchar,
+                   row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
+                                 paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
+      design$equal_error  <- design$equal_power <- design$equal_other <-
+        design$shifted_power     <- design$delta       <- NULL
+    }
+    colnames(design$data) <-
+      c(paste0("<i>&lambda;</i><sub>", c(0, seq_K), "</sub>"),
+        paste0("<i>P</i><sub>", c("dis", "con", seq_K), "</sub>"),
+        paste0("<i>FWER<sub>I</sub></i><sub>", seq_K, "</sub>"),
+        paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
+        "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
+        "<i>Sensitivity</i>", "<i>Specificity</i>", "<i>ESS</i>", "<i>SDSS</i>",
+        "<i>MSS</i>", "<i>max N</i>")
+    progress$inc(amount  = 0.25 + as.numeric(!input$design_dtl_pois_plots),
+                 message = "Outputting results")
+    design
+  })
+
+  ##### Drop-the-losers (Poisson): Value boxes #################################
+
+  output$design_dtl_pois_n_box     <- shinydashboard::renderValueBox({
+    input$design_dtl_pois_update
+    shinydashboard::valueBox(
+      value    = round(int_des_dtl_pois()$maxN, 1),
+      subtitle = "Maximal possible sample size",
+      icon     = shiny::icon(name = "users"),
+      color    = "light-blue"
+    )
+  })
+
+  output$design_dtl_pois_fwer_box  <- shinydashboard::renderValueBox({
+    input$design_dtl_pois_update
+    if (int_des_dtl_pois()$opchar$FWERI1[1] <=
+        shiny::isolate(input$design_dtl_pois_alpha) + 1e-4) {
+      icon_choice <- "thumbs-up"
+    } else {
+      icon_choice <- "thumbs-down"
+    }
+    shinydashboard::valueBox(
+      value    = round(int_des_dtl_pois()$opchar$FWERI1[1], 3),
+      subtitle = "Maximum family-wise error-rate",
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
+    )
+  })
+
+  output$design_dtl_pois_power_box <- shinydashboard::renderValueBox({
+    input$design_dtl_pois_update
+    subtitle          <-
+      c("disjunctive" = "Disjunctive power",
+        "marginal"    =
+          "Minimum marginal power")[shiny::isolate(
+            input$design_dtl_pois_power)]
+    K                 <- isolate(input$design_dtl_pois_K)
+    if (int_des_dtl_pois()$power == "disjunctive") {
+      value_power_box <- int_des_dtl_pois()$opchar$Pdis[2]
+    } else {
+      value_power_box <-
+        min(diag(as.matrix(
+          int_des_dtl_pois()$opchar[-(1:2), (K + 4):(2*K + 3)])))
+    }
+    if (value_power_box >= shiny::isolate(input$design_dtl_pois_beta) - 1e-3) {
+      icon_choice     <- "thumbs-up"
+    } else {
+      icon_choice     <- "thumbs-down"
+    }
+    shinydashboard::valueBox(
+      value    = round(value_power_box, 3),
+      subtitle = subtitle,
+      icon     = shiny::icon(name = icon_choice),
+      color    = "light-blue"
+    )
+  })
+
+  ##### Drop-the-losers (Poisson): Summary #####################################
+
+  output$design_dtl_pois_summary <- shiny::renderUI({
+    input$design_dtl_pois_update
+    n1 <- int_des_dtl_pois()$n1
+    shiny::withMathJax(
+      shiny::includeHTML(
+        path = file.path(tempdir(),
+                         "/design_dtl_pois_summary_modified.html")
+      )
+    )
+  })
+
+  ##### Drop-the-losers (Poisson): Table #######################################
+
+  output$design_dtl_pois_table_key   <- DT::renderDT({
+    table_key                                      <-
+      int_des_dtl_pois()$data[, c(1:(int_des_dtl_pois()$K + 1),
+                                  (int_des_dtl_pois()$K + 3):
+                                    (2*int_des_dtl_pois()$K + 3),
+                                  4*int_des_dtl_pois()$K + 3)]
+    colnames(table_key)[2*int_des_dtl_pois()$K + 2] <- "<i>FWER</i>"
+    DT::datatable(
+      round(table_key, 3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  output$design_dtl_pois_table_error <- DT::renderDT({
+    DT::datatable(
+      round(int_des_dtl_pois()$data[, c(1:int_des_dtl_pois()$K,
+                                        (2*int_des_dtl_pois()$K + 3):
+                                          (4*int_des_dtl_pois()$K + 3))], 3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  output$design_dtl_pois_table_other <- DT::renderDT({
+    DT::datatable(
+      round(int_des_dtl_pois()$data[, -((2*int_des_dtl_pois()$K + 3):
+                                          (4*int_des_dtl_pois()$K + 3))], 3),
+      escape        = FALSE,
+      fillContainer = TRUE
+    )
+  })
+
+  ##### Drop-the-losers (Poisson): Plots #######################################
+
+  output$design_dtl_pois_equal_error <- shiny::renderPlot({
+    input$design_dtl_pois_update
+    if (shiny::isolate(input$design_dtl_pois_plots)) {
+      int_des_dtl_pois()$equal_error +
+        ggplot2::coord_cartesian(xlim   = ranges_design_dtl_pois_equal_error$x,
+                                 ylim   = ranges_design_dtl_pois_equal_error$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_dtl_pois_equal_power <- shiny::renderPlot({
+    input$design_dtl_pois_update
+    if (shiny::isolate(input$design_dtl_pois_plots)) {
+      int_des_dtl_pois()$equal_power +
+        ggplot2::coord_cartesian(xlim   = ranges_design_dtl_pois_equal_power$x,
+                                 ylim   = ranges_design_dtl_pois_equal_power$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_dtl_pois_equal_other <- shiny::renderPlot({
+    input$design_dtl_pois_update
+    if (shiny::isolate(input$design_dtl_pois_plots)) {
+      int_des_dtl_pois()$equal_other +
+        ggplot2::coord_cartesian(xlim   = ranges_design_dtl_pois_equal_other$x,
+                                 ylim   = ranges_design_dtl_pois_equal_other$y,
+                                 expand = TRUE)
+    }
+  })
+
+  output$design_dtl_pois_shifted_power     <- shiny::renderPlot({
+    input$design_dtl_pois_update
+    if (shiny::isolate(input$design_dtl_pois_plots)) {
+      int_des_dtl_pois()$shifted_power +
+        ggplot2::coord_cartesian(xlim   = ranges_design_dtl_pois_shifted_power$x,
+                                 ylim   = ranges_design_dtl_pois_shifted_power$y,
+                                 expand = TRUE)
+    }
+  })
+
+  ##### Drop-the-losers (Poisson): Report ######################################
+
+  output$design_dtl_pois_report <- shiny::downloadHandler(
+    filename = function() {
+      paste(input$design_dtl_pois_filename, sep = '.',
+            switch(input$design_dtl_pois_format,
+                   pdf  = "pdf",
+                   html = "html",
+                   word = "docx"
+            )
+      )
+    },
+    content  = function(file) {
+      tempReport <- file.path(tempdir(), "design_dtl_pois_report.Rmd")
+      file.copy("design_dtl_pois_report.Rmd", tempReport, overwrite = T)
+      params     <- list(alpha        = int_des_dtl_pois()$alpha,
+                         beta         = int_des_dtl_pois()$beta,
+                         delta0       = int_des_dtl_pois()$delta0,
+                         delta1       = int_des_dtl_pois()$delta1,
+                         integer      = int_des_dtl_pois()$integer,
+                         J            = int_des_dtl_pois()$J,
+                         K            = int_des_dtl_pois()$K,
+                         Kv           = int_des_dtl_pois()$Kv,
+                         lambda0      = int_des_dtl_pois()$lambda0,
+                         maxN         = int_des_dtl_pois()$maxN,
+                         n10          = int_des_dtl_pois()$n10,
+                         n1           = int_des_dtl_pois()$n1,
+                         opchar       = int_des_dtl_pois()$opchar,
+                         plots        = input$design_gs_pois_plots,
+                         power        = int_des_dtl_pois()$power,
+                         ratio_type   = input$design_gs_pois_ratio_type,
+                         ratio_init   = input$design_gs_pois_ratio1,
+                         ratio        = int_des_dtl_pois()$ratio,
+                         swss         = input$design_gs_pois_swss,
+                         equal_error  = int_des_dtl_pois()$equal_error,
+                         equal_power  = int_des_dtl_pois()$equal_power,
+                         equal_other  = int_des_dtl_pois()$equal_other,
+                         shifted_power      = int_des_dtl_pois()$shifted_power)
+      rmarkdown::render(tempReport,
+                        output_format = paste0(input$design_dtl_pois_format,
                                                "_document"),
                         output_file   = file,
                         params        = params,
@@ -6833,6 +9996,10 @@ server <- function(input, output, session) {
     utils::sessionInfo()
   })
 
+  output$design_ss_pois_debug  <- shiny::renderPrint({
+    utils::sessionInfo()
+  })
+
   output$design_gs_bern_debug  <- shiny::renderPrint({
     utils::sessionInfo()
   })
@@ -6841,11 +10008,19 @@ server <- function(input, output, session) {
     utils::sessionInfo()
   })
 
+  output$design_gs_pois_debug  <- shiny::renderPrint({
+    utils::sessionInfo()
+  })
+
   output$design_dtl_bern_debug <- shiny::renderPrint({
     utils::sessionInfo()
   })
 
   output$design_dtl_norm_debug <- shiny::renderPrint({
+    utils::sessionInfo()
+  })
+
+  output$design_dtl_pois_debug <- shiny::renderPrint({
     utils::sessionInfo()
   })
 

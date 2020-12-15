@@ -86,7 +86,7 @@ FWER                  <- round(opchar$FWERI1[1], 3)
 if (power == "marginal") {
   power_type_text     <- "minimum marginal power"
   power_value         <-
-    round(min(diag(as.matrix(opchar[-(1:2), (K + 3):(2*K + 2)]))), 3)
+    round(min(diag(as.matrix(opchar[-(1:2), (K + 4):(2*K + 3)]))), 3)
 } else {
   power_scenario_text <- "the global alternative hypothesis."
   if (power == "conjunctive") {
