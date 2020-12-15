@@ -77,7 +77,7 @@ on key operating characteristics." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
       </span>
     </div>
 
@@ -266,7 +266,10 @@ interim efficacy bounds. Only used when <code>eshape = "fixed"</code>. Defaults 
       <th>integer</th>
       <td><p>A <code><a href='https://rdrr.io/r/base/logical.html'>logical</a></code> variable indicating whether the
 computed possible sample sizes required in each arm in each stage should be
-forced to be whole numbers. Defaults to <code>FALSE</code>.</p></td>
+forced to be whole numbers. Defaults to <code>FALSE</code>. WARNING: If you set
+<code>integer = TRUE</code> and <code>ratio != 1</code>, obscure results can occur due to
+difficulties in identifying a suitable whole number sample size that meets
+the allocation ratio requirement.</p></td>
     </tr>
     <tr>
       <th>summary</th>

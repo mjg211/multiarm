@@ -52,7 +52,7 @@ sim_dtl_bern <- function(des = des_dtl_bern(integer = TRUE), pi,
   ##### Print summary ##########################################################
 
   if (summary) {
-    #summary_sim_dtl(des, pi, replicates, "norm")
+    #summary_sim_dtl(des, pi, replicates, "bern")
     message("")
   }
 

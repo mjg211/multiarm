@@ -1,3 +1,12 @@
+# multiarm 0.12
+
+* Support added for clinical trials with Poisson distributed outcomes
+(`build_dtl_pois()`, `build_gs_pois()`, `build_ss_pois()`, `des_dtl_pois()`,
+`des_gs_pois()`, `des_ss_pois()`, `opchar_dtl_pois()`, `opchar_gs_pois()`,
+`opchar_ss_pois()`, `plot.multiarm_des_dtl_pois()`,
+`plot.multiarm_des_gs_pois()`, `plot.multiarm_des_ss_pois()`, `sim_dtl_pois()`,
+`sim_gs_pois()`, `sim_ss_pois()`).
+
 # multiarm 0.11
 
 * Analysis functions removed; focus purely on design for now.

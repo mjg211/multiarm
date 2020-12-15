@@ -19,12 +19,17 @@ plotting functions.
 }
 \seealso{
 \code{\link{des_dtl_bern}}, \code{\link{des_dtl_norm}},
-\code{\link{des_gs_bern}}, \code{\link{des_gs_norm}},
+\code{\link{des_dtl_pois}}, \code{\link{des_gs_bern}},
+\code{\link{des_gs_norm}}, \code{\link{des_gs_pois}},
 \code{\link{des_ss_bern}}, \code{\link{des_ss_norm}},
+\code{\link{des_ss_pois}},
 \code{\link{plot.multiarm_des_dtl_bern}},
 \code{\link{plot.multiarm_des_dtl_norm}},
+\code{\link{plot.multiarm_des_dtl_pois}},
 \code{\link{plot.multiarm_des_gs_bern}},
 \code{\link{plot.multiarm_des_gs_norm}},
+\code{\link{plot.multiarm_des_gs_pois}},
 \code{\link{plot.multiarm_des_ss_bern}},
-\code{\link{plot.multiarm_des_ss_norm}}.
+\code{\link{plot.multiarm_des_ss_norm}},
+\code{\link{plot.multiarm_des_ss_pois}}.
 }

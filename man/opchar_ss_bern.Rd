@@ -10,7 +10,7 @@ opchar_ss_bern(des = des_ss_bern(), pi, summary = FALSE)
 \arguments{
 \item{des}{A \code{\link{list}} of class \code{"multiarm_des_ss_bern"}, as
 returned by \code{\link{des_ss_bern}} (i.e., a single-stage multi-arm
-clinical trial design for a normally distributed outcome). Defaults to
+clinical trial design for a Poisson distributed outcome). Defaults to
 \code{des_ss_bern()}.}
 
 \item{pi}{A \code{\link{matrix}} whose rows indicate values of

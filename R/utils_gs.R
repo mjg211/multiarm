@@ -1,4 +1,4 @@
-bounds_gs                         <- function(C, comp) {
+bounds_gs                          <- function(C, comp) {
   if (comp$eshape == "obf") {
     e   <- C*sqrt(comp$J/comp$seq_J)
   } else if (comp$eshape == "pocock") {
@@ -27,7 +27,7 @@ bounds_gs                         <- function(C, comp) {
   comp
 }
 
-components_gs_all                 <- function(comp) {
+components_gs_all                  <- function(comp) {
   comp                                          <-
     components_gs_covariances_sqrt_Is(comp)
   perms_d                                       <-
@@ -190,7 +190,7 @@ components_gs_all                 <- function(comp) {
   comp
 }
 
-components_gs_all_update_bern     <- function(comp, i) {
+components_gs_all_update_bern_pois <- function(comp, i) {
   if (comp$type == "variable") {
     Lambda                            <- comp$Lambda_null
     diag_sqrt_Is                      <- list()
@@ -254,7 +254,7 @@ components_gs_all_update_bern     <- function(comp, i) {
   comp
 }
 
-components_gs_covariances_sqrt_Is <- function(comp) {
+components_gs_covariances_sqrt_Is  <- function(comp) {
   Cov_taus                                    <- diag_sqrt_Is <- sqrt_Is <-
     list()
   if (comp$outcome == "norm") {
@@ -304,7 +304,7 @@ components_gs_covariances_sqrt_Is <- function(comp) {
         sqrt_Is[[i]]                        <- sqrt_Is[[1]]
       }
     }
-  } else if (comp$outcome == "bern") {
+  } else if (comp$outcome %in% c("bern", "pois")) {
     if (comp$type == "variable") {
       NC                                      <- comp$n_factor*comp$spacing
       NE                                      <- comp$r*NC
@@ -355,7 +355,7 @@ components_gs_covariances_sqrt_Is <- function(comp) {
   comp
 }
 
-components_gs_hg_lfc              <- function(comp) {
+components_gs_hg_lfc               <- function(comp) {
   comp$tau_power                                 <-
     c(rep(comp$delta1, comp$c), rep(comp$delta0, comp$K - comp$c))
   comp$tau                                       <- rbind(rep(0, comp$K),
@@ -375,6 +375,11 @@ components_gs_hg_lfc              <- function(comp) {
       comp$sigma                                 <-
         cbind(comp$sigma[1], matrix(comp$sigma[2], 2, comp$K))
     }
+  } else if (comp$outcome == "pois") {
+    comp$lambda                                  <-
+      comp$lambda0 + cbind(0, comp$tau)
+    comp$nrow_lambda                             <- 2
+    comp$sigma                                   <- sqrt(comp$lambda)
   }
   comp                                           <-
     components_gs_covariances_sqrt_Is(comp)
@@ -731,12 +736,12 @@ components_gs_hg_lfc              <- function(comp) {
   comp
 }
 
-components_gs_init                <- function(alpha, beta, delta0, delta1,
-                                              efix, eshape, ffix, fshape,
-                                              integer, J, K, power, ratio,
-                                              stopping, summary, type, sigma,
-                                              pi0, n_factor = 1, f = NULL,
-                                              e = NULL) {
+components_gs_init                 <- function(alpha, beta, delta0, delta1,
+                                               efix, eshape, ffix, fshape,
+                                               integer, J, K, power, ratio,
+                                               stopping, summary, type, sigma,
+                                               pi0, lambda0, n_factor = 1,
+                                               f = NULL, e = NULL) {
   a                    <- 1L
   if (power == "marginal") {
     b                  <- c <- 1L
@@ -786,10 +791,13 @@ components_gs_init                <- function(alpha, beta, delta0, delta1,
   }
   if (!missing(sigma)) {
     outcome            <- "norm"
-    pi0                <- NA
+    pi0                <- lambda0 <- NA
   } else if (!missing(pi0)) {
     outcome            <- "bern"
-    sigma              <- NA
+    sigma              <- lambda0 <- NA
+  } else if (!missing(lambda0)) {
+    outcome            <- "pois"
+    sigma              <- pi0 <- NA
   }
   if (all(!is.null(f), !is.null(e))) {
     bounds             <- c(f, e, -Inf, Inf)
@@ -801,6 +809,7 @@ components_gs_init                <- function(alpha, beta, delta0, delta1,
        delta0 = delta0, delta1 = delta1, e = e, efix = efix, eshape = eshape,
        f = f, ffix = ffix, fshape = fshape, integer = integer, J = J,
        Jm1 = J - 1, Jp1 = J + 1, JK = JK, K = K, Kp1 = K + 1, Kp2 = K + 2,
+       lambda0 = lambda0,
        max_N_factor = ifelse(type == "variable", J*(1 + ratio*K), J),
        n_factor = n_factor, nrow_stage_K = nrow_stage_K, numerics = numerics,
        outcome = outcome, pi0 = pi0, power = power, r = ratio, seqs = seqs,
@@ -812,7 +821,7 @@ components_gs_init                <- function(alpha, beta, delta0, delta1,
        type = type, w = NA)
 }
 
-components_gs_update              <- function(comp, tau, pi) {
+components_gs_update               <- function(comp, tau, pi, lambda) {
   if (comp$outcome == "norm") {
     comp$tau      <- tau
     comp$nrow_tau <- nrow(comp$tau)
@@ -833,11 +842,16 @@ components_gs_update              <- function(comp, tau, pi) {
     comp$tau      <- pi[, -1] - pi[, 1]
     comp$nrow_pi  <- comp$nrow_tau <- nrow(comp$pi)
     comp$sigma    <- sqrt(comp$pi*(1 - comp$pi))
+  } else if (comp$outcome == "pois") {
+    comp$lambda   <- lambda
+    comp$tau      <- lambda[, -1] - lambda[, 1]
+    comp$nrow_lambda <- comp$nrow_tau <- nrow(comp$lambda)
+    comp$sigma    <- sqrt(comp$lambda)
   }
   components_gs_all(comp)
 }
 
-integer_gs                        <- function(comp) {
+integer_gs                         <- function(comp) {
   if (comp$integer) {
     if (comp$type == "variable") {
       comp$n_factor   <- ceiling(comp$n_factor)
@@ -854,7 +868,7 @@ integer_gs                        <- function(comp) {
   comp
 }
 
-opchar_gs_internal                <- function(comp) {
+opchar_gs_internal                 <- function(comp) {
   #comp$combs          <- iterpc::getall(iterpc::iterpc(n       = comp$K,
   #                                                     r       = 2,
   #                                                     labels  = comp$seq_K,
@@ -891,6 +905,13 @@ opchar_gs_internal                <- function(comp) {
                                       comp$nrow_tau*comp$len_poss_n,
                                       comp$Kp1), pmf_N)
     fact              <- paste0("pi", c(0, comp$seq_K))
+  } else if (comp$outcome == "pois") {
+    opchar            <- cbind(comp$lambda, opchar)
+    pmf_N             <- cbind(matrix(rep(as.vector(comp$lambda),
+                                          each = comp$len_poss_n),
+                                      comp$nrow_tau*comp$len_poss_n,
+                                      comp$Kp1), pmf_N)
+    fact              <- paste0("lambda", c(0, comp$seq_K))
   }
   colnames(pmf_N)     <- c(fact, "n", "Prob")
   colnames(opchar)    <- c(fact, "Pdis", "Pcon", paste0("P", comp$seq_K),
@@ -903,9 +924,9 @@ opchar_gs_internal                <- function(comp) {
   comp
 }
 
-opchar_gs_internal_2              <- function(i, comp) {
-  if (comp$outcome == "bern") {
-    comp                          <- components_gs_all_update_bern(comp, i)
+opchar_gs_internal_2               <- function(i, comp) {
+  if (comp$outcome %in% c("bern", "pois")) {
+    comp                          <- components_gs_all_update_bern_pois(comp, i)
   }
   neg_mat                         <-
     matrix(comp$tau[i, ] <= 0, comp$nrow_outcomes, comp$K, byrow = TRUE)
@@ -983,7 +1004,7 @@ opchar_gs_internal_2              <- function(i, comp) {
        pmf_N  = pmf_N)
 }
 
-root_bounds_gs                    <- function(C, comp) {
+root_bounds_gs                     <- function(C, comp) {
   comp   <- bounds_gs(C, comp)
   fwer   <- 0
   for (i in which(comp$thetas_d_HG_a_fwer[, comp$twoKp2] > 0)) {
@@ -996,7 +1017,7 @@ root_bounds_gs                    <- function(C, comp) {
   fwer - comp$alpha
 }
 
-root_ss_gs                        <- function(ss, comp) {
+root_ss_gs                         <- function(ss, comp) {
   power   <- 0
   for (i in which(comp$thetas_bc_LFC_power[, comp$twoKp2] > 0)) {
     power <- power + comp$thetas_bc_LFC_power[i, comp$twoKp2]*
@@ -1008,10 +1029,10 @@ root_ss_gs                        <- function(ss, comp) {
   power - (1 - comp$beta)
 }
 
-sim_gs_bern_internal              <- function(pi, completed_replicates, n, e,
-                                              f, ratio, stopping, type,
-                                              replicates, K, J, summary,
-                                              total_replicates) {
+sim_gs_bern_internal               <- function(pi, completed_replicates, n, e,
+                                               f, ratio, stopping, type,
+                                               replicates, K, J, summary,
+                                               total_replicates) {
   summary_i                   <-
     round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
   seq_J                       <- 1:J
@@ -1103,10 +1124,106 @@ sim_gs_bern_internal              <- function(pi, completed_replicates, n, e,
     stats::quantile(rowsums_N, 0.5), maxN)
 }
 
-sim_gs_norm_internal              <- function(tau, completed_replicates, n, e,
-                                              f, sigma, ratio, stopping, type,
-                                              replicates, K, J, summary,
-                                              total_replicates) {
+sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
+                                               e, f, ratio, stopping, type,
+                                               replicates, K, J, summary,
+                                               total_replicates) {
+  summary_i                       <-
+    round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
+  seq_J                           <- 1:J
+  seq_K                           <- 1:K
+  Kp1                             <- K + 1L
+  if (type == "variable") {
+    N                             <- matrix(c(n, rep(n*ratio, K)), replicates,
+                                            Kp1)
+    nj_base                       <- c(n, rep(n*ratio, K))
+    maxN                          <- J*n*(1 + ratio*K)
+  } else {
+    N                             <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
+                                            replicates, K + 1L)
+    maxN                          <- n*J
+  }
+  rej_mat                         <- matrix(0L, replicates, K)
+  numeric_Kp1                     <- numeric(Kp1)
+  for (i in 1:replicates) {
+    present                       <- rep(TRUE, Kp1)
+    lambda_hat                    <- numeric_Kp1
+    nj                            <- N[i, ]
+    for (j in seq_J) {
+      lambda_hat_iterate          <- numeric_Kp1
+      lambda_hat_iterate[present] <- stats::rpois(sum(present),
+                                                  nj[present]*lambda[present])
+      lambda_hat                  <-
+        ((N[i, ] - nj)*lambda_hat + lambda_hat_iterate)/N[i, ]
+      sigma2                  <- lambda_hat
+      Z_j                     <-
+        (lambda_hat[-1] - lambda_hat[1])/sqrt(sigma2[1]/N[i, 1] + sigma2[-1]/N[i, -1])
+      for (k in which(present[-1])) {
+        if (Z_j[k] > e[j]) {
+          rej_mat[i, k]       <- 1L
+          present[k + 1]      <- FALSE
+        } else if (Z_j[k] <= f[j]) {
+          present[k + 1]      <- FALSE
+        }
+      }
+      if (all(stopping == "simultaneous", sum(rej_mat[i, ]) > 0)) {
+        break
+      } else if (all(!present[-1])) {
+        break
+      }
+      if (j < J) {
+        if (type == "variable") {
+          nj                  <- nj_base
+          nj[which(!present)] <- 0
+        } else {
+          nj                  <-
+            c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
+          nj[which(!present)] <- 0
+        }
+        N[i, ]                <- N[i, ] + nj
+      }
+    }
+    if (all((completed_replicates + i) %in% summary_i, summary)) {
+      message("..approximately ",
+              10*which(summary_i == (completed_replicates + i)),
+              "% through the required simulations..")
+    }
+  }
+  discoveries                           <- Rfast::rowsums(rej_mat)
+  non_discoveries                       <- K - discoveries
+  neg_mat                               <- matrix(lambda[-1] <= lambda[1], replicates,
+                                                  K, byrow = TRUE)
+  pos_mat                               <- !neg_mat
+  false_discoveries                     <- Rfast::rowsums(rej_mat*neg_mat)
+  false_non_discoveries                 <-
+    Rfast::rowsums((rej_mat == 0)*pos_mat)
+  which_discoveries                     <- which(discoveries > 0)
+  discoveries[-which_discoveries]       <- 1
+  non_discoveries[non_discoveries == 0] <- 1
+  rowsums_N                             <- Rfast::rowsums(N)
+  c(lambda, length(which_discoveries)/replicates, sum(discoveries == K)/replicates,
+    Rfast::colsums(rej_mat)/replicates,
+    sapply(1:K, function(k) { sum(false_discoveries >= k) })/replicates,
+    sapply(1:K, function(k) { sum(false_non_discoveries >= k) })/replicates,
+    sum(false_discoveries)/(K*replicates),
+    sum(false_discoveries/discoveries)/replicates,
+    sum(Rfast::rowsums(rej_mat[which_discoveries, ]*
+                         matrix(lambda[-1] <= lambda[1], length(which_discoveries), K,
+                                byrow = TRUE))/discoveries[which_discoveries])/
+      length(which_discoveries),
+    sum(false_non_discoveries/non_discoveries)/replicates,
+    sum(Rfast::rowsums(rej_mat*pos_mat))/(max(sum(lambda[-1] > lambda[1]),
+                                              1)*replicates),
+    sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
+      (max(sum(lambda[-1] <= lambda[1]), 1)*replicates),
+    sum(rowsums_N)/replicates, stats::sd(rowsums_N),
+    stats::quantile(rowsums_N, 0.5), maxN)
+}
+
+sim_gs_norm_internal               <- function(tau, completed_replicates, n, e,
+                                               f, sigma, ratio, stopping, type,
+                                               replicates, K, J, summary,
+                                               total_replicates) {
   summary_i                   <-
     round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
   tau                         <- c(0, tau)

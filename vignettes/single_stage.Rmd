@@ -234,11 +234,11 @@ The optimal allocation ratios are identified in the app using available closed-f
 
 ## 2.6. Supported outcome variables
 
+Currently, __multiarm__ supports multi-arm trial design for scenarios in which the outcome variables are assumed to be either normally, Bernoulli, or Poisson distributed.
+
 ### 2.6.1. Normally distributed outcome variables
 
-Currently, __multiarm__ supports multi-arm trial design for scenarios in which the outcome variables are assumed to be either normally or Bernoulli distributed.
-
-Precisely, for the normal case, it assumes that $X_{ik}\sim N(\mu_k,\sigma_k^2)$, and that $\sigma_k^2$ is known for $k\in\{0,\dots,K\}$. Then, for each $k\in\{1,\dots,K\}$:
+For the normal case, it assumes that $X_{ik}\sim N(\mu_k,\sigma_k^2)$, and that $\sigma_k^2$ is known for $k\in\{0,\dots,K\}$. Then, for each $k\in\{1,\dots,K\}$:
 
 \begin{align}
 \tau_k &= \mu_k-\mu_0,\\
@@ -284,34 +284,60 @@ In this case, we should also ensure that $\delta_1\in(0,1)$ and $\delta_0\in(-\p
 
 Functions with names ending in `_ss_bern` support single-stage designs in which the outcome variables are assumed to be Bernoulli distributed.
 
+### 2.6.3. Poisson distributed outcome variables
+
+In this case, $X_{ik}\sim Po(\lambda_k)$ for event rates $\lambda_k$, and for each $k\in\{1,\dots,K\}$:
+
+\begin{align}
+\tau_k &= \lambda_k-\lambda_0,\\
+\hat{\tau}_k &= \frac{1}{n_k}\sum_{l=1}^{n_k}x_{ik} - \frac{1}{n_0}\sum_{l=1}^{n_0}x_{i0},\\
+I_{k} &= \frac{1}{\frac{\lambda_0}{n_0} + \frac{\lambda_k}{n_k}}.
+\end{align}
+
+Thus, like the Bernoulli situation above, a problem for design determination becomes that the information levels are dependent on the unknown event rates.
+Similarly, this is handled in __multiarm__ by setting:
+
+$$ I_k = \frac{1}{\frac{\hat{\lambda}_0}{n_0} + \frac{\hat{\lambda}_k}{n_k}},$$
+for $\hat{\lambda}_k = \sum_{l=1}^{n_k}x_{ik}/n_k$, $k\in\{0,\dots,K\}$.
+Again, $\boldsymbol{Z}_K$ is then only asymptotically multivariate normal, and so once more it is important to validate operating characteristics evaluated using multivariate normal integration via simulation.
+
+Furhermore, this problem again means that the operating characterstics under $HG$, $HA$, and the $LFC_k$ are not unique without further restriction.
+To achieve uniqueness, __multiarm__ requires a value be specified for $\lambda_0$ (`lambda0`) for use in the definition of these scenarios.
+For this reason, the inputs and outputs of functions supporting Poisson outcomes make no reference to the $\tau_k$, and work instead directly in terms of the $\lambda_k$.
+Finally, it also means that to determine $A$-, $D$-, or $E$-optimised allocation ratios, a specific set of values for for the $\lambda_k$ must be assumed (see `ratio_scenario` in `des_ss_pois()`).
+
+In this case, we should also ensure that $\delta_1\in(0,Inf)$ and $\delta_0\in[-\lambda_0,\delta_1)$, for the assumed value of $\lambda_0$, since $\lambda_k\in[0,Inf)$ for $k\in\{1,\dots,K\}$.
+
+Functions with names ending in `_ss_pois` support single-stage designs in which the outcome variables are assumed to be Poisson distributed.
+
 # 3. Functions
 
-## 3.1. `des_ss_bern()` and `des_ss_norm()`
+## 3.1. `des_ss_bern()`, `des_ss_norm()`, and `des_ss_pois()`
 
-`des_ss_bern()` and `des_ss_norm()` are amongs the primary functions within __multiarm__.
-They are used to determine single-stage multi-arm clinical trial designs attaining a desired level of a specified type of power, for normally and Bernoulli distributed outcomes respectively.
+`des_ss_bern()`, `des_ss_norm()`, and `des_ss_pois()` are amongst the primary functions within __multiarm__.
+They are used to determine single-stage multi-arm clinical trial designs attaining a desired level of a specified type of power, for Bernoulli, normally, and Poisson distributed outcomes respectively.
 
-## 3.3. `build_ss_bern()` and `build_ss_norm()`
+## 3.3. `build_ss_bern()`, `build_ss_norm()`, and `build_ss_pois()`
 
-`des_ss_bern()` and `des_ss_norm()` search for designs based upon the chosen input parameters.
+`des_ss_bern()`, `des_ss_norm()`, and `des_ss_pois()` search for designs based upon the chosen input parameters.
 However, in certain circumstances there may be a specific design that is of interest.
-`build_ss_bern()` and `build_ss_norm()` can be used to construct such designs, specifically for subsequent use with the other functions available in __multiarm__.
+`build_ss_bern()`, `build_ss_norm()`, and `build_ss_pois()` can be used to construct such designs, specifically for subsequent use with the other functions available in __multiarm__.
 
-## 3.4. `plot.multiarm_des_ss_bern()` and `plot.multiarm_des_ss_norm()`
+## 3.4. `plot.multiarm_des_ss_bern()`, `plot.multiarm_des_ss_norm()`, and `plot.multiarm_des_ss_pois()`
 
 __multiarm__ can produce a variety of plots for the outputs from `build_ss_bern()`,
-`build_ss_norm()`, `des_ss_bern()`, and `des_ss_norm()` via the S3 functions `plot.multiarm_des_ss_bern()` and `plot.multiarm_des_ss_norm()`.
+`build_ss_norm()`, `build_ss_pois()`, `des_ss_bern()`, `des_ss_norm()`, and `des_ss_pois()` via the S3 functions `plot.multiarm_des_ss_bern()`, `plot.multiarm_des_ss_norm()`, and `plot.multiarm_des_ss_pois()`.
 
-## 3.5. `opchar_ss_bern()` and `opchar_ss_norm()`
+## 3.5. `opchar_ss_bern()`, `opchar_ss_norm()`, and `opchar_ss_pois()`
 
-Whilst `build_ss_bern()`, `build_ss_norm()`, `des_ss_bern()`, and `des_ss_norm()` return a small summary of the statistical operating characteristics of a design, it may occasionally be of interest to evaluate the operating characteristics of a design in a wider range of settings.
-`opchar_ss_bern()` and `opchar_ss_norm()` are designed for this purpose.
+Whilst `build_ss_bern()`, `build_ss_norm()`, `build_ss_pois()`, `des_ss_bern()`, `des_ss_norm()`, and `des_ss_pois()` return a small summary of the statistical operating characteristics of a design, it may occasionally be of interest to evaluate the operating characteristics of a design in a wider range of settings.
+`opchar_ss_bern()`, `opchar_ss_norm()`, and `opchar_ss_pois()` are designed for this purpose.
 
-## 3.6. `sim_ss_bern()` and `sim_ss_norm()`
+## 3.6. `sim_ss_bern()`, `sim_ss_norm()` and `sim_ss_pois()`
 
 Each of the functions above rely upon multivariate normal integration for operating characteristic evaluation.
 In certain circumstances, most likely when either (a) $K$ is large or (b) analytical evaluations need to be validated, recourse to simulation is useful.
-`sim_ss_bern()` and `sim_ss_norm()` are designed to be helpful in these settings.
+`sim_ss_bern()`, `sim_ss_norm()`, and `sim_ss_pois()` are designed to be helpful in these settings.
 
 # 4. Examples
 

@@ -116,9 +116,14 @@ des_ss_norm <- function(K = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
 
   ##### Preliminaries ##########################################################
 
+  if (is.character(ratio)) {
+    ratio_n <- rep(1, K)
+  } else {
+    ratio_n <- ratio
+  }
   comp <- components_ss_norm(alpha, beta, correction, delta0, delta1, integer,
                              K, power, ratio, sigma,
-                             c(1, ratio)/(1 + sum(ratio)))
+                             c(1, ratio_n)/(1 + sum(ratio_n)))
   if (summary) {
     summary_des_ss_norm(comp)
     message("")

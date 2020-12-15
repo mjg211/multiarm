@@ -117,9 +117,14 @@ des_ss_bern <- function(K = 2, alpha = 0.025, beta = 0.1, pi0 = 0.3,
 
   ##### Preliminaries ##########################################################
 
+  if (is.character(ratio)) {
+    ratio_n <- rep(1, K)
+  } else {
+    ratio_n <- ratio
+  }
   comp <- components_ss_bern(alpha, beta, correction, delta0, delta1, integer,
                              K, pi0, power, ratio, ratio_scenario,
-                             c(1, ratio)/(1 + sum(ratio)))
+                             c(1, ratio_n)/(1 + sum(ratio_n)))
   if (summary) {
     summary_des_ss_bern(comp)
     message("")

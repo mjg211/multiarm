@@ -31,7 +31,7 @@ accessed with \code{vignette("multiarm")}. For further help, please email
 \section{Details}{
 
 
-In total, 31 functions are currently available. Their naming conventions are
+In total, 46 functions are currently available. Their naming conventions are
 such that several character strings are joined together, separated by
 underscores. The first string indicates the purpose of the function (i.e.,
 what type of calculation it performs):
@@ -73,6 +73,7 @@ The third indicates what type of outcome the function is for:
 \itemize{
 \item \code{###_###_bern()}: Assume a Bernoulli distributed primary outcome.
 \item \code{###_###_norm()}: Assume a normally distributed primary outcome.
+\item \code{###_###_pois()}: Assume a Poisson distributed primary outcome.
 }
 }
 

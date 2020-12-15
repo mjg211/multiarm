@@ -41,13 +41,13 @@ devtools::install_github("mjg211/multiarm")
 ```
 
 An introductory example of how to make use of some of the package's core functionality can be found below.
-More detailed support, for single-stage designs, is available in the package vignette, which can be accessed with `vignette("single-stage", package = "multiarm")`.
+More detailed support, for single-stage designs, is available in the package vignette, which can be accessed with `vignette("single_stage", package = "multiarm")`.
 See also [Grayling and Wason (2020)](https://doi.org/10.1186/s12885-020-6525-0).
 For further help, please email michael.grayling@newcastle.ac.uk.
 
 ## Details
 
-In total, 31 functions are currently available.
+In total, 46 functions are currently available.
 Their naming conventions are such that several character strings are joined together, separated by underscores.
 The first string indicates the purpose of the function (i.e., what type of calculation it performs):
 
@@ -69,6 +69,7 @@ The third indicates what type of outcome the function is for:
 
 - `###_###_bern()`: Assume a Bernoulli distributed primary outcome.
 - `###_###_norm()`: Assume a normally distributed primary outcome.
+- `###_###_pois()`: Assume a Poisson distributed primary outcome.
 
 ## Example: Single-stage design for a normally distributed outcome
 

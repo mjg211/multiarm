@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
       </span>
     </div>
 
@@ -79,13 +79,14 @@
 
       
 
-      </header><script src="single_stage_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="single_stage_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="single_stage_files/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet">
+<script src="single_stage_files/anchor-sections-1.0.1/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Single-stage multi-arm clinical trials</h1>
                         <h4 class="author">Michael J. Grayling, Newcastle University (<a href="mailto:michael.grayling@newcastle.ac.uk" class="email">michael.grayling@newcastle.ac.uk</a>)</h4>
             
-            <h4 class="date">14/10/2020</h4>
+            <h4 class="date">15/12/2020</h4>
       
       <small class="dont-index">Source: <a href="http://github.com/mjg211/multiarm/blob/master/vignettes/single_stage.Rmd"><code>vignettes/single_stage.Rmd</code></a></small>
       <div class="hidden name"><code>single_stage.Rmd</code></div>
@@ -261,11 +262,11 @@
 <div id="supported-outcome-variables" class="section level2">
 <h2 class="hasAnchor">
 <a href="#supported-outcome-variables" class="anchor"></a>2.6. Supported outcome variables</h2>
+<p>Currently, <strong>multiarm</strong> supports multi-arm trial design for scenarios in which the outcome variables are assumed to be either normally, Bernoulli, or Poisson distributed.</p>
 <div id="normally-distributed-outcome-variables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#normally-distributed-outcome-variables" class="anchor"></a>2.6.1. Normally distributed outcome variables</h3>
-<p>Currently, <strong>multiarm</strong> supports multi-arm trial design for scenarios in which the outcome variables are assumed to be either normally or Bernoulli distributed.</p>
-<p>Precisely, for the normal case, it assumes that <span class="math inline">\(X_{ik}\sim N(\mu_k,\sigma_k^2)\)</span>, and that <span class="math inline">\(\sigma_k^2\)</span> is known for <span class="math inline">\(k\in\{0,\dots,K\}\)</span>. Then, for each <span class="math inline">\(k\in\{1,\dots,K\}\)</span>:</p>
+<p>For the normal case, it assumes that <span class="math inline">\(X_{ik}\sim N(\mu_k,\sigma_k^2)\)</span>, and that <span class="math inline">\(\sigma_k^2\)</span> is known for <span class="math inline">\(k\in\{0,\dots,K\}\)</span>. Then, for each <span class="math inline">\(k\in\{1,\dots,K\}\)</span>:</p>
 <p><span class="math display">\[\begin{align}
 \tau_k &amp;= \mu_k-\mu_0,\\
 \hat{\tau}_k &amp;= \frac{1}{n_k}\sum_{l=1}^{n_k}x_{ik} - \frac{1}{n_0}\sum_{l=1}^{n_0}x_{i0},\\
@@ -292,40 +293,55 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <p>In this case, we should also ensure that <span class="math inline">\(\delta_1\in(0,1)\)</span> and <span class="math inline">\(\delta_0\in(-\pi_0,\delta_1)\)</span>, for the assumed value of <span class="math inline">\(\pi_0\)</span>, since <span class="math inline">\(\pi_k\in[0,1]\)</span> for <span class="math inline">\(k\in\{1,\dots,K\}\)</span>.</p>
 <p>Functions with names ending in <code>_ss_bern</code> support single-stage designs in which the outcome variables are assumed to be Bernoulli distributed.</p>
 </div>
+<div id="poisson-distributed-outcome-variables" class="section level3">
+<h3 class="hasAnchor">
+<a href="#poisson-distributed-outcome-variables" class="anchor"></a>2.6.3. Poisson distributed outcome variables</h3>
+<p>In this case, <span class="math inline">\(X_{ik}\sim Po(\lambda_k)\)</span> for event rates <span class="math inline">\(\lambda_k\)</span>, and for each <span class="math inline">\(k\in\{1,\dots,K\}\)</span>:</p>
+<p><span class="math display">\[\begin{align}
+\tau_k &amp;= \lambda_k-\lambda_0,\\
+\hat{\tau}_k &amp;= \frac{1}{n_k}\sum_{l=1}^{n_k}x_{ik} - \frac{1}{n_0}\sum_{l=1}^{n_0}x_{i0},\\
+I_{k} &amp;= \frac{1}{\frac{\lambda_0}{n_0} + \frac{\lambda_k}{n_k}}.
+\end{align}\]</span></p>
+<p>Thus, like the Bernoulli situation above, a problem for design determination becomes that the information levels are dependent on the unknown event rates. Similarly, this is handled in <strong>multiarm</strong> by setting:</p>
+<p><span class="math display">\[ I_k = \frac{1}{\frac{\hat{\lambda}_0}{n_0} + \frac{\hat{\lambda}_k}{n_k}},\]</span> for <span class="math inline">\(\hat{\lambda}_k = \sum_{l=1}^{n_k}x_{ik}/n_k\)</span>, <span class="math inline">\(k\in\{0,\dots,K\}\)</span>. Again, <span class="math inline">\(\boldsymbol{Z}_K\)</span> is then only asymptotically multivariate normal, and so once more it is important to validate operating characteristics evaluated using multivariate normal integration via simulation.</p>
+<p>Furhermore, this problem again means that the operating characterstics under <span class="math inline">\(HG\)</span>, <span class="math inline">\(HA\)</span>, and the <span class="math inline">\(LFC_k\)</span> are not unique without further restriction. To achieve uniqueness, <strong>multiarm</strong> requires a value be specified for <span class="math inline">\(\lambda_0\)</span> (<code>lambda0</code>) for use in the definition of these scenarios. For this reason, the inputs and outputs of functions supporting Poisson outcomes make no reference to the <span class="math inline">\(\tau_k\)</span>, and work instead directly in terms of the <span class="math inline">\(\lambda_k\)</span>. Finally, it also means that to determine <span class="math inline">\(A\)</span>-, <span class="math inline">\(D\)</span>-, or <span class="math inline">\(E\)</span>-optimised allocation ratios, a specific set of values for for the <span class="math inline">\(\lambda_k\)</span> must be assumed (see <code>ratio_scenario</code> in <code><a href="../reference/des_ss_pois.html">des_ss_pois()</a></code>).</p>
+<p>In this case, we should also ensure that <span class="math inline">\(\delta_1\in(0,Inf)\)</span> and <span class="math inline">\(\delta_0\in[-\lambda_0,\delta_1)\)</span>, for the assumed value of <span class="math inline">\(\lambda_0\)</span>, since <span class="math inline">\(\lambda_k\in[0,Inf)\)</span> for <span class="math inline">\(k\in\{1,\dots,K\}\)</span>.</p>
+<p>Functions with names ending in <code>_ss_pois</code> support single-stage designs in which the outcome variables are assumed to be Poisson distributed.</p>
+</div>
 </div>
 </div>
 <div id="functions" class="section level1">
 <h1 class="hasAnchor">
 <a href="#functions" class="anchor"></a>3. Functions</h1>
-<div id="des_ss_bern-and-des_ss_norm" class="section level2">
+<div id="des_ss_bern-des_ss_norm-and-des_ss_pois" class="section level2">
 <h2 class="hasAnchor">
-<a href="#des_ss_bern-and-des_ss_norm" class="anchor"></a>3.1. <code>des_ss_bern()</code> and <code>des_ss_norm()</code>
+<a href="#des_ss_bern-des_ss_norm-and-des_ss_pois" class="anchor"></a>3.1. <code>des_ss_bern()</code>, <code>des_ss_norm()</code>, and <code>des_ss_pois()</code>
 </h2>
-<p><code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code> and <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code> are amongs the primary functions within <strong>multiarm</strong>. They are used to determine single-stage multi-arm clinical trial designs attaining a desired level of a specified type of power, for normally and Bernoulli distributed outcomes respectively.</p>
+<p><code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code>, <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code>, and <code><a href="../reference/des_ss_pois.html">des_ss_pois()</a></code> are amongst the primary functions within <strong>multiarm</strong>. They are used to determine single-stage multi-arm clinical trial designs attaining a desired level of a specified type of power, for Bernoulli, normally, and Poisson distributed outcomes respectively.</p>
 </div>
-<div id="build_ss_bern-and-build_ss_norm" class="section level2">
+<div id="build_ss_bern-build_ss_norm-and-build_ss_pois" class="section level2">
 <h2 class="hasAnchor">
-<a href="#build_ss_bern-and-build_ss_norm" class="anchor"></a>3.3. <code>build_ss_bern()</code> and <code>build_ss_norm()</code>
+<a href="#build_ss_bern-build_ss_norm-and-build_ss_pois" class="anchor"></a>3.3. <code>build_ss_bern()</code>, <code>build_ss_norm()</code>, and <code>build_ss_pois()</code>
 </h2>
-<p><code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code> and <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code> search for designs based upon the chosen input parameters. However, in certain circumstances there may be a specific design that is of interest. <code><a href="../reference/build_ss_bern.html">build_ss_bern()</a></code> and <code><a href="../reference/build_ss_norm.html">build_ss_norm()</a></code> can be used to construct such designs, specifically for subsequent use with the other functions available in <strong>multiarm</strong>.</p>
+<p><code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code>, <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code>, and <code><a href="../reference/des_ss_pois.html">des_ss_pois()</a></code> search for designs based upon the chosen input parameters. However, in certain circumstances there may be a specific design that is of interest. <code><a href="../reference/build_ss_bern.html">build_ss_bern()</a></code>, <code><a href="../reference/build_ss_norm.html">build_ss_norm()</a></code>, and <code><a href="../reference/build_ss_pois.html">build_ss_pois()</a></code> can be used to construct such designs, specifically for subsequent use with the other functions available in <strong>multiarm</strong>.</p>
 </div>
-<div id="plot-multiarm_des_ss_bern-and-plot-multiarm_des_ss_norm" class="section level2">
+<div id="plot-multiarm_des_ss_bern-plot-multiarm_des_ss_norm-and-plot-multiarm_des_ss_pois" class="section level2">
 <h2 class="hasAnchor">
-<a href="#plot-multiarm_des_ss_bern-and-plot-multiarm_des_ss_norm" class="anchor"></a>3.4. <code>plot.multiarm_des_ss_bern()</code> and <code>plot.multiarm_des_ss_norm()</code>
+<a href="#plot-multiarm_des_ss_bern-plot-multiarm_des_ss_norm-and-plot-multiarm_des_ss_pois" class="anchor"></a>3.4. <code>plot.multiarm_des_ss_bern()</code>, <code>plot.multiarm_des_ss_norm()</code>, and <code>plot.multiarm_des_ss_pois()</code>
 </h2>
-<p><strong>multiarm</strong> can produce a variety of plots for the outputs from <code><a href="../reference/build_ss_bern.html">build_ss_bern()</a></code>, <code><a href="../reference/build_ss_norm.html">build_ss_norm()</a></code>, <code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code>, and <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code> via the S3 functions <code><a href="../reference/plot.multiarm_des_ss_bern.html">plot.multiarm_des_ss_bern()</a></code> and <code><a href="../reference/plot.multiarm_des_ss_norm.html">plot.multiarm_des_ss_norm()</a></code>.</p>
+<p><strong>multiarm</strong> can produce a variety of plots for the outputs from <code><a href="../reference/build_ss_bern.html">build_ss_bern()</a></code>, <code><a href="../reference/build_ss_norm.html">build_ss_norm()</a></code>, <code><a href="../reference/build_ss_pois.html">build_ss_pois()</a></code>, <code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code>, <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code>, and <code><a href="../reference/des_ss_pois.html">des_ss_pois()</a></code> via the S3 functions <code><a href="../reference/plot.multiarm_des_ss_bern.html">plot.multiarm_des_ss_bern()</a></code>, <code><a href="../reference/plot.multiarm_des_ss_norm.html">plot.multiarm_des_ss_norm()</a></code>, and <code><a href="../reference/plot.multiarm_des_ss_pois.html">plot.multiarm_des_ss_pois()</a></code>.</p>
 </div>
-<div id="opchar_ss_bern-and-opchar_ss_norm" class="section level2">
+<div id="opchar_ss_bern-opchar_ss_norm-and-opchar_ss_pois" class="section level2">
 <h2 class="hasAnchor">
-<a href="#opchar_ss_bern-and-opchar_ss_norm" class="anchor"></a>3.5. <code>opchar_ss_bern()</code> and <code>opchar_ss_norm()</code>
+<a href="#opchar_ss_bern-opchar_ss_norm-and-opchar_ss_pois" class="anchor"></a>3.5. <code>opchar_ss_bern()</code>, <code>opchar_ss_norm()</code>, and <code>opchar_ss_pois()</code>
 </h2>
-<p>Whilst <code><a href="../reference/build_ss_bern.html">build_ss_bern()</a></code>, <code><a href="../reference/build_ss_norm.html">build_ss_norm()</a></code>, <code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code>, and <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code> return a small summary of the statistical operating characteristics of a design, it may occasionally be of interest to evaluate the operating characteristics of a design in a wider range of settings. <code><a href="../reference/opchar_ss_bern.html">opchar_ss_bern()</a></code> and <code><a href="../reference/opchar_ss_norm.html">opchar_ss_norm()</a></code> are designed for this purpose.</p>
+<p>Whilst <code><a href="../reference/build_ss_bern.html">build_ss_bern()</a></code>, <code><a href="../reference/build_ss_norm.html">build_ss_norm()</a></code>, <code><a href="../reference/build_ss_pois.html">build_ss_pois()</a></code>, <code><a href="../reference/des_ss_bern.html">des_ss_bern()</a></code>, <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code>, and <code><a href="../reference/des_ss_pois.html">des_ss_pois()</a></code> return a small summary of the statistical operating characteristics of a design, it may occasionally be of interest to evaluate the operating characteristics of a design in a wider range of settings. <code><a href="../reference/opchar_ss_bern.html">opchar_ss_bern()</a></code>, <code><a href="../reference/opchar_ss_norm.html">opchar_ss_norm()</a></code>, and <code><a href="../reference/opchar_ss_pois.html">opchar_ss_pois()</a></code> are designed for this purpose.</p>
 </div>
-<div id="sim_ss_bern-and-sim_ss_norm" class="section level2">
+<div id="sim_ss_bern-sim_ss_norm-and-sim_ss_pois" class="section level2">
 <h2 class="hasAnchor">
-<a href="#sim_ss_bern-and-sim_ss_norm" class="anchor"></a>3.6. <code>sim_ss_bern()</code> and <code>sim_ss_norm()</code>
+<a href="#sim_ss_bern-sim_ss_norm-and-sim_ss_pois" class="anchor"></a>3.6. <code>sim_ss_bern()</code>, <code>sim_ss_norm()</code> and <code>sim_ss_pois()</code>
 </h2>
-<p>Each of the functions above rely upon multivariate normal integration for operating characteristic evaluation. In certain circumstances, most likely when either (a) <span class="math inline">\(K\)</span> is large or (b) analytical evaluations need to be validated, recourse to simulation is useful. <code><a href="../reference/sim_ss_bern.html">sim_ss_bern()</a></code> and <code><a href="../reference/sim_ss_norm.html">sim_ss_norm()</a></code> are designed to be helpful in these settings.</p>
+<p>Each of the functions above rely upon multivariate normal integration for operating characteristic evaluation. In certain circumstances, most likely when either (a) <span class="math inline">\(K\)</span> is large or (b) analytical evaluations need to be validated, recourse to simulation is useful. <code><a href="../reference/sim_ss_bern.html">sim_ss_bern()</a></code>, <code><a href="../reference/sim_ss_norm.html">sim_ss_norm()</a></code>, and <code><a href="../reference/sim_ss_pois.html">sim_ss_pois()</a></code> are designed to be helpful in these settings.</p>
 </div>
 </div>
 <div id="examples" class="section level1">
@@ -341,7 +357,7 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt; multiarm: Design of single- and multi-stage multi-arm clinical trials</span>
 <span class="co">#&gt; ---------------------------------------------------------------------</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; v.0.11: For an overview of the package's functionality enter: ?multiarm</span>
+<span class="co">#&gt; v.0.12: For an overview of the package's functionality enter: ?multiarm</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; For news on the latest updates enter: news(package = "multiarm")</span>
 <span class="kw">des</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/des_ss_norm.html">des_ss_norm</a></span>(integer = <span class="fl">TRUE</span>)
@@ -371,10 +387,10 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt; # A tibble: 4 x 16</span>
 <span class="co">#&gt;    tau1  tau2   Pdis    Pcon     P1     P2 FWERI1  FWERI2 FWERII1 FWERII2</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0   0.0248 0.00193 0.0134 0.0133 0.0248 0.00193  0       0     </span>
-<span class="co">#&gt; 2   0.5   0.5 0.968  0.834   0.900  0.902  0      0        0.166   0.0315</span>
-<span class="co">#&gt; 3   0.5   0   0.901  0.0127  0.901  0.0127 0.0127 0        0.0987  0     </span>
-<span class="co">#&gt; 4   0     0.5 0.901  0.0135  0.0136 0.901  0.0136 0        0.0988  0     </span>
+<span class="co">#&gt; 1   0     0   0.0250 0.00197 0.0132 0.0138 0.0250 0.00197  0       0     </span>
+<span class="co">#&gt; 2   0.5   0.5 0.969  0.833   0.901  0.900  0      0        0.167   0.0314</span>
+<span class="co">#&gt; 3   0.5   0   0.901  0.0137  0.901  0.0138 0.0138 0        0.0986  0     </span>
+<span class="co">#&gt; 4   0     0.5 0.902  0.0132  0.0132 0.902  0.0132 0        0.0985  0     </span>
 <span class="co">#&gt; # … with 6 more variables: PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
 </pre></div>
@@ -408,7 +424,7 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt; # A tibble: 5 x 20</span>
 <span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0     0   0.0243 9.65e-5 0.00856 0.00855 0.00852 0.0243 1.22e-3</span>
+<span class="co">#&gt; 1   0     0     0   0.0243 9.64e-5 0.00856 0.00855 0.00853 0.0243 1.22e-3</span>
 <span class="co">#&gt; 2   0.5   0.5   0.5 0.901  3.32e-1 0.822   0.614   0.449   0      0.     </span>
 <span class="co">#&gt; 3   0.5   0     0   0.788  9.67e-4 0.787   0.0124  0.0124  0.0238 9.71e-4</span>
 <span class="co">#&gt; 4   0     0.5   0   0.535  1.03e-3 0.0117  0.531   0.0114  0.0221 1.07e-3</span>
@@ -421,15 +437,16 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">sim</span>
 <span class="co">#&gt; # A tibble: 5 x 20</span>
-<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1     P2      P3 FWERI1  FWERI2  FWERI3</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0     0   0.0239 1.50e-4 0.00842 0.0086 0.00829 0.0239 0.00123 1.50e-4</span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.900  3.32e-1 0.820   0.613  0.447   0      0       0.     </span>
-<span class="co">#&gt; 3   0.5   0     0   0.787  8.60e-4 0.786   0.0124 0.0127  0.0242 0.00086 0.     </span>
-<span class="co">#&gt; 4   0     0.5   0   0.536  9.60e-4 0.0118  0.532  0.0120  0.0228 0.00102 0.     </span>
-<span class="co">#&gt; 5   0     0     0.5 0.349  9.40e-4 0.0105  0.0107 0.342   0.0202 0.00109 0.     </span>
-<span class="co">#&gt; # … with 9 more variables: FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;, FWERII3 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
+<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0     0     0   0.0247 0.00011 0.00883 0.00852 0.00879 0.0247 0.0013 </span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  0.331   0.820   0.613   0.449   0      0      </span>
+<span class="co">#&gt; 3   0.5   0     0   0.790  0.00112 0.789   0.0127  0.0124  0.0240 0.00112</span>
+<span class="co">#&gt; 4   0     0.5   0   0.535  0.00091 0.0119  0.532   0.0111  0.0220 0.00095</span>
+<span class="co">#&gt; 5   0     0     0.5 0.348  0.00102 0.0108  0.0108  0.341   0.0204 0.00118</span>
+<span class="co">#&gt; # … with 10 more variables: FWERI3 &lt;dbl&gt;, FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   FWERII3 &lt;dbl&gt;, PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
 </pre></div>
 <p>Or recreate them with <code><a href="../reference/opchar_ss_norm.html">opchar_ss_norm()</a></code> via:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit">
@@ -438,8 +455,8 @@ I_{k} &amp;= \frac{1}{\frac{\pi_0(1 - \pi_0)}{n_0} +
 <span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
 <span class="co">#&gt; 1   0     0     0   0.0243 9.64e-5 0.00856 0.00854 0.00852 0.0243 1.22e-3</span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  3.32e-1 0.822   0.614   0.449   0      0.     </span>
-<span class="co">#&gt; 3   0.5   0     0   0.788  9.67e-4 0.787   0.0124  0.0124  0.0238 9.71e-4</span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  3.32e-1 0.822   0.615   0.449   0      0.     </span>
+<span class="co">#&gt; 3   0.5   0     0   0.788  9.67e-4 0.787   0.0125  0.0124  0.0238 9.71e-4</span>
 <span class="co">#&gt; 4   0     0.5   0   0.535  1.03e-3 0.0117  0.532   0.0114  0.0221 1.07e-3</span>
 <span class="co">#&gt; 5   0     0     0.5 0.348  9.96e-4 0.0108  0.0106  0.341   0.0203 1.12e-3</span>
 <span class="co">#&gt; # … with 10 more variables: FWERI3 &lt;dbl&gt;, FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;,</span>

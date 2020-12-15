@@ -3,7 +3,7 @@
 
 # multiarm <img src='man/figures/multiarm.png' align="right" height="139" />
 
-[![](https://img.shields.io/badge/devel%20version-0.11.0-blue.svg)](https://github.com/mjg211/multiarm)
+[![](https://img.shields.io/badge/devel%20version-0.12.0-blue.svg)](https://github.com/mjg211/multiarm)
 [![](https://img.shields.io/github/languages/code-size/mjg211/multiarm.svg)](https://github.com/mjg211/multiarm)
 [![](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 ![](https://img.shields.io/badge/contributions-welcome-blue.svg)
@@ -35,13 +35,13 @@ devtools::install_github("mjg211/multiarm")
 An introductory example of how to make use of some of the package’s core
 functionality can be found below. More detailed support, for
 single-stage designs, is available in the package vignette, which can be
-accessed with `vignette("single-stage", package = "multiarm")`. See also
+accessed with `vignette("single_stage", package = "multiarm")`. See also
 [Grayling and Wason (2020)](https://doi.org/10.1186/s12885-020-6525-0).
 For further help, please email <michael.grayling@newcastle.ac.uk>.
 
 ## Details
 
-In total, 31 functions are currently available. Their naming conventions
+In total, 46 functions are currently available. Their naming conventions
 are such that several character strings are joined together, separated
 by underscores. The first string indicates the purpose of the function
 (i.e., what type of calculation it performs):
@@ -78,6 +78,7 @@ The third indicates what type of outcome the function is for:
 
   - `###_###_bern()`: Assume a Bernoulli distributed primary outcome.
   - `###_###_norm()`: Assume a normally distributed primary outcome.
+  - `###_###_pois()`: Assume a Poisson distributed primary outcome.
 
 ## Example: Single-stage design for a normally distributed outcome
 
@@ -111,7 +112,7 @@ Then, the total required sample size is:
 
 ``` r
 des$N
-#> [1] 67.40703
+#> [1] 67.43197
 ```
 
 In addition, the operating characteristics under the *global null*,
@@ -123,11 +124,11 @@ des$opchar
 #> # A tibble: 5 x 20
 #>    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2  FWERI3
 #>   <dbl> <dbl> <dbl>  <dbl>   <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>   <dbl>
-#> 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00772 0.00108
+#> 1     0     0     0 0.0501 0.00108 0.0196 0.0196 0.0196 0.0501 0.00773 0.00108
 #> 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0       0      
-#> 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0359 0.00330 0      
-#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.00330 0      
-#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00330 0      
+#> 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0360 0.00330 0      
+#> 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0360 0.00330 0      
+#> 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0360 0.00330 0      
 #> # … with 9 more variables: FWERII1 <dbl>, FWERII2 <dbl>, FWERII3 <dbl>,
 #> #   PHER <dbl>, FDR <dbl>, pFDR <dbl>, FNDR <dbl>, Sens <dbl>, Spec <dbl>
 ```

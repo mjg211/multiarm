@@ -121,7 +121,7 @@ components_dtl_all                 <- function(comp) {
 }
 
 components_dtl_all_update          <- function(comp, i) {
-  if (comp$outcome == "bern") {
+  if (comp$outcome %in% c("bern", "norm")) {
     Lambda                            <- comp$Lambda_null
     diag_sqrt_Is                      <- list()
     for (j1 in comp$seq_J) {
@@ -182,7 +182,7 @@ components_dtl_covariances_sqrt_Is <- function(comp) {
         sqrt_Is[[i]]                     <- sqrt_Is[[1]]
       }
     }
-  } else if (comp$outcome == "bern") {
+  } else if (comp$outcome %in% c("bern", "pois")) {
     for (i in 1:nrow(comp$sigma)) {
       Cov_taus[[i]]                      <- list()
       sqrt_Is[[i]]                       <- sqrt_Is_null
@@ -222,6 +222,11 @@ components_dtl_hg_lfc              <- function(comp) {
       comp$sigma                                 <-
         cbind(comp$sigma[1], matrix(comp$sigma[2], 2, comp$K))
     }
+  } else if (comp$outcome == "pois") {
+    comp$lambda                                  <-
+      comp$lambda0 + cbind(0, comp$tau)
+    comp$nrow_lambda                             <- 2
+    comp$sigma                                   <- sqrt(comp$lambda)
   }
   comp                                         <-
     components_dtl_covariances_sqrt_Is(comp)
@@ -328,7 +333,8 @@ components_dtl_hg_lfc              <- function(comp) {
 components_dtl_init                <- function(alpha, beta, delta0, delta1,
                                                integer, Kv, power, ratio,
                                                summary, type, sigma, pi0,
-                                               n_factor = 1, e = NULL) {
+                                               lambda0, n_factor = 1,
+                                               e = NULL) {
   J             <- length(Kv)
   K             <- Kv[1]
   seq_J         <- 1:J
@@ -343,40 +349,49 @@ components_dtl_init                <- function(alpha, beta, delta0, delta1,
   }
   if (!missing(sigma)) {
     outcome     <- "norm"
-    pi0         <- NA
+    pi0         <- lambda0 <- NA
   } else if (!missing(pi0)) {
     outcome     <- "bern"
-    sigma       <- NA
+    sigma       <- lambda0 <- NA
+  } else if (!missing(lambda0)) {
+    outcome     <- "pois"
+    sigma       <- pi0     <- NA
   }
   list(alpha = alpha, beta = beta, c = c, delta0 = delta0, delta1 = delta1,
        e = e, integer = integer, J = J, JK = J*K, Jm1 = J - 1, K = K,
-       Kp1 = K + 1, Kv = Kv, KvJ = Kv[J], n_factor = n_factor,
-       outcome = outcome, pi0 = pi0, power = power, r = ratio, seq_J = seq_J,
-       seq_js = seq_js, seq_K = 1:K, seq_KvJ = 1:Kv[J], sigma = sigma,
-       summary = summary, twoKp1 = 2*K + 1, type = type)
+       Kp1 = K + 1, Kv = Kv, KvJ = Kv[J], lambda0 = lambda0,
+       n_factor = n_factor, outcome = outcome, pi0 = pi0, power = power,
+       r = ratio, seq_J = seq_J, seq_js = seq_js, seq_K = 1:K,
+       seq_KvJ = 1:Kv[J], sigma = sigma, summary = summary, twoKp1 = 2*K + 1,
+       type = type)
 }
 
-components_dtl_update              <- function(comp, tau, pi) {
+components_dtl_update              <- function(comp, tau, pi, lambda) {
   if (comp$outcome == "norm") {
-    comp$tau      <- tau
-    comp$nrow_tau <- nrow(comp$tau)
+    comp$tau         <- tau
+    comp$nrow_tau    <- nrow(comp$tau)
     if (is.matrix(comp$sigma)) {
-      comp$sigma  <- matrix(comp$sigma[1, ], comp$nrow_tau, comp$Kp1,
-                            byrow = TRUE)
+      comp$sigma     <- matrix(comp$sigma[1, ], comp$nrow_tau, comp$Kp1,
+                               byrow = TRUE)
     } else {
       if (length(comp$sigma) == 1) {
-        comp$sigma     <- matrix(comp$sigma, 2, comp$Kp1)
+        comp$sigma   <- matrix(comp$sigma, 2, comp$Kp1)
       } else {
-        comp$sigma     <- cbind(comp$sigma[1], matrix(comp$sigma[2], 2, comp$K))
+        comp$sigma   <- cbind(comp$sigma[1], matrix(comp$sigma[2], 2, comp$K))
       }
-      comp$sigma       <- matrix(comp$sigma[1, ], comp$nrow_tau, comp$Kp1,
-                                 byrow = TRUE)
+      comp$sigma     <- matrix(comp$sigma[1, ], comp$nrow_tau, comp$Kp1,
+                               byrow = TRUE)
     }
   } else if (comp$outcome == "bern") {
-    comp$pi       <- pi
-    comp$tau      <- pi[, -1] - pi[, 1]
-    comp$nrow_pi  <- comp$nrow_tau <- nrow(comp$pi)
-    comp$sigma    <- sqrt(comp$pi*(1 - comp$pi))
+    comp$pi          <- pi
+    comp$tau         <- pi[, -1] - pi[, 1]
+    comp$nrow_pi     <- comp$nrow_tau <- nrow(comp$pi)
+    comp$sigma       <- sqrt(comp$pi*(1 - comp$pi))
+  } else if (comp$outcome == "pois") {
+    comp$lambda      <- lambda
+    comp$tau         <- lambda[, -1] - lambda[, 1]
+    comp$nrow_lambda <- comp$nrow_tau <- nrow(comp$lambda)
+    comp$sigma       <- sqrt(comp$lambda)
   }
   components_dtl_all(comp)
 }
@@ -429,6 +444,9 @@ opchar_dtl_internal                <- function(comp) {
   } else if (comp$outcome == "bern") {
     opchar            <- cbind(comp$pi, opchar)
     fact              <- paste0("pi", c(0, comp$seq_K))
+  } else if (comp$outcome == "pois") {
+    opchar            <- cbind(comp$lambda, opchar)
+    fact              <- paste0("lambda", c(0, comp$seq_K))
   }
   colnames(opchar)    <- c(fact, "Pdis", "Pcon", paste0("P", comp$seq_K),
                            paste0("FWERI", comp$seq_K),
@@ -510,6 +528,108 @@ root_ss_dtl                        <- function(ss, comp) {
     factorial(comp$K)*sum(comp$outcomes[, comp$K + comp$KvJ + 2L]) -
       (1 - comp$beta)
   }
+}
+
+sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
+                                               Kv, ratio, type, replicates,
+                                               summary, total_replicates) {
+  summary_i                   <-
+    round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
+  J                           <- length(Kv)
+  seq_J                       <- 1:J
+  K                           <- Kv[1]
+  seq_K                       <- 1:K
+  Kp1                         <- K + 1L
+  if (type == "variable") {
+    N                         <- matrix(c(n, rep(n*ratio, K)), replicates, Kp1)
+    nj_base                   <- c(n, rep(n*ratio, K))
+    maxN                      <- J*n*(1 + ratio*K)
+  } else {
+    N                         <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
+                                        replicates, K + 1L)
+    maxN                      <- n*J
+  }
+  rej_mat                     <- matrix(0L, replicates, K)
+  numeric_Kp1                 <- numeric(Kp1)
+  for (i in 1:replicates) {
+    present                   <- rep(TRUE, Kp1)
+    pi_hat                    <- numeric_Kp1
+    nj                        <- N[i, ]
+    for (j in seq_J) {
+      pi_hat_iterate          <- numeric_Kp1
+      pi_hat_iterate[present] <- stats::rbinom(sum(present), nj[present],
+                                               pi[present])
+      pi_hat                  <-
+        ((N[i, ] - nj)*pi_hat + pi_hat_iterate)/N[i, ]
+      sigma2                  <- pi_hat*(1 - pi_hat)
+      Z_j                     <-
+        (pi_hat[-1] - pi_hat[1])/sqrt(sigma2[1]/N[i, 1] + sigma2[-1]/N[i, -1])
+      if (j < J) {
+        order_Z_j             <- order(Z_j, decreasing = TRUE)
+        found                 <- 0L
+        present_new           <- c(TRUE, rep(FALSE, K))
+        counter               <- 1L
+        while (found < Kv[j + 1]) {
+          if (present[order_Z_j[counter] + 1]) {
+            present_new[order_Z_j[counter] + 1] <- TRUE
+            found             <- found + 1L
+          }
+          counter             <- counter + 1L
+        }
+        present               <- present_new
+        if (type == "variable") {
+          nj                  <- nj_base
+          nj[which(!present)] <- 0
+        } else {
+          nj                  <-
+            c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
+          nj[which(!present)] <- 0
+        }
+        N[i, ]                <- N[i, ] + nj
+      } else {
+        for (k in which(present[-1])) {
+          if (Z_j[k] > e) {
+            rej_mat[i, k]       <- 1L
+          }
+        }
+      }
+    }
+    if (all((completed_replicates + i) %in% summary_i, summary)) {
+      message("..approximately ",
+              10*which(summary_i == (completed_replicates + i)),
+              "% through the required simulations..")
+    }
+  }
+  discoveries                           <- Rfast::rowsums(rej_mat)
+  non_discoveries                       <- K - discoveries
+  neg_mat                               <- matrix(pi[-1] <= pi[1], replicates,
+                                                  K, byrow = TRUE)
+  pos_mat                               <- !neg_mat
+  false_discoveries                     <- Rfast::rowsums(rej_mat*neg_mat)
+  false_non_discoveries                 <-
+    Rfast::rowsums((rej_mat == 0)*pos_mat)
+  which_discoveries                     <- which(discoveries > 0)
+  discoveries[-which_discoveries]       <- 1
+  non_discoveries[non_discoveries == 0] <- 1
+  rowsums_N                             <- Rfast::rowsums(N)
+  c(pi, length(which_discoveries)/replicates,
+    sum(discoveries == K)/replicates,
+    Rfast::colsums(rej_mat)/replicates,
+    sapply(1:K, function(k) { sum(false_discoveries >= k) })/replicates,
+    sapply(1:K, function(k) { sum(false_non_discoveries >= k) })/replicates,
+    sum(false_discoveries)/(K*replicates),
+    sum(false_discoveries/discoveries)/replicates,
+    sum(Rfast::rowsums(rej_mat[which_discoveries, ]*
+                         matrix(pi[-1] <= pi[1], length(which_discoveries), K,
+                                byrow = TRUE))/discoveries[which_discoveries])/
+      length(which_discoveries),
+    sum(false_non_discoveries/non_discoveries)/replicates,
+    sum(Rfast::rowsums(rej_mat*pos_mat))/
+      (max(sum(pi[-1] > pi[1]), 1)*replicates),
+    sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
+      (max(sum(pi[-1] <= pi[1]), 1)*replicates),
+    sum(rowsums_N)/replicates, stats::sd(rowsums_N),
+    stats::quantile(rowsums_N, 0.5), maxN)
 }
 
 sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
@@ -614,40 +734,42 @@ sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
     stats::quantile(rowsums_N, 0.5), maxN)
 }
 
-sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
-                                               Kv, ratio, type, replicates,
+sim_dtl_pois_internal              <- function(lambda, completed_replicates, n,
+                                               e, Kv, ratio, type, replicates,
                                                summary, total_replicates) {
-  summary_i                   <-
+  summary_i                       <-
     round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
-  J                           <- length(Kv)
-  seq_J                       <- 1:J
-  K                           <- Kv[1]
-  seq_K                       <- 1:K
-  Kp1                         <- K + 1L
+  J                               <- length(Kv)
+  seq_J                           <- 1:J
+  K                               <- Kv[1]
+  seq_K                           <- 1:K
+  Kp1                             <- K + 1L
   if (type == "variable") {
-    N                         <- matrix(c(n, rep(n*ratio, K)), replicates, Kp1)
-    nj_base                   <- c(n, rep(n*ratio, K))
-    maxN                      <- J*n*(1 + ratio*K)
+    N                             <- matrix(c(n, rep(n*ratio, K)), replicates,
+                                            Kp1)
+    nj_base                       <- c(n, rep(n*ratio, K))
+    maxN                          <- J*n*(1 + ratio*K)
   } else {
-    N                         <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
-                                        replicates, K + 1L)
-    maxN                      <- n*J
+    N                             <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
+                                            replicates, K + 1L)
+    maxN                          <- n*J
   }
-  rej_mat                     <- matrix(0L, replicates, K)
-  numeric_Kp1                 <- numeric(Kp1)
+  rej_mat                         <- matrix(0L, replicates, K)
+  numeric_Kp1                     <- numeric(Kp1)
   for (i in 1:replicates) {
-    present                   <- rep(TRUE, Kp1)
-    pi_hat                    <- numeric_Kp1
-    nj                        <- N[i, ]
+    present                       <- rep(TRUE, Kp1)
+    lambda_hat                    <- numeric_Kp1
+    nj                            <- N[i, ]
     for (j in seq_J) {
-      pi_hat_iterate          <- numeric_Kp1
-      pi_hat_iterate[present] <- stats::rbinom(sum(present), nj[present],
-                                               pi[present])
-      pi_hat                  <-
-        ((N[i, ] - nj)*pi_hat + pi_hat_iterate)/N[i, ]
-      sigma2                  <- pi_hat*(1 - pi_hat)
-      Z_j                     <-
-        (pi_hat[-1] - pi_hat[1])/sqrt(sigma2[1]/N[i, 1] + sigma2[-1]/N[i, -1])
+      lambda_hat_iterate          <- numeric_Kp1
+      lambda_hat_iterate[present] <- stats::rpois(sum(present),
+                                                  nj[present]*lambda[present])
+      lambda_hat                  <-
+        ((N[i, ] - nj)*lambda_hat + lambda_hat_iterate)/N[i, ]
+      sigma2                      <- lambda_hat
+      Z_j                         <-
+        (lambda_hat[-1] - lambda_hat[1])/
+        sqrt(sigma2[1]/N[i, 1] + sigma2[-1]/N[i, -1])
       if (j < J) {
         order_Z_j             <- order(Z_j, decreasing = TRUE)
         found                 <- 0L
@@ -686,7 +808,7 @@ sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
   }
   discoveries                           <- Rfast::rowsums(rej_mat)
   non_discoveries                       <- K - discoveries
-  neg_mat                               <- matrix(pi[-1] <= pi[1], replicates,
+  neg_mat                               <- matrix(lambda[-1] <= lambda[1], replicates,
                                                   K, byrow = TRUE)
   pos_mat                               <- !neg_mat
   false_discoveries                     <- Rfast::rowsums(rej_mat*neg_mat)
@@ -696,7 +818,7 @@ sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
   discoveries[-which_discoveries]       <- 1
   non_discoveries[non_discoveries == 0] <- 1
   rowsums_N                             <- Rfast::rowsums(N)
-  c(pi, length(which_discoveries)/replicates,
+  c(lambda, length(which_discoveries)/replicates,
     sum(discoveries == K)/replicates,
     Rfast::colsums(rej_mat)/replicates,
     sapply(1:K, function(k) { sum(false_discoveries >= k) })/replicates,
@@ -704,14 +826,14 @@ sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
     sum(false_discoveries)/(K*replicates),
     sum(false_discoveries/discoveries)/replicates,
     sum(Rfast::rowsums(rej_mat[which_discoveries, ]*
-                         matrix(pi[-1] <= pi[1], length(which_discoveries), K,
+                         matrix(lambda[-1] <= lambda[1], length(which_discoveries), K,
                                 byrow = TRUE))/discoveries[which_discoveries])/
       length(which_discoveries),
     sum(false_non_discoveries/non_discoveries)/replicates,
     sum(Rfast::rowsums(rej_mat*pos_mat))/
-      (max(sum(pi[-1] > pi[1]), 1)*replicates),
+      (max(sum(lambda[-1] > lambda[1]), 1)*replicates),
     sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
-      (max(sum(pi[-1] <= pi[1]), 1)*replicates),
+      (max(sum(lambda[-1] <= lambda[1]), 1)*replicates),
     sum(rowsums_N)/replicates, stats::sd(rowsums_N),
     stats::quantile(rowsums_N, 0.5), maxN)
 }

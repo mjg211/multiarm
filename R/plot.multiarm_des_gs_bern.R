@@ -96,10 +96,10 @@ plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
                    `Stopping boundary` = c(x$e, x$f))
   plots$boundaries            <-
     ggplot2::ggplot(boundaries,
-                    ggplot2::aes(x = Stage,
-                                 y = `Stopping boundary`,
-                                 colour = Type,
-                                 by = Type)) +
+                    ggplot2::aes(x = .data$Stage,
+                                 y = .data$`Stopping boundary`,
+                                 colour = .data$Type,
+                                 by = .data$Type)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::scale_color_manual(values = c("forestgreen", "firebrick2")) +

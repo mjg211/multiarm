@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
       </span>
     </div>
 
@@ -105,12 +105,12 @@
 <div class="sourceCode" id="cb1"><pre class="downlit">
 <span class="kw">devtools</span>::<span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"mjg211/multiarm"</span>)
 </pre></div>
-<p>An introductory example of how to make use of some of the package’s core functionality can be found below. More detailed support, for single-stage designs, is available in the package vignette, which can be accessed with <code>vignette("single-stage", package = "multiarm")</code>. See also <a href="https://doi.org/10.1186/s12885-020-6525-0">Grayling and Wason (2020)</a>. For further help, please email <a href="mailto:michael.grayling@newcastle.ac.uk" class="email">michael.grayling@newcastle.ac.uk</a>.</p>
+<p>An introductory example of how to make use of some of the package’s core functionality can be found below. More detailed support, for single-stage designs, is available in the package vignette, which can be accessed with <code><a href="articles/single_stage.html">vignette("single_stage", package = "multiarm")</a></code>. See also <a href="https://doi.org/10.1186/s12885-020-6525-0">Grayling and Wason (2020)</a>. For further help, please email <a href="mailto:michael.grayling@newcastle.ac.uk" class="email">michael.grayling@newcastle.ac.uk</a>.</p>
 </div>
 <div id="details" class="section level2">
 <h2 class="hasAnchor">
 <a href="#details" class="anchor"></a>Details</h2>
-<p>In total, 31 functions are currently available. Their naming conventions are such that several character strings are joined together, separated by underscores. The first string indicates the purpose of the function (i.e., what type of calculation it performs):</p>
+<p>In total, 46 functions are currently available. Their naming conventions are such that several character strings are joined together, separated by underscores. The first string indicates the purpose of the function (i.e., what type of calculation it performs):</p>
 <ul>
 <li>
 <code>build_###_###()</code>: Build multi-arm clinical trial design objects, like those returned by the <code>des_###_###()</code> functions. For use when a specific design is of interest.</li>
@@ -140,6 +140,8 @@
 <code>###_###_bern()</code>: Assume a Bernoulli distributed primary outcome.</li>
 <li>
 <code>###_###_norm()</code>: Assume a normally distributed primary outcome.</li>
+<li>
+<code>###_###_pois()</code>: Assume a Poisson distributed primary outcome.</li>
 </ul>
 </div>
 <div id="example-single-stage-design-for-a-normally-distributed-outcome" class="section level2">
@@ -167,7 +169,7 @@
 <p>Then, the total required sample size is:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
 <span class="kw">des</span><span class="op">$</span><span class="kw">N</span>
-<span class="co">#&gt; [1] 67.40703</span>
+<span class="co">#&gt; [1] 67.43197</span>
 </pre></div>
 <p>In addition, the operating characteristics under the <em>global null</em>, <em>global alternative</em>, and each of the <em>least favourable configurations</em>, can be accessed with:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
@@ -175,11 +177,11 @@
 <span class="co">#&gt; # A tibble: 5 x 20</span>
 <span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon     P1     P2     P3 FWERI1  FWERI2  FWERI3</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1     0     0     0 0.0500 0.00108 0.0196 0.0196 0.0196 0.0500 0.00772 0.00108</span>
+<span class="co">#&gt; 1     0     0     0 0.0501 0.00108 0.0196 0.0196 0.0196 0.0501 0.00773 0.00108</span>
 <span class="co">#&gt; 2     1     1     1 0.950  0.611   0.800  0.800  0.800  0      0       0      </span>
-<span class="co">#&gt; 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0359 0.00330 0      </span>
-<span class="co">#&gt; 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0359 0.00330 0      </span>
-<span class="co">#&gt; 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0359 0.00330 0      </span>
+<span class="co">#&gt; 3     1     0     0 0.800  0.00329 0.800  0.0196 0.0196 0.0360 0.00330 0      </span>
+<span class="co">#&gt; 4     0     1     0 0.800  0.00329 0.0196 0.800  0.0196 0.0360 0.00330 0      </span>
+<span class="co">#&gt; 5     0     0     1 0.800  0.00329 0.0196 0.0196 0.800  0.0360 0.00330 0      </span>
 <span class="co">#&gt; # … with 9 more variables: FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;, FWERII3 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
 </pre></div>
@@ -232,7 +234,7 @@
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/mjg211/multiarm"><img src="https://img.shields.io/badge/devel%20version-0.11.0-blue.svg"></a></li>
+<li><a href="https://github.com/mjg211/multiarm"><img src="https://img.shields.io/badge/devel%20version-0.12.0-blue.svg"></a></li>
 <li><a href="https://github.com/mjg211/multiarm"><img src="https://img.shields.io/github/languages/code-size/mjg211/multiarm.svg"></a></li>
 <li><a href="https://www.tidyverse.org/lifecycle/#maturing"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg"></a></li>
 </ul>
