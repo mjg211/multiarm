@@ -154,7 +154,7 @@ des_gs_norm <- function(K = 2, J = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
     message("  Identifying the required sample size..")
   }
   comp$n_factor <- stats::uniroot(f        = root_ss_gs,
-                                  interval = c(1e-16, 1000),
+                                  interval = c(1e-16, 1e4),
                                   comp     = comp)$root
   if (summary) {
     message("..identified the required sample size.")

@@ -427,40 +427,47 @@ integer_dtl                        <- function(comp) {
   comp
 }
 
+calculate_mode                     <- function(x) {
+  uniq_x <- unique(na.omit(x))
+  uniq_x[which.max(tabulate(match(x, uniq_x)))]
+}
+
 opchar_dtl_internal                <- function(comp) {
-  opchar        <- matrix(0, comp$nrow_tau, 3*comp$K + 8)
+  opchar           <- matrix(0, comp$nrow_tau, 3*comp$K + 8)
   for (i in 1:comp$nrow_tau) {
-    opchar[i, ] <- opchar_dtl_internal_2(comp, i)
+    opchar[i, ]    <- opchar_dtl_internal_2(comp, i)
   }
   if (comp$type == "fixed") {
-    ess <- mss <- maxN <- comp$n_factor*comp$J
+    ess            <- mess <- moss <- maxN <- comp$n_factor*comp$J
   } else {
-    ess <- mss <- maxN <- comp$n_factor*(comp$J + sum(comp$Kv)*comp$r)
+    ess            <- mess <- moss <- maxN <-
+      comp$n_factor*(comp$J + sum(comp$Kv)*comp$r)
   }
-  opchar <- cbind(opchar, ess, 0, mss, maxN)
+  opchar           <- cbind(opchar, ess, 0, mess, moss, maxN)
   if (comp$outcome == "norm") {
-    opchar            <- cbind(comp$tau, opchar)
-    fact              <- paste0("tau", comp$seq_K)
+    opchar         <- cbind(comp$tau, opchar)
+    fact           <- paste0("tau", comp$seq_K)
   } else if (comp$outcome == "bern") {
-    opchar            <- cbind(comp$pi, opchar)
-    fact              <- paste0("pi", c(0, comp$seq_K))
+    opchar         <- cbind(comp$pi, opchar)
+    fact           <- paste0("pi", c(0, comp$seq_K))
   } else if (comp$outcome == "pois") {
-    opchar            <- cbind(comp$lambda, opchar)
-    fact              <- paste0("lambda", c(0, comp$seq_K))
+    opchar         <- cbind(comp$lambda, opchar)
+    fact           <- paste0("lambda", c(0, comp$seq_K))
   }
-  colnames(opchar)    <- c(fact, "Pdis", "Pcon", paste0("P", comp$seq_K),
-                           paste0("FWERI", comp$seq_K),
-                           paste0("FWERII", comp$seq_K), "PHER", "FDR", "pFDR",
-                           "FNDR", "Sens", "Spec", "ESS", "SDSS", "MSS", "maxN")
-  comp$opchar         <- tibble::as_tibble(opchar, .name_repair = "minimal")
+  colnames(opchar) <- c(fact, "Pdis", "Pcon", paste0("P", comp$seq_K),
+                        paste0("FWERI", comp$seq_K),
+                        paste0("FWERII", comp$seq_K), "PHER", "FDR", "pFDR",
+                        "FNDR", "Sens", "Spec", "ESS", "SDSS", "MeSS", "MoSS",
+                        "maxN")
+  comp$opchar      <- tibble::as_tibble(opchar, .name_repair = "minimal")
   comp
 }
 
 opchar_dtl_internal_2              <- function(comp, i) {
-  comp                                        <- components_dtl_all_update(comp, i)
-  neg_mat                                     <-
+  comp                            <- components_dtl_all_update(comp, i)
+  neg_mat                         <-
     matrix(comp$tau[i, ] <= 0, comp$nrow_outcomes, comp$K, byrow = TRUE)
-  tau                                         <- rep(comp$tau[i, ], comp$J)
+  tau                             <- rep(comp$tau[i, ], comp$J)
   for (i in 1:comp$nrow_outcomes) {
     comp$outcomes[i, comp$twoKp1] <-
       mvtnorm::pmvnorm(comp$lowers[[i]], comp$uppers[[i]],
@@ -480,7 +487,7 @@ opchar_dtl_internal_2              <- function(comp, i) {
           comp$discoveries[comp$disjunctive])/
     sum(comp$outcomes[comp$disjunctive, comp$twoKp1])
   if (is.nan(pFDR)) {
-    pFDR                                          <- 0
+    pFDR                          <- 0
   }
   c(sum(comp$outcomes[comp$disjunctive, comp$twoKp1]),
     sum(comp$outcomes[comp$conjunctive, comp$twoKp1]),
@@ -629,7 +636,7 @@ sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
     sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
       (max(sum(pi[-1] <= pi[1]), 1)*replicates),
     sum(rowsums_N)/replicates, stats::sd(rowsums_N),
-    stats::quantile(rowsums_N, 0.5), maxN)
+    stats::quantile(rowsums_N, 0.5), calculate_mode(rowsums_N), maxN)
 }
 
 sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
@@ -731,7 +738,7 @@ sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
     sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
       (max(sum(tau[-1] <= 0), 1)*replicates),
     sum(rowsums_N)/replicates, stats::sd(rowsums_N),
-    stats::quantile(rowsums_N, 0.5), maxN)
+    stats::quantile(rowsums_N, 0.5), calculate_mode(rowsums_N), maxN)
 }
 
 sim_dtl_pois_internal              <- function(lambda, completed_replicates, n,
@@ -835,5 +842,5 @@ sim_dtl_pois_internal              <- function(lambda, completed_replicates, n,
     sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
       (max(sum(lambda[-1] <= lambda[1]), 1)*replicates),
     sum(rowsums_N)/replicates, stats::sd(rowsums_N),
-    stats::quantile(rowsums_N, 0.5), maxN)
+    stats::quantile(rowsums_N, 0.5), calculate_mode(rowsums_N), maxN)
 }

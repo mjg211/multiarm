@@ -513,7 +513,7 @@ sample_size_ss             <- function(comp) {
   if (all(comp$power == "marginal",
           comp$correction %in% c("bonferroni", "dunnett", "none", "sidak"))) {
     comp$N <- ((comp$u + stats::qnorm(1 - comp$beta))*
-                 max(sqrt(comp$Var[1, ]))/comp$delta1)^2
+                 sqrt(comp$Var[1, comp$power_index])/comp$delta1)^2
   } else {
     Nmax   <- 3*((stats::qnorm(1 - comp$alpha/comp$K) +
                     stats::qnorm(1 - comp$beta))*

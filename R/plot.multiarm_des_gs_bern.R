@@ -122,14 +122,15 @@ plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
   }
   opchar_equal_og             <- opchar_equal <- opchar_gs_bern(x, pi)$opchar
   opchar_equal                <-
-    tidyr::pivot_longer(opchar_equal, .data$`Pdis`:.data$MSS, names_to = "type",
-                        values_to = "P")
+    tidyr::pivot_longer(opchar_equal, .data$`Pdis`:.data$MoSS,
+                        names_to = "type", values_to = "P")
   opchar_equal$type           <- factor(opchar_equal$type,
                                         c("Pdis", "Pcon", paste0("P", seq_K),
                                           paste0("FWERI", seq_K),
                                           paste0("FWERII", seq_K), "PHER",
                                           "FDR", "pFDR", "FNDR", "Sens",
-                                          "Spec", "ESS", "SDSS", "MSS"))
+                                          "Spec", "ESS", "SDSS", "MeSS",
+                                          "MoSS"))
   labels_power                <- numeric(K + 2)
   labels_power[1:2]           <- c(parse(text = "italic(P)[dis]"),
                                    parse(text = "italic(P)[con]"))
@@ -265,12 +266,13 @@ plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
   }
   labels_ss                    <- c(parse(text = "italic(ESS)"),
                                     parse(text = "italic(SDSS)"),
-                                    parse(text = "italic(MSS)"))
+                                    parse(text = "italic(MeSS)"),
+                                    parse(text = "italic(MoSS)"))
   colours_ss                   <- ggthemes::ptol_pal()(3)
   plots$equal_sample_size      <- ggplot2::ggplot() +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,
-                           (.data$type %in% c("ESS", "SDSS", "MSS"))),
+                           (.data$type %in% c("ESS", "SDSS", "MeSS", "MoSS"))),
       ggplot2::aes(.data$pi1, .data$P, col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours_ss,
                                  labels = labels_ss) +
@@ -311,9 +313,9 @@ plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
   opchar_1                    <- opchar_gs_bern(x, pi)$opchar
   opchar_shifted_og           <- opchar_shifted <- opchar_1
   opchar_shifted              <- tidyr::gather(opchar_shifted_og, "type",
-                                               "Value", .data$P1:.data$MSS)
+                                               "Value", .data$P1:.data$MoSS)
   opchar_shifted$type         <- factor(opchar_shifted$type,
-                                        c("P1", "ESS", "SDSS", "MSS"))
+                                        c("P1", "ESS", "SDSS", "MeSS", "MoSS"))
   plots$shifted_power         <- ggplot2::ggplot() +
     ggplot2::geom_line(data = dplyr::filter(opchar_shifted, .data$type == "P1"),
                        ggplot2::aes(.data$pi1, .data$Value)) +
@@ -331,7 +333,8 @@ plot.multiarm_des_gs_bern <- function(x = des_gs_bern(),
   }
   plots$shifted_sample_size      <- ggplot2::ggplot() +
     ggplot2::geom_line(
-      data = dplyr::filter(opchar_shifted, .data$type %in% c("ESS", "SDSS", "MSS")),
+      data = dplyr::filter(opchar_shifted, .data$type %in% c("ESS", "SDSS",
+                                                             "MeSS", "MoSS")),
       ggplot2::aes(.data$pi1, .data$Value, col = .data$type)) +
     ggplot2::scale_colour_manual(values = colours_ss,
                                  labels = labels_ss) +

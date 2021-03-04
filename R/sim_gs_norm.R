@@ -68,7 +68,7 @@ sim_gs_norm <- function(des = des_gs_norm(integer = TRUE), tau,
   }
   nrow_tau         <- nrow(tau)
   total_replicates <- nrow_tau*replicates
-  sim              <- matrix(0, nrow_tau, 4*des$K + 12)
+  sim              <- matrix(0, nrow_tau, 4*des$K + 13)
   for (i in 1:nrow_tau) {
     sim[i, ]       <-
       sim_gs_norm_internal(tau[i, ], (i - 1)*replicates, des$n_factor, des$e,
@@ -80,7 +80,7 @@ sim_gs_norm <- function(des = des_gs_norm(integer = TRUE), tau,
   colnames(sim)    <- c(paste0("tau", seq_K), "Pdis", "Pcon",
                         paste0("P", seq_K), paste0("FWERI", seq_K),
                         paste0("FWERII", seq_K), "PHER", "FDR", "pFDR", "FNDR",
-                        "Sens", "Spec", "ESS", "SDSS", "MSS", "maxN")
+                        "Sens", "Spec", "ESS", "SDSS", "MeSS", "MoSS", "maxN")
   sim              <- tibble::as_tibble(sim, .name_repair = "minimal")
   if (summary) {
     message("..completed the required simulations.")

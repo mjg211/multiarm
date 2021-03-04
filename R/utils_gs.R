@@ -37,8 +37,10 @@ components_gs_all                  <- function(comp) {
   ceil_perms_obj                                <- ceiling(perms_d/2)
   outcomes                                      <-
     cbind(1*(perms_d%%2 == 0), ceil_perms_obj,
-          apply(ceil_perms_obj, 1, max) +
-            (comp$type == "variable")*Rfast::rowsums(ceil_perms_obj),
+          comp$spacing[apply(ceil_perms_obj, 1, max)] +
+            (comp$type == "variable")*
+            Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
+                                  byrow = FALSE)),
           numeric(num_perms_d))
   colnames(outcomes)                            <-
     c(paste0("psi_", comp$seq_K), paste0("omega_", comp$seq_K),
@@ -277,8 +279,13 @@ components_gs_covariances_sqrt_Is  <- function(comp) {
       NC                                      <- matrix(0, comp$nrow_stage_K,
                                                         comp$J)
       for (k in 1:comp$nrow_stage_K) {
-        NC[k, ]                               <-
-          comp$n_factor*cumsum(1/(comp$r*comp$stage_K[k, ] + 1))
+        NC[k, 1]                              <-
+          comp$n_factor/(comp$r*comp$K + 1)
+        for (j in comp$seq_J[-1]) {
+          NC[k, j]                            <- NC[k, j - 1] +
+            comp$n_factor*(comp$spacing[j] - comp$spacing[j - 1])/
+            (comp$r*comp$stage_K[k, j] + 1)
+        }
       }
       NE                                      <- comp$r*NC
       sqrt_Is_null                            <- matrix(0, comp$nrow_stage_K,
@@ -326,8 +333,13 @@ components_gs_covariances_sqrt_Is  <- function(comp) {
       NC                                      <- matrix(0, comp$nrow_stage_K,
                                                         comp$J)
       for (k in 1:comp$nrow_stage_K) {
-        NC[k, ]                               <-
-          comp$n_factor*cumsum(1/(comp$r*comp$stage_K[k, ] + 1))
+        NC[k, 1]                              <-
+          comp$n_factor/(comp$r*comp$K + 1)
+        for (j in comp$seq_J[-1]) {
+          NC[k, j]                            <- NC[k, j - 1] +
+            comp$n_factor*(comp$spacing[j] - comp$spacing[j - 1])/
+            (comp$r*comp$stage_K[k, j] + 1)
+        }
       }
       NE                                      <- comp$r*NC
       sqrt_Is_null                            <- matrix(0, comp$nrow_stage_K,
@@ -402,8 +414,10 @@ components_gs_hg_lfc               <- function(comp) {
   ceil_perms_obj                                 <- ceiling(perms_d_HG/2)
   thetas_d_HG_a_fwer                             <-
     cbind(1*fact, ceil_perms_obj, deg_d_HG, deg_d_HG_a_fwer,
-          apply(ceil_perms_obj, 1, max) +
-            (comp$type == "variable")*Rfast::rowsums(ceil_perms_obj), prob_col)
+          comp$spacing[apply(ceil_perms_obj, 1, max)] +
+            (comp$type == "variable")*
+            Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
+                                  byrow = FALSE)), prob_col)
   colnames(thetas_d_HG_a_fwer)                   <-
     c(paste0("psi_", comp$seq_K), paste0("omega_", comp$seq_K),
       "deg_{HG}(psi,omega)", "deg_{HG,a-FWER}(psi,omega)",
@@ -476,16 +490,20 @@ components_gs_hg_lfc               <- function(comp) {
     thetas_bc_LFC_power                          <-
       cbind(1*(perms_K_d_bc_LFC%%2 == 0), ceil_perms_obj, deg_K_d_bc_LFC,
             deg_K_d_bc_LFC_power,
-            apply(ceil_perms_obj, 1, max) +
-              (comp$type == "variable")*Rfast::rowsums(ceil_perms_obj),
+            comp$spacing[apply(ceil_perms_obj, 1, max)] +
+              (comp$type == "variable")*
+              Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
+                                    byrow = FALSE)),
             numeric(num_perms_c_delta1*num_perms_Kmin_c_delta0))
   } else {
     ceil_perms_obj                               <- ceiling(perms_c_delta1/2)
     thetas_bc_LFC_power                          <-
       cbind(1*(perms_c_delta1%%2 == 0), ceil_perms_obj, deg_c_delta1,
             deg_c_delta1_b_power,
-            apply(ceil_perms_obj, 1, max) +
-              (comp$type == "variable")*Rfast::rowsums(ceil_perms_obj),
+            comp$spacing[apply(ceil_perms_obj, 1, max)] +
+              (comp$type == "variable")*
+              Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
+                                    byrow = FALSE)),
             numeric(num_perms_c_delta1))
   }
   colnames(thetas_bc_LFC_power)                  <-
@@ -876,7 +894,7 @@ opchar_gs_internal                 <- function(comp) {
   #comp$nrow_combs     <- nrow(comp$combs)
   #comp$seq_nrow_combs <- 1:comp$nrow_combs
   opchar              <- matrix(0, comp$nrow_tau,
-                                3*comp$K + 12) #+ comp$nrow_combs)
+                                3*comp$K + 13) #+ comp$nrow_combs)
   comp$poss_n         <-
     comp$n_factor*sort(unique(comp$outcomes[, comp$twoKp1]))
   comp$len_poss_n     <- length(comp$poss_n)
@@ -918,7 +936,7 @@ opchar_gs_internal                 <- function(comp) {
                            paste0("FWERI", comp$seq_K),
                            paste0("FWERII", comp$seq_K), "PHER", "FDR", "pFDR",
                            "FNDR", "Sens", "Spec",# paste0("P", powers_names),
-                           "ESS", "SDSS", "MSS", "maxN")
+                           "ESS", "SDSS", "MeSS", "MoSS", "maxN")
   comp$opchar         <- tibble::as_tibble(opchar, .name_repair = "minimal")
   comp$pmf_N          <- tibble::as_tibble(pmf_N, .name_repair = "minimal")
   comp
@@ -996,23 +1014,32 @@ opchar_gs_internal_2               <- function(i, comp) {
                         comp$twoKp2])
   }
   cum_S                           <- cumsum(pmf_N)
-  MSS                             <-
+  MeSS                            <-
     ifelse(any(cum_S == 0.5), 0.5*(comp$poss_n[which(cum_S == 0.5)] +
                                      comp$poss_n[which(cum_S == 0.5) + 1]),
            comp$poss_n[which(cum_S > 0.5)[1]])
-  list(opchar = c(core, ess, sqrt(vss), MSS, comp$poss_n[comp$len_poss_n]),
+  MoSS                            <-
+    mean(comp$poss_n[which(pmf_N == max(pmf_N))])
+  list(opchar = c(core, ess, sqrt(vss), MeSS, MoSS,
+                  comp$poss_n[comp$len_poss_n]),
        pmf_N  = pmf_N)
 }
 
 root_bounds_gs                     <- function(C, comp) {
-  comp   <- bounds_gs(C, comp)
-  fwer   <- 0
+  comp     <- bounds_gs(C, comp)
+  fwer     <- 0
   for (i in which(comp$thetas_d_HG_a_fwer[, comp$twoKp2] > 0)) {
-    fwer <- fwer + comp$thetas_d_HG_a_fwer[i, comp$twoKp2]*
-      mvtnorm::pmvnorm(comp$bounds[comp$l_indices_HG[[i]]],
-                       comp$bounds[comp$u_indices_HG[[i]]],
-                       comp$means_HG[[i]],
-                       sigma = comp$Lambdas_HG[[i]])[1]
+    int    <- mvtnorm::pmvnorm(comp$bounds[comp$l_indices_HG[[i]]],
+                               comp$bounds[comp$u_indices_HG[[i]]],
+                               comp$means_HG[[i]],
+                               sigma = comp$Lambdas_HG[[i]])[1]
+    if (!is.nan(int)) {
+      fwer <- fwer + comp$thetas_d_HG_a_fwer[i, comp$twoKp2]*
+        mvtnorm::pmvnorm(comp$bounds[comp$l_indices_HG[[i]]],
+                         comp$bounds[comp$u_indices_HG[[i]]],
+                         comp$means_HG[[i]],
+                         sigma = comp$Lambdas_HG[[i]])[1]
+    }
   }
   fwer - comp$alpha
 }
@@ -1121,7 +1148,7 @@ sim_gs_bern_internal               <- function(pi, completed_replicates, n, e,
     sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
       (max(sum(pi[-1] <= pi[1]), 1)*replicates),
     sum(rowsums_N)/replicates, stats::sd(rowsums_N),
-    stats::quantile(rowsums_N, 0.5), maxN)
+    stats::quantile(rowsums_N, 0.5), calculate_mode(rowsums_N), maxN)
 }
 
 sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
@@ -1217,7 +1244,7 @@ sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
     sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
       (max(sum(lambda[-1] <= lambda[1]), 1)*replicates),
     sum(rowsums_N)/replicates, stats::sd(rowsums_N),
-    stats::quantile(rowsums_N, 0.5), maxN)
+    stats::quantile(rowsums_N, 0.5), calculate_mode(rowsums_N), maxN)
 }
 
 sim_gs_norm_internal               <- function(tau, completed_replicates, n, e,
@@ -1313,5 +1340,5 @@ sim_gs_norm_internal               <- function(tau, completed_replicates, n, e,
     sum(Rfast::rowsums((rej_mat == 0)*neg_mat))/
       (max(sum(tau[-1] <= 0), 1)*replicates),
     sum(rowsums_N)/replicates, stats::sd(rowsums_N),
-    stats::quantile(rowsums_N, 0.5), maxN)
+    stats::quantile(rowsums_N, 0.5), calculate_mode(rowsums_N), maxN)
 }

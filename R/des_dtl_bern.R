@@ -110,7 +110,7 @@ des_dtl_bern <- function(Kv = c(2, 1), alpha = 0.025, beta = 0.1, pi0 = 0.3,
     message("  Identifying the stopping boundaries..")
   }
   comp$e        <- stats::uniroot(f        = root_bounds_dtl,
-                                  interval = c(-5, 5),
+                                  interval = c(-10, 10),
                                   comp     = comp)$root
   comp          <- components_dtl_update_bounds(comp$e, comp)
   N             <- des_ss_bern(Kv[1], alpha, beta, pi0, delta1, delta0,

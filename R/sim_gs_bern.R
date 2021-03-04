@@ -63,7 +63,7 @@ sim_gs_bern <- function(des = des_gs_bern(integer = TRUE), pi, replicates = 1e5,
   }
   nrow_pi          <- nrow(pi)
   total_replicates <- nrow_pi*replicates
-  sim              <- matrix(0, nrow_pi, 4*des$K + 13)
+  sim              <- matrix(0, nrow_pi, 4*des$K + 14)
   for (i in 1:nrow_pi) {
     sim[i, ]       <-
       sim_gs_bern_internal(pi[i, ], (i - 1)*replicates, des$n_factor, des$e,
@@ -74,7 +74,7 @@ sim_gs_bern <- function(des = des_gs_bern(integer = TRUE), pi, replicates = 1e5,
   colnames(sim)    <- c(paste0("pi", c(0, seq_K)), "Pdis", "Pcon",
                         paste0("P", seq_K), paste0("FWERI", seq_K),
                         paste0("FWERII", seq_K), "PHER", "FDR", "pFDR", "FNDR",
-                        "Sens", "Spec", "ESS", "SDSS", "MSS", "maxN")
+                        "Sens", "Spec", "ESS", "SDSS", "MeSS", "MoSS", "maxN")
   sim              <- tibble::as_tibble(sim, .name_repair = "minimal")
   if (summary) {
     message("..completed the required simulations.")

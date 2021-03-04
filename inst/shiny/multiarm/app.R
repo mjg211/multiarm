@@ -107,6 +107,7 @@ ui <- function(request) {
         }"
         )
       ),
+      rclipboard::rclipboardSetup(),
       shinybusy::add_busy_bar(color = "black"),
       sever::use_sever(),
       shinydashboard::tabItems(
@@ -365,6 +366,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_ss_bern_n_box"),
             shinydashboard::valueBoxOutput("design_ss_bern_fwer_box"),
             shinydashboard::valueBoxOutput("design_ss_bern_power_box")
+          ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_ss_bern_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_ss_bern_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
           ),
           ##### Rows 3-5: Operating characteristics summary ####################
           shiny::fluidRow(
@@ -4792,6 +4823,34 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
         "<i>Sensitivity</i>", "<i>Specificity</i>")
+    design$repro_code     <-
+      paste0("# Running the following code within R will reproduce the design\n",
+           "design <- des_ss_bern(K              = ", design$K,
+           ",\n                      alpha          = ",
+           design$alpha,
+           ",\n                      beta           = ", design$beta,
+           ",\n                      pi0            = ", design$pi0,
+           ",\n                      delta1         = ",
+           design$delta1,
+           ",\n                      delta0         = ",
+           design$delta0,
+           ",\n                      ratio          = c(",
+           paste(design$ratio, collapse = ", "), ")",
+           ",\n                      correction     = ",
+           design$correction,
+           ",\n                      power          = ",
+           design$power,
+           ",\n                      integer        = ",
+           design$integer,
+           ",\n                      ratio_scenario = \"",
+           design$ratio_scenario, "\")\n",
+           "# Running the following code will then reproduce the data given ",
+           "in the tables and the figures\n",
+           "tables_and_figs <- plot(design",
+           ",\n                        density     = ",
+           as.numeric(input$design_ss_bern_density),
+           ",\n                        output      = TRUE",
+           ",\n                        print_plots = TRUE)")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_ss_bern_plots),
                  message = "Outputting results")
     design
@@ -4860,6 +4919,23 @@ server <- function(input, output, session) {
       icon     = shiny::icon(name = icon_choice),
       color    = "light-blue"
     )
+  })
+
+  ##### Single-stage (Bernoulli): Code #########################################
+
+  # Plots needs to be conditional. Need to do something properly about
+  # ratio_scenario (whether it's needed) and when ratio follows sqrt(K) rule
+  output$design_ss_bern_code <- renderText({
+    input$design_ss_bern_update
+    N <- int_des_ss_bern()$N
+    int_des_ss_bern()$repro_code
+  })
+
+  output$design_ss_bern_clip <- renderUI({
+    input$design_ss_bern_update
+    N <- int_des_ss_bern()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_ss_bern()$repro_code, icon("clipboard"))
   })
 
   ##### Single-stage (Bernoulli): Summary ######################################
