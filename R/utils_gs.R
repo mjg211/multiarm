@@ -899,11 +899,16 @@ opchar_gs_internal                 <- function(comp) {
     comp$n_factor*sort(unique(comp$outcomes[, comp$twoKp1]))
   comp$len_poss_n     <- length(comp$poss_n)
   pmf_N               <- cbind(rep(comp$poss_n, comp$nrow_tau), 0)
+  summary_message     <- ceiling(seq(0.1, 1, 0.1)*comp$nrow_tau)
   for (i in 1:comp$nrow_tau) {
     output            <- opchar_gs_internal_2(i, comp)
     opchar[i, ]       <- output$opchar
     range             <- (1 + (i - 1)*comp$len_poss_n):(i*comp$len_poss_n)
     pmf_N[range, 2]   <- output$pmf_N
+    if (all(i %in% summary_message, comp$summary)) {
+      which_match     <- which(summary_message == i)
+      message("..", 10*which_match[length(which_match)], "% complete..")
+    }
   }
   #powers_names        <- character(comp$nrow_combs)
   #for (i in 1:comp$nrow_combs) {
