@@ -76,7 +76,7 @@ normally distributed." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0</span>
       </span>
     </div>
 
@@ -140,17 +140,17 @@ normally distributed.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for multiarm_des_ss_norm</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
-  x = <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span>(),
-  delta_min = <span class='op'>-</span><span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta1</span>,
-  delta_max = <span class='fl'>2</span> <span class='op'>*</span> <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta1</span>,
-  delta = <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta1</span> <span class='op'>-</span> <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta0</span>,
-  density = <span class='fl'>100</span>,
-  output = <span class='fl'>FALSE</span>,
-  print_plots = <span class='fl'>TRUE</span>,
-  summary = <span class='fl'>FALSE</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span><span class='op'>(</span><span class='op'>)</span>,
+  delta_min <span class='op'>=</span> <span class='op'>-</span><span class='va'>x</span><span class='op'>$</span><span class='va'>delta1</span>,
+  delta_max <span class='op'>=</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='va'>x</span><span class='op'>$</span><span class='va'>delta1</span>,
+  delta <span class='op'>=</span> <span class='va'>x</span><span class='op'>$</span><span class='va'>delta1</span> <span class='op'>-</span> <span class='va'>x</span><span class='op'>$</span><span class='va'>delta0</span>,
+  density <span class='op'>=</span> <span class='fl'>100</span>,
+  output <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  print_plots <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  summary <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -224,21 +224,21 @@ plots.</p></li>
 <code><a href='gui.html'>gui</a></code>, <code><a href='opchar_ss_norm.html'>opchar_ss_norm</a></code>, <code><a href='sim_ss_norm.html'>sim_ss_norm</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># The design for the default parameters</span>
-<span class='kw'>des</span>        <span class='op'>&lt;-</span> <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span>()
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='kw'>des</span>)
+<span class='va'>des</span>        <span class='op'>&lt;-</span> <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>des</span><span class='op'>)</span>
 <span class='co'># An A-optimal design, returning the avaiable outputs from</span>
 <span class='co'># plot.multiarm_des_ss_norm()</span>
-<span class='kw'>des_A</span>      <span class='op'>&lt;-</span> <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span>(ratio = <span class='st'>"A"</span>)
-<span class='kw'>plots</span>      <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='kw'>des_A</span>, output = <span class='kw'>T</span>)
+<span class='va'>des_A</span>      <span class='op'>&lt;-</span> <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span><span class='op'>(</span>ratio <span class='op'>=</span> <span class='st'>"A"</span><span class='op'>)</span>
+<span class='va'>plots</span>      <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>des_A</span>, output <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span>
 <span class='co'># Using the root-K allocation rule, modifying the desired type of power, and</span>
 <span class='co'># choosing an alternative multiple comparison correction</span>
-<span class='kw'>des_root_K</span> <span class='op'>&lt;-</span> <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span>(ratio      = <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='fl'>2</span>), <span class='fl'>2</span>),
-                          correction = <span class='st'>"holm_bonferroni"</span>,
-                          power      = <span class='st'>"disjunctive"</span>)
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='kw'>des_root_K</span>)
-}
+<span class='va'>des_root_K</span> <span class='op'>&lt;-</span> <span class='fu'><a href='des_ss_norm.html'>des_ss_norm</a></span><span class='op'>(</span>ratio      <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>, <span class='fl'>2</span><span class='op'>)</span>,
+                          correction <span class='op'>=</span> <span class='st'>"holm_bonferroni"</span>,
+                          power      <span class='op'>=</span> <span class='st'>"disjunctive"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>des_root_K</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -1,3 +1,8 @@
+# multiarm 0.13
+
+* Support added for computing median and modal sample sizes.
+* 'Code for reproduction' box added to the GUI.
+
 # multiarm 0.12
 
 * Support added for clinical trials with Poisson distributed outcomes

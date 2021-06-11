@@ -79,7 +79,7 @@ treatment effects, using simulation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0</span>
       </span>
     </div>
 
@@ -144,12 +144,12 @@ primary outcome is normally distributed, for given values of the true
 treatment effects, using simulation.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sim_gs_norm</span>(
-  des = <span class='fu'><a href='des_gs_norm.html'>des_gs_norm</a></span>(integer = <span class='fl'>TRUE</span>),
-  <span class='kw'>tau</span>,
-  replicates = <span class='fl'>1e+05</span>,
-  summary = <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>sim_gs_norm</span><span class='op'>(</span>
+  des <span class='op'>=</span> <span class='fu'><a href='des_gs_norm.html'>des_gs_norm</a></span><span class='op'>(</span>integer <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>,
+  <span class='va'>tau</span>,
+  replicates <span class='op'>=</span> <span class='fl'>1e+05</span>,
+  summary <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -199,10 +199,10 @@ operating characteristics.</p></li>
 <code><a href='opchar_gs_norm.html'>opchar_gs_norm</a></code>, <code><a href='plot.multiarm_des_gs_norm.html'>plot.multiarm_des_gs_norm</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># The estimated operating characteristics for the default parameters</span>
-<span class='kw'>sim</span>   <span class='op'>&lt;-</span> <span class='fu'>sim_gs_norm</span>()
-}
+<span class='va'>sim</span>   <span class='op'>&lt;-</span> <span class='fu'>sim_gs_norm</span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

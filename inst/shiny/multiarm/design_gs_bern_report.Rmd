@@ -209,9 +209,9 @@ The following choices were made:
 
 ```{r, echo = F, results = "asis"}
 library(knitr)
-kable(opchar[, c(1:(K + 1), (2*K + 4):(4*K + 3))])
-kable(opchar[, 1:(2*K + 3)])
-kable(opchar[, -((K + 2):(4*K + 3))])
+kable(round(opchar[, c(1:(K + 1), (2*K + 4):(4*K + 3))]), digits = 3)
+kable(round(opchar[, 1:(2*K + 3)]), digits = 3)
+kable(round(opchar[, -((K + 2):(4*K + 3))]), digits = 3)
 ```
 
 # Plots

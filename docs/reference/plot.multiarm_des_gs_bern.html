@@ -76,7 +76,7 @@ primary outcome is Bernoulli distributed." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0</span>
       </span>
     </div>
 
@@ -140,17 +140,17 @@ primary outcome is Bernoulli distributed.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for multiarm_des_gs_bern</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
-  x = <span class='fu'><a href='des_gs_bern.html'>des_gs_bern</a></span>(),
-  delta_min = <span class='op'>-</span><span class='kw'>x</span><span class='op'>$</span><span class='kw'>pi0</span> <span class='op'>+</span> <span class='fl'>1e-06</span>,
-  delta_max = <span class='fl'>1</span> <span class='op'>-</span> <span class='kw'>x</span><span class='op'>$</span><span class='kw'>pi0</span> <span class='op'>-</span> <span class='fl'>1e-06</span>,
-  delta = <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta1</span> <span class='op'>-</span> <span class='kw'>x</span><span class='op'>$</span><span class='kw'>delta0</span>,
-  density = <span class='fl'>100</span>,
-  output = <span class='fl'>FALSE</span>,
-  print_plots = <span class='fl'>TRUE</span>,
-  summary = <span class='fl'>FALSE</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='fu'><a href='des_gs_bern.html'>des_gs_bern</a></span><span class='op'>(</span><span class='op'>)</span>,
+  delta_min <span class='op'>=</span> <span class='op'>-</span><span class='va'>x</span><span class='op'>$</span><span class='va'>pi0</span> <span class='op'>+</span> <span class='fl'>1e-06</span>,
+  delta_max <span class='op'>=</span> <span class='fl'>1</span> <span class='op'>-</span> <span class='va'>x</span><span class='op'>$</span><span class='va'>pi0</span> <span class='op'>-</span> <span class='fl'>1e-06</span>,
+  delta <span class='op'>=</span> <span class='va'>x</span><span class='op'>$</span><span class='va'>delta1</span> <span class='op'>-</span> <span class='va'>x</span><span class='op'>$</span><span class='va'>delta0</span>,
+  density <span class='op'>=</span> <span class='fl'>100</span>,
+  output <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  print_plots <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  summary <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -224,11 +224,11 @@ plots.</p></li>
 <code><a href='gui.html'>gui</a></code>, <code><a href='opchar_gs_bern.html'>opchar_gs_bern</a></code>, <code><a href='sim_gs_bern.html'>sim_gs_bern</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># The design for the default parameters</span>
-<span class='kw'>des</span>        <span class='op'>&lt;-</span> <span class='fu'><a href='des_gs_bern.html'>des_gs_bern</a></span>()
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='kw'>des</span>)
-}
+<span class='va'>des</span>        <span class='op'>&lt;-</span> <span class='fu'><a href='des_gs_bern.html'>des_gs_bern</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>des</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

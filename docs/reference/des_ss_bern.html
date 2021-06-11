@@ -79,7 +79,7 @@ arm, and returns information on key operating characteristics." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0</span>
       </span>
     </div>
 
@@ -145,20 +145,20 @@ instances, <code>des_ss_bern()</code> computes the required sample size in each
 arm, and returns information on key operating characteristics.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>des_ss_bern</span>(
-  K = <span class='fl'>2</span>,
-  alpha = <span class='fl'>0.025</span>,
-  beta = <span class='fl'>0.1</span>,
-  pi0 = <span class='fl'>0.3</span>,
-  delta1 = <span class='fl'>0.2</span>,
-  delta0 = <span class='fl'>0</span>,
-  ratio = <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='kw'>K</span>),
-  correction = <span class='st'>"dunnett"</span>,
-  power = <span class='st'>"marginal"</span>,
-  integer = <span class='fl'>FALSE</span>,
-  ratio_scenario = <span class='st'>"HG"</span>,
-  summary = <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>des_ss_bern</span><span class='op'>(</span>
+  K <span class='op'>=</span> <span class='fl'>2</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.025</span>,
+  beta <span class='op'>=</span> <span class='fl'>0.1</span>,
+  pi0 <span class='op'>=</span> <span class='fl'>0.3</span>,
+  delta1 <span class='op'>=</span> <span class='fl'>0.2</span>,
+  delta0 <span class='op'>=</span> <span class='fl'>0</span>,
+  ratio <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>K</span><span class='op'>)</span>,
+  correction <span class='op'>=</span> <span class='st'>"dunnett"</span>,
+  power <span class='op'>=</span> <span class='st'>"marginal"</span>,
+  integer <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  ratio_scenario <span class='op'>=</span> <span class='st'>"HG"</span>,
+  summary <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -281,14 +281,14 @@ the chosen step-wise testing procedure. Will be <code><a href='https://rdrr.io/r
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># The design for the default parameters</span>
-<span class='kw'>des</span>        <span class='op'>&lt;-</span> <span class='fu'>des_ss_bern</span>()
+<span class='va'>des</span>        <span class='op'>&lt;-</span> <span class='fu'>des_ss_bern</span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># An A-optimal design</span>
-<span class='kw'>des_A</span>      <span class='op'>&lt;-</span> <span class='fu'>des_ss_bern</span>(ratio = <span class='st'>"A"</span>)
+<span class='va'>des_A</span>      <span class='op'>&lt;-</span> <span class='fu'>des_ss_bern</span><span class='op'>(</span>ratio <span class='op'>=</span> <span class='st'>"A"</span><span class='op'>)</span>
 <span class='co'># Using the root-K allocation rule, modifying the desired type of power, and</span>
 <span class='co'># choosing an alternative multiple comparison correction</span>
-<span class='kw'>des_root_K</span> <span class='op'>&lt;-</span> <span class='fu'>des_ss_bern</span>(ratio      = <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='fl'>2</span>), <span class='fl'>2</span>),
-                          correction = <span class='st'>"holm_bonferroni"</span>,
-                          power      = <span class='st'>"disjunctive"</span>)
+<span class='va'>des_root_K</span> <span class='op'>&lt;-</span> <span class='fu'>des_ss_bern</span><span class='op'>(</span>ratio      <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>, <span class='fl'>2</span><span class='op'>)</span>,
+                          correction <span class='op'>=</span> <span class='st'>"holm_bonferroni"</span>,
+                          power      <span class='op'>=</span> <span class='st'>"disjunctive"</span><span class='op'>)</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

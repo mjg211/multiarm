@@ -77,7 +77,7 @@ on key operating characteristics." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0</span>
       </span>
     </div>
 
@@ -141,25 +141,25 @@ distributed. It computes required design components and returns information
 on key operating characteristics.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>des_gs_norm</span>(
-  K = <span class='fl'>2</span>,
-  J = <span class='fl'>2</span>,
-  alpha = <span class='fl'>0.025</span>,
-  beta = <span class='fl'>0.1</span>,
-  delta1 = <span class='fl'>0.5</span>,
-  delta0 = <span class='fl'>0</span>,
-  sigma = <span class='fl'>1</span>,
-  ratio = <span class='fl'>1</span>,
-  power = <span class='st'>"marginal"</span>,
-  stopping = <span class='st'>"simultaneous"</span>,
-  type = <span class='st'>"variable"</span>,
-  fshape = <span class='st'>"pocock"</span>,
-  eshape = <span class='st'>"pocock"</span>,
-  ffix = <span class='op'>-</span><span class='fl'>3</span>,
-  efix = <span class='fl'>3</span>,
-  integer = <span class='fl'>FALSE</span>,
-  summary = <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>des_gs_norm</span><span class='op'>(</span>
+  K <span class='op'>=</span> <span class='fl'>2</span>,
+  J <span class='op'>=</span> <span class='fl'>2</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.025</span>,
+  beta <span class='op'>=</span> <span class='fl'>0.1</span>,
+  delta1 <span class='op'>=</span> <span class='fl'>0.5</span>,
+  delta0 <span class='op'>=</span> <span class='fl'>0</span>,
+  sigma <span class='op'>=</span> <span class='fl'>1</span>,
+  ratio <span class='op'>=</span> <span class='fl'>1</span>,
+  power <span class='op'>=</span> <span class='st'>"marginal"</span>,
+  stopping <span class='op'>=</span> <span class='st'>"simultaneous"</span>,
+  type <span class='op'>=</span> <span class='st'>"variable"</span>,
+  fshape <span class='op'>=</span> <span class='st'>"pocock"</span>,
+  eshape <span class='op'>=</span> <span class='st'>"pocock"</span>,
+  ffix <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3</span>,
+  efix <span class='op'>=</span> <span class='fl'>3</span>,
+  integer <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  summary <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -316,7 +316,7 @@ required in the control arm in stage one of the trial.</p></li>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># The design for the default parameters</span>
-<span class='kw'>des</span> <span class='op'>&lt;-</span> <span class='fu'>des_gs_norm</span>()
+<span class='va'>des</span> <span class='op'>&lt;-</span> <span class='fu'>des_gs_norm</span><span class='op'>(</span><span class='op'>)</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

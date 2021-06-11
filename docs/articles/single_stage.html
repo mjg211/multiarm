@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0</span>
       </span>
     </div>
 
@@ -79,13 +79,13 @@
 
       
 
-      </header><script src="single_stage_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="single_stage_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Single-stage multi-arm clinical trials</h1>
                         <h4 class="author">Michael J. Grayling, Newcastle University (<a href="mailto:michael.grayling@newcastle.ac.uk" class="email">michael.grayling@newcastle.ac.uk</a>)</h4>
             
-            <h4 class="date">15/12/2020</h4>
+            <h4 class="date">11/06/2021</h4>
       
       <small class="dont-index">Source: <a href="http://github.com/mjg211/multiarm/blob/master/vignettes/single_stage.Rmd"><code>vignettes/single_stage.Rmd</code></a></small>
       <div class="hidden name"><code>single_stage.Rmd</code></div>
@@ -350,26 +350,24 @@ I_{k} &amp;= \frac{1}{\frac{\lambda_0}{n_0} + \frac{\lambda_k}{n_k}}.
 <h2 class="hasAnchor">
 <a href="#example-1" class="anchor"></a>4.1. Example 1</h2>
 <p>We demonstrate the basic functionality provided in <strong>multiarm</strong>. First, identify a design using <code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code>:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://github.com/mjg211/multiarm">multiarm</a></span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/mjg211/multiarm">multiarm</a></span><span class="op">)</span>
 <span class="co">#&gt; ---------------------------------------------------------------------</span>
 <span class="co">#&gt; multiarm: Design of single- and multi-stage multi-arm clinical trials</span>
 <span class="co">#&gt; ---------------------------------------------------------------------</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; v.0.12: For an overview of the package's functionality enter: ?multiarm</span>
+<span class="co">#&gt; v.0.13: For an overview of the package's functionality enter: ?multiarm</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; For news on the latest updates enter: news(package = "multiarm")</span>
-<span class="kw">des</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/des_ss_norm.html">des_ss_norm</a></span>(integer = <span class="fl">TRUE</span>)
-</pre></div>
+<span class="va">des</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/des_ss_norm.html">des_ss_norm</a></span><span class="op">(</span>integer <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>Note that the argument <code>integer</code> has been used because we will make a call to <code><a href="../reference/sim_ss_norm.html">sim_ss_norm()</a></code> later on.</p>
 <p>We can then plot power curves with <code><a href="../reference/plot.multiarm_des_ss_norm.html">plot.multiarm_des_ss_norm()</a></code> as follows:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw">des</span>)
-</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">des</span><span class="op">)</span></code></pre></div>
 <p><img src="single_stage_files/figure-html/unnamed-chunk-2-1.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-2.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-3.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-2-4.png" width="700"></p>
 <p><code><a href="../reference/des_ss_norm.html">des_ss_norm()</a></code> contains a summary of the operating characteristics of the identified design:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="kw">des</span><span class="op">$</span><span class="kw">opchar</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">des</span><span class="op">$</span><span class="va">opchar</span>
 <span class="co">#&gt; # A tibble: 4 x 16</span>
 <span class="co">#&gt;    tau1  tau2   Pdis    Pcon     P1     P2 FWERI1  FWERI2 FWERII1 FWERII2</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
@@ -378,94 +376,84 @@ I_{k} &amp;= \frac{1}{\frac{\lambda_0}{n_0} + \frac{\lambda_k}{n_k}}.
 <span class="co">#&gt; 3   0.5   0   0.901  0.0135  0.901  0.0135 0.0135 0        0.0989  0     </span>
 <span class="co">#&gt; 4   0     0.5 0.901  0.0135  0.0135 0.901  0.0135 0        0.0989  0     </span>
 <span class="co">#&gt; # … with 6 more variables: PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
-</pre></div>
+<span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span></code></pre></div>
 <p>We can validate these using <code><a href="../reference/sim_ss_norm.html">sim_ss_norm()</a></code> with:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">sim</span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span><span class="op">(</span><span class="va">des</span><span class="op">)</span><span class="op">$</span><span class="va">sim</span>
 <span class="co">#&gt; # A tibble: 4 x 16</span>
 <span class="co">#&gt;    tau1  tau2   Pdis    Pcon     P1     P2 FWERI1  FWERI2 FWERII1 FWERII2</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0   0.0249 0.00213 0.0135 0.0135 0.0249 0.00213  0       0     </span>
-<span class="co">#&gt; 2   0.5   0.5 0.968  0.832   0.901  0.899  0      0        0.168   0.0322</span>
-<span class="co">#&gt; 3   0.5   0   0.902  0.0139  0.902  0.0139 0.0139 0        0.0977  0     </span>
-<span class="co">#&gt; 4   0     0.5 0.901  0.0136  0.0136 0.901  0.0136 0        0.0986  0     </span>
+<span class="co">#&gt; 1   0     0   0.0246 0.00185 0.0129 0.0136 0.0246 0.00185  0       0     </span>
+<span class="co">#&gt; 2   0.5   0.5 0.969  0.834   0.902  0.902  0      0        0.166   0.0314</span>
+<span class="co">#&gt; 3   0.5   0   0.902  0.0136  0.902  0.0136 0.0136 0        0.0981  0     </span>
+<span class="co">#&gt; 4   0     0.5 0.900  0.0129  0.0130 0.900  0.0130 0        0.0999  0     </span>
 <span class="co">#&gt; # … with 6 more variables: PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span>
-</pre></div>
+<span class="co">#&gt; #   Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="example-2" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example-2" class="anchor"></a>4.2. Example 2</h2>
 <p>Now, lets make use of some of the additional functionality from <strong>multiarm</strong>.</p>
 <p>First, let’s find a design for a scenario with <span class="math inline">\(K=3\)</span>, using the Holm-Bonferroni correction, desiring to control the disjunctive power, choosing the allocation ratios for <span class="math inline">\(D\)</span>-optimality, in a scenario where the standard deviations differ across the arms:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">des</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/des_ss_norm.html">des_ss_norm</a></span>(K          = <span class="fl">3</span>,
-                   sigma      = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">2</span>),
-                   ratio      = <span class="st">"D"</span>,
-                   correction = <span class="st">"holm_bonferroni"</span>,
-                   power      = <span class="st">"disjunctive"</span>,
-                   integer    = <span class="fl">TRUE</span>)
-</pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">des</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/des_ss_norm.html">des_ss_norm</a></span><span class="op">(</span>K          <span class="op">=</span> <span class="fl">3</span>,
+                   sigma      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">2</span><span class="op">)</span>,
+                   ratio      <span class="op">=</span> <span class="st">"D"</span>,
+                   correction <span class="op">=</span> <span class="st">"holm_bonferroni"</span>,
+                   power      <span class="op">=</span> <span class="st">"disjunctive"</span>,
+                   integer    <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>Thus the total required sample size by the design is:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="kw">des</span><span class="op">$</span><span class="kw">N</span>
-<span class="co">#&gt; [1] 230</span>
-</pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">des</span><span class="op">$</span><span class="va">N</span>
+<span class="co">#&gt; [1] 230</span></code></pre></div>
 <p>And, the allocation ratios are:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="kw">des</span><span class="op">$</span><span class="kw">ratio</span>
-<span class="co">#&gt; [1] 1.705882 1.970588 2.088235</span>
-</pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">des</span><span class="op">$</span><span class="va">ratio</span>
+<span class="co">#&gt; [1] 1.705882 1.970588 2.088235</span></code></pre></div>
 <p>Next, note that the operating characeristics of the truly optimal design are:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="kw">des</span><span class="op">$</span><span class="kw">opchar</span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">des</span><span class="op">$</span><span class="va">opchar</span>
 <span class="co">#&gt; # A tibble: 5 x 20</span>
-<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0     0   0.0243 9.64e-5 0.00856 0.00854 0.00852 0.0243 1.22e-3</span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.901  3.32e-1 0.822   0.614   0.449   0      0.     </span>
-<span class="co">#&gt; 3   0.5   0     0   0.788  9.67e-4 0.787   0.0124  0.0124  0.0238 9.71e-4</span>
-<span class="co">#&gt; 4   0     0.5   0   0.535  1.03e-3 0.0117  0.531   0.0114  0.0221 1.07e-3</span>
-<span class="co">#&gt; 5   0     0     0.5 0.348  9.96e-4 0.0108  0.0106  0.341   0.0203 1.12e-3</span>
+<span class="co">#&gt;    tau1  tau2  tau3   Pdis      Pcon      P1      P2      P3 FWERI1   FWERI2</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0     0     0   0.0243 0.0000964 0.00856 0.00854 0.00852 0.0243 0.00122 </span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.901  0.332     0.821   0.614   0.449   0      0       </span>
+<span class="co">#&gt; 3   0.5   0     0   0.788  0.000967  0.787   0.0124  0.0124  0.0238 0.000971</span>
+<span class="co">#&gt; 4   0     0.5   0   0.535  0.00103   0.0117  0.532   0.0114  0.0221 0.00107 </span>
+<span class="co">#&gt; 5   0     0     0.5 0.348  0.000996  0.0108  0.0106  0.341   0.0203 0.00112 </span>
 <span class="co">#&gt; # … with 10 more variables: FWERI3 &lt;dbl&gt;, FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   FWERII3 &lt;dbl&gt;, PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
-</pre></div>
+<span class="co">#&gt; #   Spec &lt;dbl&gt;</span></code></pre></div>
 <p>We can validate these with:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">sim</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/sim_ss_norm.html">sim_ss_norm</a></span><span class="op">(</span><span class="va">des</span><span class="op">)</span><span class="op">$</span><span class="va">sim</span>
 <span class="co">#&gt; # A tibble: 5 x 20</span>
-<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0     0   0.0247 0.00011 0.00883 0.00852 0.00879 0.0247 0.0013 </span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  0.331   0.820   0.613   0.449   0      0      </span>
-<span class="co">#&gt; 3   0.5   0     0   0.790  0.00112 0.789   0.0127  0.0124  0.0240 0.00112</span>
-<span class="co">#&gt; 4   0     0.5   0   0.535  0.00091 0.0119  0.532   0.0111  0.0220 0.00095</span>
-<span class="co">#&gt; 5   0     0     0.5 0.348  0.00102 0.0108  0.0108  0.341   0.0204 0.00118</span>
-<span class="co">#&gt; # … with 10 more variables: FWERI3 &lt;dbl&gt;, FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   FWERII3 &lt;dbl&gt;, PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
-</pre></div>
+<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2 FWERI3</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0     0     0   0.0242 0.00016 0.00874 0.00883 0.00812 0.0242 0.00132 1.6e-4</span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  0.332   0.821   0.617   0.449   0      0       0     </span>
+<span class="co">#&gt; 3   0.5   0     0   0.788  0.00093 0.787   0.0120  0.0118  0.0228 0.00093 0     </span>
+<span class="co">#&gt; 4   0     0.5   0   0.535  0.00108 0.0116  0.531   0.0111  0.0216 0.00112 0     </span>
+<span class="co">#&gt; 5   0     0     0.5 0.345  0.00088 0.0107  0.0106  0.338   0.0202 0.00099 0     </span>
+<span class="co">#&gt; # … with 9 more variables: FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;, FWERII3 &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;, Spec &lt;dbl&gt;</span></code></pre></div>
 <p>Or recreate them with <code><a href="../reference/opchar_ss_norm.html">opchar_ss_norm()</a></code> via:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="fu"><a href="../reference/opchar_ss_norm.html">opchar_ss_norm</a></span>(<span class="kw">des</span>)<span class="op">$</span><span class="kw">opchar</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/opchar_ss_norm.html">opchar_ss_norm</a></span><span class="op">(</span><span class="va">des</span><span class="op">)</span><span class="op">$</span><span class="va">opchar</span>
 <span class="co">#&gt; # A tibble: 5 x 20</span>
-<span class="co">#&gt;    tau1  tau2  tau3   Pdis    Pcon      P1      P2      P3 FWERI1  FWERI2</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt; 1   0     0     0   0.0243 9.64e-5 0.00856 0.00854 0.00852 0.0243 1.22e-3</span>
-<span class="co">#&gt; 2   0.5   0.5   0.5 0.902  3.32e-1 0.822   0.615   0.449   0      0.     </span>
-<span class="co">#&gt; 3   0.5   0     0   0.788  9.67e-4 0.787   0.0125  0.0124  0.0238 9.71e-4</span>
-<span class="co">#&gt; 4   0     0.5   0   0.535  1.03e-3 0.0117  0.532   0.0114  0.0221 1.07e-3</span>
-<span class="co">#&gt; 5   0     0     0.5 0.348  9.96e-4 0.0108  0.0106  0.341   0.0203 1.12e-3</span>
+<span class="co">#&gt;    tau1  tau2  tau3   Pdis      Pcon      P1      P2      P3 FWERI1   FWERI2</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1   0     0     0   0.0243 0.0000966 0.00856 0.00855 0.00852 0.0243 0.00122 </span>
+<span class="co">#&gt; 2   0.5   0.5   0.5 0.901  0.332     0.822   0.614   0.449   0      0       </span>
+<span class="co">#&gt; 3   0.5   0     0   0.788  0.000967  0.787   0.0124  0.0124  0.0238 0.000971</span>
+<span class="co">#&gt; 4   0     0.5   0   0.535  0.00103   0.0117  0.532   0.0114  0.0221 0.00107 </span>
+<span class="co">#&gt; 5   0     0     0.5 0.348  0.000996  0.0108  0.0106  0.341   0.0203 0.00112 </span>
 <span class="co">#&gt; # … with 10 more variables: FWERI3 &lt;dbl&gt;, FWERII1 &lt;dbl&gt;, FWERII2 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   FWERII3 &lt;dbl&gt;, PHER &lt;dbl&gt;, FDR &lt;dbl&gt;, pFDR &lt;dbl&gt;, FNDR &lt;dbl&gt;, Sens &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   Spec &lt;dbl&gt;</span>
-</pre></div>
+<span class="co">#&gt; #   Spec &lt;dbl&gt;</span></code></pre></div>
 <p>And, as earlier, we can produce power-curve plots with:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw">des</span>)
-</pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">des</span><span class="op">)</span></code></pre></div>
 <p><img src="single_stage_files/figure-html/unnamed-chunk-11-1.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-11-2.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-11-3.png" width="700"><img src="single_stage_files/figure-html/unnamed-chunk-11-4.png" width="700"></p>
 </div>
 </div>

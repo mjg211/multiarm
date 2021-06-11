@@ -186,9 +186,9 @@ if (power == "marginal") {
 
 ```{r, echo = F, results = "asis"}
 library(knitr)
-kable(params$data[, c(1:K, (2*K + 3):(4*K + 2))])
-kable(params$data[, 1:(2*K + 2)])
-kable(params$data[, -((K + 1):(4*K + 2))])
+kable(round(params$data[, c(1:K, (2*K + 3):(4*K + 2))]), digits = 3)
+kable(round(params$data[, 1:(2*K + 2)]), digits = 3)
+kable(round(params$data[, -((K + 1):(4*K + 2))]), digits = 3)
 ```
 
 # Plots

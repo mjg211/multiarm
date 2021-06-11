@@ -268,7 +268,7 @@ plot.multiarm_des_gs_pois <- function(x = des_gs_pois(),
                                     parse(text = "italic(SDSS)"),
                                     parse(text = "italic(MeSS)"),
                                     parse(text = "italic(MoSS)"))
-  colours_ss                   <- ggthemes::ptol_pal()(3)
+  colours_ss                   <- ggthemes::ptol_pal()(4)
   plots$equal_sample_size      <- ggplot2::ggplot() +
     ggplot2::geom_line(
       data = dplyr::filter(opchar_equal,

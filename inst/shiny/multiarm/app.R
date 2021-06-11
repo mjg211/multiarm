@@ -85,8 +85,9 @@ ui <- function(request) {
           icon    = shiny::icon(name = "question")
         ),
         shinydashboard::menuItem(
-          text    = HTML("Source code<sup><i class='fa fa-external-link' ",
-                         "style='font-size:8px'></i></sup>"),
+          text    =
+            shiny::HTML("Source code<sup><i class='fa fa-external-link' ",
+                        "style='font-size:8px'></i></sup>"),
           icon    = shiny::icon(name = "file-code-o"),
           href    = "https://github.com/mjg211/multiarm/"
         ),
@@ -97,7 +98,7 @@ ui <- function(request) {
     shinydashboard::dashboardBody(
       #tags$head(includeScript("google-analytics.js")),
       tags$script(
-        HTML(
+        shiny::HTML(
           "var openTab = function(tabName){
            $('a', $('.sidebar')).each(function() {
              if(this.getAttribute('data-value') == tabName) {
@@ -115,8 +116,8 @@ ui <- function(request) {
         shinydashboard::tabItem(
           tabName = "home",
           shinydashboard::box(
-            title       = p("multiarm: Design of single- and multi-stage ",
-                            "multi-arm clinical trials"),
+            title       = paste0("multiarm: Design of single- and ",
+                                 "multi-stage multi-arm clinical trials"),
             status      = "primary",
             width       = 12,
             solidHeader = TRUE,
@@ -443,7 +444,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -816,6 +817,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_ss_norm_fwer_box"),
             shinydashboard::valueBoxOutput("design_ss_norm_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_ss_norm_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_ss_norm_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Rows 3-5: Operating characteristics summary ####################
           shiny::fluidRow(
             shinydashboard::box(
@@ -861,7 +892,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -1217,6 +1248,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_ss_pois_fwer_box"),
             shinydashboard::valueBoxOutput("design_ss_pois_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_ss_pois_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_ss_pois_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Rows 3-5: Operating characteristics summary ####################
           shiny::fluidRow(
             shinydashboard::box(
@@ -1263,7 +1324,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -1664,6 +1725,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_gs_bern_fwer_box"),
             shinydashboard::valueBoxOutput("design_gs_bern_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_gs_bern_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_gs_bern_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Row 3: Stopping boundaries plot ################################
           shiny::fluidRow(
             shinydashboard::box(
@@ -1727,7 +1818,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -2204,6 +2295,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_gs_norm_fwer_box"),
             shinydashboard::valueBoxOutput("design_gs_norm_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_gs_norm_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_gs_norm_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Row 3: Stopping boundaries plot ################################
           shiny::fluidRow(
             shinydashboard::box(
@@ -2267,7 +2388,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -2728,6 +2849,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_gs_pois_fwer_box"),
             shinydashboard::valueBoxOutput("design_gs_pois_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_gs_pois_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_gs_pois_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Row 3: Stopping boundaries plot ################################
           shiny::fluidRow(
             shinydashboard::box(
@@ -2791,7 +2942,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -3194,6 +3345,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_dtl_bern_fwer_box"),
             shinydashboard::valueBoxOutput("design_dtl_bern_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_dtl_bern_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_dtl_bern_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Rows 3-5: Operating characteristics summary ####################
           shiny::fluidRow(
             shinydashboard::box(
@@ -3240,7 +3421,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -3597,6 +3778,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_dtl_norm_fwer_box"),
             shinydashboard::valueBoxOutput("design_dtl_norm_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_dtl_norm_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_dtl_norm_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Rows 3-5: Operating characteristics summary ######################
           shiny::fluidRow(
             shinydashboard::box(
@@ -3643,7 +3854,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -3984,6 +4195,36 @@ ui <- function(request) {
             shinydashboard::valueBoxOutput("design_dtl_pois_fwer_box"),
             shinydashboard::valueBoxOutput("design_dtl_pois_power_box")
           ),
+          shiny::fluidRow(
+            shinydashboard::box(
+              title       = "Code for reproduction",
+              width       = 12,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed   = TRUE,
+              status      = "primary",
+              shiny::column(
+                width = 12,
+                align = "right",
+                shinycssloaders::withSpinner(
+                  shiny::uiOutput("design_dtl_pois_clip"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              ),
+              shiny::column(
+                width = 12,
+                align = "left",
+                shinycssloaders::withSpinner(
+                  shiny::verbatimTextOutput("design_dtl_pois_code"),
+                  type  = 6,
+                  color = "#3C8DBC",
+                  size  = 1/3
+                )
+              )
+            )
+          ),
           ##### Rows 3-5: Operating characteristics summary ####################
           shiny::fluidRow(
             shinydashboard::box(
@@ -4030,7 +4271,7 @@ ui <- function(request) {
           shiny::fluidRow(
             shinydashboard::box(
               title       =
-                "Operating characteristics summary: Power & other quantities",
+                "Operating characteristics summary: Other",
               width       = 12,
               solidHeader = TRUE,
               collapsible = TRUE,
@@ -4160,86 +4401,78 @@ ui <- function(request) {
               width       = 12,
               solidHeader = TRUE,
               shinydashboardPlus::timelineBlock(
+                width = 12,
                 shinydashboardPlus::timelineEnd(color = "gray"),
+                shinydashboardPlus::timelineLabel("Jun 2021", color = "gray"),
                 shinydashboardPlus::timelineItem(
-                  title = strong("SCT Webinar"),
-                  icon  = "laptop",
-                  color = "gray",
-                  time  = "Feb 2021",
-                  p("The latest functionality for multi-stage designs will be",
-                    "presented during an upcoming Society for Clinical Trials",
-                    "webinar entitled",
-                    em("How to design and run an adaptive clinical trial:",
-                       "New resources and easy-to-use software"),
-                    ", being run by Graham Wheeler, Munya Dimairo, and ",
-                    "Michael Grayling.")
+                  title  = shiny::strong("1000 unique users reached"),
+                  border = FALSE,
+                  icon   = shiny::icon("users"),
+                  time   = "7 May 2021",
                 ),
                 shinydashboardPlus::timelineLabel("Jan 2021", color = "gray"),
                 shinydashboardPlus::timelineItem(
-                  title = strong("Poisson distributed outcomes now supported"),
-                  icon  = "gears",
-                  color = "gray",
+                  title =
+                    shiny::strong("Poisson distributed outcomes now supported"),
+                  icon  = shiny::icon("gears"),
                   time  = "15 Dec 2020",
-                  p("A major upgrade to the app is pushed online to provide",
-                    "support for Poisson distributed outcomes.")
+                  "A major upgrade to the app is pushed online to provide",
+                  "support for Poisson distributed outcomes."
                 ),
                 shinydashboardPlus::timelineItem(
-                  title  = strong("500 unique users reached"),
+                  title  = shiny::strong("500 unique users reached"),
                   border = FALSE,
-                  icon   = "users",
-                  color  = "gray",
+                  icon   = shiny::icon("users"),
                   time   = "15 Oct 2020",
                 ),
                 shinydashboardPlus::timelineItem(
-                  title = strong("Multi-stage designs now supported"),
-                  icon  = "gears",
-                  color = "gray",
+                  title = shiny::strong("Multi-stage designs now supported"),
+                  icon  = shiny::icon("gears"),
                   time  = "14 Oct 2020",
-                  p("A major overhaul to the app is pushed online to provide",
-                    "support for multi-stage designs.")
+                  "A major overhaul to the app is pushed online to provide",
+                  "support for multi-stage designs."
                 ),
                 shinydashboardPlus::timelineItem(
-                  title = strong("SCT 2020 Virtual Meeting"),
-                  icon  = "comments",
-                  color = "gray",
+                  title = shiny::strong("SCT 2020 Virtual Meeting"),
+                  icon  = shiny::icon("comments"),
                   time  = "1 Sep 2020",
-                  p("A talk including a discussion of upcoming multi-stage app",
-                    "functionality is given as part of the",
-                    em("Society for Clinical Trials 2020 Virtual Meeting."))
+                  shiny::p("A talk including a discussion of upcoming",
+                           "multi-stage app functionality is given as part of",
+                           "the", shiny::em("Society for Clinical Trials",
+                                            "2020 Virtual Meeting."))
                 ),
                 shinydashboardPlus::timelineLabel("June 2020", color = "gray"),
                 shinydashboardPlus::timelineItem(
-                  title  = strong("250 unique users reached"),
+                  title  = shiny::strong("250 unique users reached"),
                   border = FALSE,
-                  icon   = "users",
-                  color  = "gray",
-                  time   = "7 Feb 2020",
+                  icon   = shiny::icon("users"),
+                  time   = "7 Feb 2020"
                 ),
                 shinydashboardPlus::timelineItem(
-                  title = strong("Paper published in", em("BMC Cancer")),
-                  icon  = "file-alt",
-                  color = "gray",
+                  title = shiny::strong("Paper published in",
+                                        shiny::em("BMC Cancer")),
+                  icon  = shiny::icon("file-alt"),
                   time  = "31 Jan 2020",
-                  p("An article on designing single-stage trials for Bernoulli",
-                    "and normally distributed outcomes is published in",
-                    em("BMC Cancer."))
+                  shiny::p("An article on designing single-stage trials for",
+                           "Bernoulli and normally distributed outcomes using",
+                           "multiarm is published in", shiny::em("BMC Cancer."))
                 ),
                 shinydashboardPlus::timelineLabel("Jan 2020", color = "gray"),
                 shinydashboardPlus::timelineItem(
-                  title = strong("ICTMC 2019"),
-                  icon  = "comments",
-                  color = "gray",
+                  title = shiny::strong("ICTMC 2019"),
+                  icon  = shiny::icon("comments"),
                   time  = "6-9 Oct 2019",
-                  p("A poster on the app's single-stage functionality, along",
-                    "with a talk that included a discussion of upcoming ",
-                    "multi-stage functionality, are presented as part of the",
-                    em("5th International Clinical Trials Methodology",
-                       "Conference"), "in Brighton, UK.")
+                  shiny::p("A poster on the app's single-stage functionality,",
+                           "along with a talk that included a discussion of",
+                           "upcoming multi-stage functionality, are presented",
+                           "as part of the",
+                           shiny::em("5th International Clinical Trials",
+                                      "Methodology Conference"),
+                           "in Brighton, UK.")
                 ),
                 shinydashboardPlus::timelineItem(
-                  title = strong("Paper submitted for publication"),
-                  icon  = "file-alt",
-                  color = "gray",
+                  title = shiny::strong("Paper submitted for publication"),
+                  icon  = shiny::icon("file-alt"),
                   time  = "20 June 2019",
                   "A paper on the app's single-stage functionality is",
                   "submitted for publication; a corresponding pre-print is",
@@ -4247,26 +4480,23 @@ ui <- function(request) {
                 ),
                 shinydashboardPlus::timelineItem(
                   title  =
-                    strong("Support added for binary (Bernoulli) outcomes"),
+                    shiny::strong("Support added for binary (Bernoulli)",
+                                  "outcomes"),
                   border = FALSE,
-                  icon   = "gears",
+                  icon   = shiny::icon("gears"),
                   time   = "17 June 2019"
                 ),
                 shinydashboardPlus::timelineLabel("June 2019", color = "gray"),
                 shinydashboardPlus::timelineItem(
-                  title  = strong("100 unique users reached"),
+                  title  = shiny::strong("100 unique users reached"),
                   border = FALSE,
-                  icon   = "users",
-                  color  = "gray",
-                  time   = "6 May 2019",
+                  icon   = shiny::icon("users"),
+                  time   = "6 May 2019"
                 ),
                 shinydashboardPlus::timelineItem(
-                  title = strong("Initial beta version pushed online"),
-                  icon  = "gears",
-                  color = "gray",
-                  time  = "23 Apr 2019",
-                  p("Support originally available for continuous (normal)",
-                    "outcomes only.")
+                  title = shiny::strong("Initial beta version pushed online"),
+                  icon  = shiny::icon("gears"),
+                  time  = "23 Apr 2019"
                 ),
                 shinydashboardPlus::timelineStart(color = "gray")
               )
@@ -4289,8 +4519,8 @@ ui <- function(request) {
                     "Add functionality for ordinal (multinomial) outcomes",
                 ),
                 shinydashboardPlus::todoListItem(
-                  label = p("Add functionality for multi-stage response ","
-                            adaptive designs"),
+                  label = shiny::p("Add functionality for multi-stage response",
+                                   "adaptive designs"),
                 ),
                 shinydashboardPlus::todoListItem(
                   label = "Add functionality for TiTE (Weibull) outcomes",
@@ -4302,13 +4532,13 @@ ui <- function(request) {
                   label = "Add walkthrough/tutorial overlay"
                 ),
                 shinydashboardPlus::todoListItem(
-                  label = p("Expand background information/other details on ",
-                            "multi-arm trials"),
+                  label = shiny::p("Expand background information/other",
+                                   "details on multi-arm trials"),
                 ),
                 shinydashboardPlus::todoListItem(
                   label = "Fix minor tab linking problem",
-                  p("Need correct highlighting of currently opened tab after ",
-                    "linking")
+                  shiny::p("Need correct highlighting of currently opened tab",
+                           "after linking")
                 ),
                 shinydashboardPlus::todoListItem(
                   label = "Make geom_hline() and geom_vline() optional in plots"
@@ -4333,13 +4563,13 @@ ui <- function(request) {
                 ),
                 shinydashboardPlus::todoListItem(
                   checked = TRUE,
-                  label   = p("Add functionality for multi-stage ",
-                              "group-sequential designs")
+                  label   = shiny::p("Add functionality for multi-stage",
+                                     "group-sequential designs")
                 ),
                 shinydashboardPlus::todoListItem(
                   checked = TRUE,
-                  label   = p("Add functionality for multi-stage ",
-                              "drop-the-losers designs")
+                  label   = shiny::p("Add functionality for multi-stage",
+                                     "drop-the-losers designs")
                 )
               )
             ),
@@ -4506,16 +4736,16 @@ server <- function(input, output, session) {
                         input$design_ss_bern_ratio3,
                         input$design_ss_bern_ratio4,
                         input$design_ss_bern_ratio5), {
-                          vals <- c(input$design_ss_bern_ratio1, input$design_ss_bern_ratio2,
-                                    input$design_ss_bern_ratio3, input$design_ss_bern_ratio4,
-                                    input$design_ss_bern_ratio5)
-                          for (i in 1:5) {
-                            shinyFeedback::feedbackDanger(
-                              inputId = paste0("design_ss_bern_ratio", i),
-                              show    = (vals[i] <= 0),
-                              text    = "Must be strictly positive")
-                          }
-                        })
+    vals <- c(input$design_ss_bern_ratio1, input$design_ss_bern_ratio2,
+              input$design_ss_bern_ratio3, input$design_ss_bern_ratio4,
+              input$design_ss_bern_ratio5)
+    for (i in 1:5) {
+      shinyFeedback::feedbackDanger(
+        inputId = paste0("design_ss_bern_ratio", i),
+        show    = (vals[i] <= 0),
+        text    = "Must be strictly positive")
+    }
+  })
 
   shiny::observeEvent(input$design_ss_bern_filename, {
     shinyFeedback::feedbackWarning(
@@ -4540,7 +4770,7 @@ server <- function(input, output, session) {
           max     = 1 - input$design_ss_bern_pi0,
           step    = 0.1
         ) %>%
-          shinyhelper:: helper(
+          shinyhelper::helper(
             type    = "markdown",
             title   = "",
             content = "design_delta1",
@@ -4556,14 +4786,14 @@ server <- function(input, output, session) {
       max     = 1 - input$design_ss_bern_pi0,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
         size    = "m",
         colour  = "black"
       ))
-    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList <- shiny::tagAppendChild(inputTagList, newInput)
     inputTagList
   })
 
@@ -4600,7 +4830,7 @@ server <- function(input, output, session) {
             min     = 0,
             max     = NA,
             step    = 0.25)
-        inputTagList <<- tagAppendChild(inputTagList, newInput)
+        inputTagList <<- shiny::tagAppendChild(inputTagList, newInput)
       })
       inputTagList
     } else if (input$design_ss_bern_ratio_type %in% c("A", "D", "E")) {
@@ -4785,6 +5015,30 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_ss_bern_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_ss_bern(K              = ", design$K,
+             ",\n                      alpha          = ",
+             design$alpha,
+             ",\n                      beta           = ", design$beta,
+             ",\n                      pi0            = ", design$pi0,
+             ",\n                      delta1         = ",
+             design$delta1,
+             ",\n                      delta0         = ",
+             design$delta0,
+             ",\n                      ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                      correction     = \"",
+             design$correction,
+             "\",\n                      power          = \"",
+             design$power,
+             "\",\n                      integer        = ",
+             design$integer,
+             ",\n                      ratio_scenario = \"",
+             design$ratio_scenario, "\")")
     if (input$design_ss_bern_plots) {
       density             <- as.numeric(input$design_ss_bern_density)
       progress$inc(amount  = 0.25,
@@ -4808,6 +5062,15 @@ server <- function(input, output, session) {
                                  paste0("Shifted <i>&pi;</i><sub>",
                                         rep(seq_K, each = rows_shifted),
                                         "</sub>, #", rep(1:rows_shifted, K))))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+              "# Running the following code will then reproduce the data given",
+              " in the tables and the figures\n",
+              "tables_and_figs <- plot(design,\n",
+              "                        density     = ",
+              as.numeric(input$design_ss_bern_density), ",\n",
+              "                        output      = TRUE,\n",
+              "                        print_plots = TRUE)")
     } else {
       design$data         <-
         data.frame(design$opchar,
@@ -4823,34 +5086,6 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
         "<i>Sensitivity</i>", "<i>Specificity</i>")
-    design$repro_code     <-
-      paste0("# Running the following code within R will reproduce the design\n",
-           "design <- des_ss_bern(K              = ", design$K,
-           ",\n                      alpha          = ",
-           design$alpha,
-           ",\n                      beta           = ", design$beta,
-           ",\n                      pi0            = ", design$pi0,
-           ",\n                      delta1         = ",
-           design$delta1,
-           ",\n                      delta0         = ",
-           design$delta0,
-           ",\n                      ratio          = c(",
-           paste(design$ratio, collapse = ", "), ")",
-           ",\n                      correction     = ",
-           design$correction,
-           ",\n                      power          = ",
-           design$power,
-           ",\n                      integer        = ",
-           design$integer,
-           ",\n                      ratio_scenario = \"",
-           design$ratio_scenario, "\")\n",
-           "# Running the following code will then reproduce the data given ",
-           "in the tables and the figures\n",
-           "tables_and_figs <- plot(design",
-           ",\n                        density     = ",
-           as.numeric(input$design_ss_bern_density),
-           ",\n                        output      = TRUE",
-           ",\n                        print_plots = TRUE)")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_ss_bern_plots),
                  message = "Outputting results")
     design
@@ -4923,8 +5158,6 @@ server <- function(input, output, session) {
 
   ##### Single-stage (Bernoulli): Code #########################################
 
-  # Plots needs to be conditional. Need to do something properly about
-  # ratio_scenario (whether it's needed) and when ratio follows sqrt(K) rule
   output$design_ss_bern_code <- renderText({
     input$design_ss_bern_update
     N <- int_des_ss_bern()$N
@@ -4956,8 +5189,8 @@ server <- function(input, output, session) {
   output$design_ss_bern_table_key   <- DT::renderDT({
     K                            <- int_des_ss_bern()$K
     table_key                    <-
-      int_des_ss_bern()$data[, c(1:(K + 2), (K + 4):(2*K + 4), 4*K + 4)]
-    colnames(table_key)[2*K + 3] <- "<i>FWER</i>"
+      int_des_ss_bern()$data[, c(1:(2*K + 4), 4*K + 4)]
+    colnames(table_key)[2*K + 4] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -4980,7 +5213,7 @@ server <- function(input, output, session) {
     K                            <- int_des_ss_bern()$K
     DT::datatable(
       round(
-        int_des_ss_bern()$data[, -((2*K + 4):(4*K + 4))],
+        int_des_ss_bern()$data[, -((K + 2):(4*K + 4))],
         3),
       escape        = FALSE,
       fillContainer = TRUE
@@ -5182,7 +5415,7 @@ server <- function(input, output, session) {
       max     = input$design_ss_norm_delta1,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
@@ -5247,7 +5480,7 @@ server <- function(input, output, session) {
             max     = NA,
             step    = 0.1
           )
-        inputTagList <<- tagAppendChild(inputTagList, newInput)
+        inputTagList <<- shiny::tagAppendChild(inputTagList, newInput)
       })
       inputTagList
     }
@@ -5285,7 +5518,7 @@ server <- function(input, output, session) {
             min     = 0,
             max     = NA,
             step    = 0.25)
-        inputTagList <<- tagAppendChild(inputTagList, newInput)
+        inputTagList <<- shiny::tagAppendChild(inputTagList, newInput)
       })
       inputTagList
     }
@@ -5466,6 +5699,29 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_ss_norm_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_ss_norm(K              = ", design$K,
+             ",\n                      alpha          = ",
+             design$alpha,
+             ",\n                      beta           = ", design$beta,
+             ",\n                      delta1         = ",
+             design$delta1,
+             ",\n                      delta0         = ",
+             design$delta0,
+             ",\n                      sigma          = c(",
+             paste(design$sigma, collapse = ", "), ")",
+             ",\n                      ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                      correction     = \"",
+             design$correction,
+             "\",\n                      power          = \"",
+             design$power,
+             "\",\n                      integer        = ",
+             design$integer, ")")
     if (input$design_ss_norm_plots) {
       density             <- as.numeric(input$design_ss_norm_density)
       progress$inc(amount  = 0.25,
@@ -5488,6 +5744,15 @@ server <- function(input, output, session) {
                                  paste0("Shifted <i>&tau;</i><sub>",
                                         rep(seq_K, each = density), "</sub>, #",
                                         rep(1:density, K))))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_ss_norm_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
         data.frame(design$opchar,
@@ -5571,6 +5836,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Single-stage (normal): Code ############################################
+
+  output$design_ss_norm_code <- renderText({
+    input$design_ss_norm_update
+    N <- int_des_ss_norm()$N
+    int_des_ss_norm()$repro_code
+  })
+
+  output$design_ss_norm_clip <- renderUI({
+    input$design_ss_norm_update
+    N <- int_des_ss_norm()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_ss_norm()$repro_code, icon("clipboard"))
+  })
+
   ##### Single-stage (normal): Summary #########################################
 
   output$design_ss_norm_summary <- shiny::renderUI({
@@ -5589,8 +5869,8 @@ server <- function(input, output, session) {
   output$design_ss_norm_table_key   <- DT::renderDT({
     K                            <- int_des_ss_norm()$K
     table_key                    <-
-      int_des_ss_norm()$data[, c(1:(K + 1), (K + 3):(2*K + 3), 4*K + 3)]
-    colnames(table_key)[2*K + 2] <- "<i>FWER</i>"
+      int_des_ss_norm()$data[, c(1:(2*K + 3), 4*K + 3)]
+    colnames(table_key)[2*K + 3] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -5610,7 +5890,7 @@ server <- function(input, output, session) {
   output$design_ss_norm_table_other <- DT::renderDT({
     K <- int_des_ss_norm()$K
     DT::datatable(
-      round(int_des_ss_norm()$data[, -((2*K + 3):(4*K + 3))], 3),
+      round(int_des_ss_norm()$data[, -((K + 1):(4*K + 3))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -5791,7 +6071,7 @@ server <- function(input, output, session) {
           min     = 0,
           step    = 0.1
         ) %>%
-          shinyhelper:: helper(
+          shinyhelper::helper(
             type    = "markdown",
             title   = "",
             content = "design_delta1",
@@ -5806,14 +6086,14 @@ server <- function(input, output, session) {
       min     = -input$design_ss_pois_lambda0,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
         size    = "m",
         colour  = "black"
       ))
-    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList <- shiny::tagAppendChild(inputTagList, newInput)
     inputTagList
   })
 
@@ -5850,7 +6130,7 @@ server <- function(input, output, session) {
             min     = 0,
             max     = NA,
             step    = 0.25)
-        inputTagList <<- tagAppendChild(inputTagList, newInput)
+        inputTagList <<- shiny::tagAppendChild(inputTagList, newInput)
       })
       inputTagList
     } else if (input$design_ss_pois_ratio_type %in% c("A", "D", "E")) {
@@ -6035,6 +6315,30 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_ss_pois_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_ss_pois(K              = ", design$K,
+             ",\n                      alpha          = ",
+             design$alpha,
+             ",\n                      beta           = ", design$beta,
+             ",\n                      lambda0        = ", design$lambda0,
+             ",\n                      delta1         = ",
+             design$delta1,
+             ",\n                      delta0         = ",
+             design$delta0,
+             ",\n                      ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                      correction     = \"",
+             design$correction,
+             "\",\n                      power          = \"",
+             design$power,
+             "\",\n                      integer        = ",
+             design$integer,
+             ",\n                      ratio_scenario = \"",
+             design$ratio_scenario, "\")")
     if (input$design_ss_pois_plots) {
       density             <- as.numeric(input$design_ss_pois_density)
       progress$inc(amount  = 0.25,
@@ -6058,6 +6362,15 @@ server <- function(input, output, session) {
                                  paste0("Shifted <i>&lambda;</i><sub>",
                                         rep(seq_K, each = rows_shifted),
                                         "</sub>, #", rep(1:rows_shifted, K))))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_ss_pois_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
         data.frame(design$opchar,
@@ -6143,6 +6456,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Single-stage (Poisson): Code ###########################################
+
+  output$design_ss_pois_code <- renderText({
+    input$design_ss_pois_update
+    N <- int_des_ss_pois()$N
+    int_des_ss_pois()$repro_code
+  })
+
+  output$design_ss_pois_clip <- renderUI({
+    input$design_ss_pois_update
+    N <- int_des_ss_pois()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_ss_pois()$repro_code, icon("clipboard"))
+  })
+
   ##### Single-stage (Poisson): Summary ########################################
 
   output$design_ss_pois_summary <- shiny::renderUI({
@@ -6161,8 +6489,8 @@ server <- function(input, output, session) {
   output$design_ss_pois_table_key   <- DT::renderDT({
     K                            <- int_des_ss_pois()$K
     table_key                    <-
-      int_des_ss_pois()$data[, c(1:(K + 2), (K + 4):(2*K + 4), 4*K + 4)]
-    colnames(table_key)[2*K + 3] <- "<i>FWER</i>"
+      int_des_ss_pois()$data[, c(1:(2*K + 4), 4*K + 4)]
+    colnames(table_key)[2*K + 4] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -6185,7 +6513,7 @@ server <- function(input, output, session) {
     K                            <- int_des_ss_pois()$K
     DT::datatable(
       round(
-        int_des_ss_pois()$data[, -((2*K + 4):(4*K + 4))],
+        int_des_ss_pois()$data[, -((K + 2):(4*K + 4))],
         3),
       escape        = FALSE,
       fillContainer = TRUE
@@ -6389,7 +6717,7 @@ server <- function(input, output, session) {
           max     = 1 - input$design_gs_bern_pi0,
           step    = 0.1
         ) %>%
-          shinyhelper:: helper(
+          shinyhelper::helper(
             type    = "markdown",
             title   = "",
             content = "design_delta1",
@@ -6405,14 +6733,14 @@ server <- function(input, output, session) {
       max     = 1 - input$design_gs_bern_pi0,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
         size    = "m",
         colour  = "black"
       ))
-    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList <- shiny::tagAppendChild(inputTagList, newInput)
     inputTagList
   })
 
@@ -6663,6 +6991,28 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_gs_bern_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_gs_bern(K              = ", design$K,
+             ",\n                      J              = ", design$J,
+             ",\n                      stopping       = \"", design$stopping,
+             "\",\n                      type           = \"", design$type,
+             "\",\n                      alpha          = ", design$alpha,
+             ",\n                      beta           = ", design$beta,
+             ",\n                      pi0            = ", design$pi0,
+             ",\n                      delta1         = ", design$delta1,
+             ",\n                      delta0         = ", design$delta0,
+             ",\n                      ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                      power          = \"", design$power,
+             "\",\n                      fshape         = \"", design$fshape,
+             "\",\n                      eshape         = \"", design$eshape,
+             "\",\n                      ffix           = ", design$ffix,
+             ",\n                      efix           = ", design$efix,
+             ",\n                      integer        = ", design$integer, ")")
     if (input$design_gs_bern_plots) {
       density             <- as.numeric(input$design_gs_bern_density)
       plots               <- plot(design, density = density, output = TRUE,
@@ -6686,9 +7036,18 @@ server <- function(input, output, session) {
                                  paste0("Equal #", 1:density),
                                  paste0("Shifted #",
                                         1:(nrow(opchar) - density))))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_gs_bern_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
-        data.frame(design$opchar$opchar,
+        data.frame(design$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
       design$boundaries <- design$equal_error  <- design$equal_power <- design$equal_other <-
@@ -6701,7 +7060,8 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>I</sub></i><sub>", seq_K, "</sub>"),
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
-        "<i>Sensitivity</i>", "<i>Specificity</i>")
+        "<i>Sensitivity</i>", "<i>Specificity</i>", "<i>ESS</i>", "<i>SDSS</i>",
+        "<i>MeSS</i>", "<i>MoSS</i>", "<i>max N</i>")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_gs_bern_plots),
                  message = "Outputting results")
     design
@@ -6766,6 +7126,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Group-sequential (Bernoulli): Code #####################################
+
+  output$design_gs_bern_code <- renderText({
+    input$design_gs_bern_update
+    N <- int_des_gs_bern()$N
+    int_des_gs_bern()$repro_code
+  })
+
+  output$design_gs_bern_clip <- renderUI({
+    input$design_gs_bern_update
+    N <- int_des_gs_bern()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_gs_bern()$repro_code, icon("clipboard"))
+  })
+
   ##### Group-sequential (Bernoulli): Summary ##################################
 
   output$design_gs_bern_summary <- shiny::renderUI({
@@ -6783,11 +7158,10 @@ server <- function(input, output, session) {
 
   output$design_gs_bern_table_key   <- DT::renderDT({
     table_key                                      <-
-      int_des_gs_bern()$data[, c(1:(int_des_gs_bern()$K + 1),
-                                 (int_des_gs_bern()$K + 3):
-                                   (2*int_des_gs_bern()$K + 3),
-                                 4*int_des_gs_bern()$K + 3)]
-    colnames(table_key)[2*int_des_gs_bern()$K + 2] <- "<i>FWER</i>"
+      int_des_gs_bern()$data[, c(1:(2*int_des_gs_bern()$K + 4),
+                                 4*int_des_gs_bern()$K + 4,
+                                 4*int_des_gs_bern()$K + 10)]
+    colnames(table_key)[2*int_des_gs_bern()$K + 4] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -6797,9 +7171,9 @@ server <- function(input, output, session) {
 
   output$design_gs_bern_table_error <- DT::renderDT({
     DT::datatable(
-      round(int_des_gs_bern()$data[, c(1:int_des_gs_bern()$K,
-                                       (2*int_des_gs_bern()$K + 3):
-                                         (4*int_des_gs_bern()$K + 3))], 3),
+      round(int_des_gs_bern()$data[, c(1:(int_des_gs_bern()$K + 1),
+                                       (2*int_des_gs_bern()$K + 4):
+                                         (4*int_des_gs_bern()$K + 4))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -6807,8 +7181,9 @@ server <- function(input, output, session) {
 
   output$design_gs_bern_table_other <- DT::renderDT({
     DT::datatable(
-      round(int_des_gs_bern()$data[, -((2*int_des_gs_bern()$K + 3):
-                                         (4*int_des_gs_bern()$K + 3))], 3),
+      round(int_des_gs_bern()$data[, -c((int_des_gs_bern()$K + 2):
+                                          (4*int_des_gs_bern()$K + 4),
+                                        4*int_des_gs_bern()$K + 10)], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -7059,7 +7434,7 @@ server <- function(input, output, session) {
       max     = input$design_gs_norm_delta1,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
@@ -7356,6 +7731,29 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_gs_norm_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_gs_norm(K              = ", design$K,
+             ",\n                      J              = ", design$J,
+             ",\n                      stopping       = \"", design$stopping,
+             "\",\n                      type           = \"", design$type,
+             "\",\n                      alpha          = ", design$alpha,
+             ",\n                      beta           = ", design$beta,
+             ",\n                      delta1         = ", design$delta1,
+             ",\n                      delta0         = ", design$delta0,
+             ",\n                      sigma          = c(",
+             paste(design$sigma, collapse = ", "), ")",
+             ",\n                      ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                      power          = \"", design$power,
+             "\",\n                      fshape         = \"", design$fshape,
+             "\",\n                      eshape         = \"", design$eshape,
+             "\",\n                      ffix           = ", design$ffix,
+             ",\n                      efix           = ", design$efix,
+             ",\n                      integer        = ", design$integer, ")")
     if (input$design_gs_norm_plots) {
       density             <- as.numeric(input$design_gs_norm_density)
       plots               <- plot(design, density = density, output = TRUE,
@@ -7378,9 +7776,18 @@ server <- function(input, output, session) {
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>"),
                                  paste0("Equal #", 1:density),
                                  paste0("Shifted #", 1:density)))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_gs_norm_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
-        data.frame(design$opchar$opchar,
+        data.frame(design$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
       design$boundaries <- design$equal_error  <- design$equal_power <- design$equal_other <- design$equal_sample_size <-
@@ -7393,7 +7800,8 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
         "<i>Sensitivity</i>", "<i>Specificity</i>",
-        "<i>ESS</i>", "<i>SDSS</i>", "<i>MSS</i>", "<i>max N</i>")
+        "<i>ESS</i>", "<i>SDSS</i>", "<i>MeSS</i>", "<i>MoSS</i>",
+        "<i>max N</i>")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_gs_norm_plots),
                  message = "Outputting results")
     design
@@ -7458,6 +7866,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Group-sequential (normal): Code ########################################
+
+  output$design_gs_norm_code <- renderText({
+    input$design_gs_norm_update
+    N <- int_des_gs_norm()$N
+    int_des_gs_norm()$repro_code
+  })
+
+  output$design_gs_norm_clip <- renderUI({
+    input$design_gs_norm_update
+    N <- int_des_gs_norm()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_gs_norm()$repro_code, icon("clipboard"))
+  })
+
   ##### Group-sequential (normal): Summary #####################################
 
   output$design_gs_norm_summary <- shiny::renderUI({
@@ -7475,11 +7898,10 @@ server <- function(input, output, session) {
 
   output$design_gs_norm_table_key   <- DT::renderDT({
     table_key                                      <-
-      int_des_gs_norm()$data[, c(1:(int_des_gs_norm()$K + 1),
-                                 (int_des_gs_norm()$K + 3):
-                                   (2*int_des_gs_norm()$K + 3),
-                                 4*int_des_gs_norm()$K + 3)]
-    colnames(table_key)[2*int_des_gs_norm()$K + 2] <- "<i>FWER</i>"
+      int_des_gs_norm()$data[, c(1:(2*int_des_gs_norm()$K + 3),
+                                 4*int_des_gs_norm()$K + 3,
+                                 4*int_des_gs_norm()$K + 9)]
+    colnames(table_key)[2*int_des_gs_norm()$K + 3] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -7499,8 +7921,9 @@ server <- function(input, output, session) {
 
   output$design_gs_norm_table_other <- DT::renderDT({
     DT::datatable(
-      round(int_des_gs_norm()$data[, -((2*int_des_gs_norm()$K + 3):
-                                         (4*int_des_gs_norm()$K + 3))], 3),
+      round(int_des_gs_norm()$data[, -c((int_des_gs_norm()$K + 1):
+                                          (4*int_des_gs_norm()$K + 3),
+                                        4*int_des_gs_norm()$K + 9)], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -7742,7 +8165,7 @@ server <- function(input, output, session) {
           min     = 0,
           step    = 0.1
         ) %>%
-          shinyhelper:: helper(
+          shinyhelper::helper(
             type    = "markdown",
             title   = "",
             content = "design_delta1",
@@ -7757,14 +8180,14 @@ server <- function(input, output, session) {
       min     = -input$design_gs_pois_lambda0,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
         size    = "m",
         colour  = "black"
       ))
-    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList <- shiny::tagAppendChild(inputTagList, newInput)
     inputTagList
   })
 
@@ -8015,6 +8438,28 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_gs_pois_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_gs_pois(K              = ", design$K,
+             ",\n                      J              = ", design$J,
+             ",\n                      stopping       = \"", design$stopping,
+             "\",\n                      type           = \"", design$type,
+             "\",\n                      alpha          = ", design$alpha,
+             ",\n                      beta           = ", design$beta,
+             ",\n                      lambda0        = ", design$lambda0,
+             ",\n                      delta1         = ", design$delta1,
+             ",\n                      delta0         = ", design$delta0,
+             ",\n                      ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                      power          = \"", design$power,
+             "\",\n                      fshape         = \"", design$fshape,
+             "\",\n                      eshape         = \"", design$eshape,
+             "\",\n                      ffix           = ", design$ffix,
+             ",\n                      efix           = ", design$efix,
+             ",\n                      integer        = ", design$integer, ")")
     if (input$design_gs_pois_plots) {
       density             <- as.numeric(input$design_gs_pois_density)
       plots               <- plot(design, density = density, output = TRUE,
@@ -8038,9 +8483,18 @@ server <- function(input, output, session) {
                                  paste0("Equal #", 1:density),
                                  paste0("Shifted #",
                                         1:(nrow(opchar) - density))))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_gs_pois_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
-        data.frame(design$opchar$opchar,
+        data.frame(design$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
       design$boundaries <- design$equal_error  <- design$equal_power <- design$equal_other <-
@@ -8053,7 +8507,8 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>I</sub></i><sub>", seq_K, "</sub>"),
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
-        "<i>Sensitivity</i>", "<i>Specificity</i>")
+        "<i>Sensitivity</i>", "<i>Specificity</i>", "<i>ESS</i>", "<i>SDSS</i>",
+        "<i>MeSS</i>", "<i>MoSS</i>", "<i>max N</i>")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_gs_pois_plots),
                  message = "Outputting results")
     design
@@ -8118,6 +8573,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Group-sequential (Poisson): Code #######################################
+
+  output$design_gs_pois_code <- renderText({
+    input$design_gs_pois_update
+    N <- int_des_gs_pois()$N
+    int_des_gs_pois()$repro_code
+  })
+
+  output$design_gs_pois_clip <- renderUI({
+    input$design_gs_pois_update
+    N <- int_des_gs_pois()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_gs_pois()$repro_code, icon("clipboard"))
+  })
+
   ##### Group-sequential (Poisson): Summary ####################################
 
   output$design_gs_pois_summary <- shiny::renderUI({
@@ -8135,11 +8605,10 @@ server <- function(input, output, session) {
 
   output$design_gs_pois_table_key   <- DT::renderDT({
     table_key                                      <-
-      int_des_gs_pois()$data[, c(1:(int_des_gs_pois()$K + 1),
-                                 (int_des_gs_pois()$K + 3):
-                                   (2*int_des_gs_pois()$K + 3),
-                                 4*int_des_gs_pois()$K + 3)]
-    colnames(table_key)[2*int_des_gs_pois()$K + 2] <- "<i>FWER</i>"
+      int_des_gs_pois()$data[, c(1:(2*int_des_gs_pois()$K + 4),
+                                 4*int_des_gs_pois()$K + 4,
+                                 4*int_des_gs_pois()$K + 10)]
+    colnames(table_key)[2*int_des_gs_pois()$K + 4] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -8149,9 +8618,9 @@ server <- function(input, output, session) {
 
   output$design_gs_pois_table_error <- DT::renderDT({
     DT::datatable(
-      round(int_des_gs_pois()$data[, c(1:int_des_gs_pois()$K,
-                                       (2*int_des_gs_pois()$K + 3):
-                                         (4*int_des_gs_pois()$K + 3))], 3),
+      round(int_des_gs_pois()$data[, c(1:(int_des_gs_pois()$K + 1),
+                                       (2*int_des_gs_pois()$K + 4):
+                                         (4*int_des_gs_pois()$K + 4))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -8159,8 +8628,9 @@ server <- function(input, output, session) {
 
   output$design_gs_pois_table_other <- DT::renderDT({
     DT::datatable(
-      round(int_des_gs_pois()$data[, -((2*int_des_gs_pois()$K + 3):
-                                         (4*int_des_gs_pois()$K + 3))], 3),
+      round(int_des_gs_pois()$data[, -c((int_des_gs_pois()$K + 2):
+                                          (4*int_des_gs_pois()$K + 4),
+                                        4*int_des_gs_pois()$K + 10)], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -8434,7 +8904,7 @@ server <- function(input, output, session) {
           max     = 1 - input$design_dtl_bern_pi0,
           step    = 0.1
         ) %>%
-          shinyhelper:: helper(
+          shinyhelper::helper(
             type    = "markdown",
             title   = "",
             content = "design_delta1",
@@ -8450,14 +8920,14 @@ server <- function(input, output, session) {
       max     = 1 - input$design_dtl_bern_pi0,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
         size    = "m",
         colour  = "black"
       ))
-    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList <- shiny::tagAppendChild(inputTagList, newInput)
     inputTagList
   })
 
@@ -8648,6 +9118,24 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_dtl_bern_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_dtl_bern(Kv              = c(",
+             paste(design$Kv, collapse = ", "), ")",
+             ",\n                       type           = \"", design$type,
+             "\",\n                       alpha          = ", design$alpha,
+             ",\n                       beta           = ", design$beta,
+             ",\n                       pi0            = ", design$pi0,
+             ",\n                       delta1         = ", design$delta1,
+             ",\n                       delta0         = ", design$delta0,
+             ",\n                       ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                       power          = \"", design$power,
+             "\",\n                       integer        = ", design$integer,
+             ")")
     if (input$design_dtl_bern_plots) {
       density             <- as.numeric(input$design_dtl_bern_density)
       plots               <- plot(design, density = density, output = TRUE,
@@ -8667,9 +9155,18 @@ server <- function(input, output, session) {
                                  paste0("Equal #", 1:density),
                                  paste0("Shifted #",
                                         1:(nrow(opchar) - density))))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_dtl_bern_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
-        data.frame(design$opchar$opchar,
+        data.frame(design$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
       design$equal_error  <- design$equal_power <- design$equal_other <-
@@ -8682,7 +9179,7 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
         "<i>Sensitivity</i>", "<i>Specificity</i>", "<i>ESS</i>", "<i>SDSS</i>",
-        "<i>MSS</i>", "<i>max N</i>")
+        "<i>MeSS</i>", "<i>MoSS</i>", "<i>max N</i>")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_dtl_bern_plots),
                  message = "Outputting results")
     design
@@ -8744,6 +9241,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Drop-the-losers (Bernoulli): Code ######################################
+
+  output$design_dtl_bern_code <- renderText({
+    input$design_dtl_bern_update
+    N <- int_des_dtl_bern()$N
+    int_des_dtl_bern()$repro_code
+  })
+
+  output$design_dtl_bern_clip <- renderUI({
+    input$design_dtl_bern_update
+    N <- int_des_dtl_bern()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_dtl_bern()$repro_code, icon("clipboard"))
+  })
+
   ##### Drop-the-losers (Bernoulli): Summary ###################################
 
   output$design_dtl_bern_summary <- shiny::renderUI({
@@ -8761,11 +9273,10 @@ server <- function(input, output, session) {
 
   output$design_dtl_bern_table_key   <- DT::renderDT({
     table_key                                      <-
-      int_des_dtl_bern()$data[, c(1:(int_des_dtl_bern()$K + 1),
-                                  (int_des_dtl_bern()$K + 3):
-                                    (2*int_des_dtl_bern()$K + 3),
-                                  4*int_des_dtl_bern()$K + 3)]
-    colnames(table_key)[2*int_des_dtl_bern()$K + 2] <- "<i>FWER</i>"
+      int_des_dtl_bern()$data[, c(1:(2*int_des_dtl_bern()$K + 4),
+                                 4*int_des_dtl_bern()$K + 4,
+                                 4*int_des_dtl_bern()$K + 10)]
+    colnames(table_key)[2*int_des_dtl_bern()$K + 4] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -8775,9 +9286,9 @@ server <- function(input, output, session) {
 
   output$design_dtl_bern_table_error <- DT::renderDT({
     DT::datatable(
-      round(int_des_dtl_bern()$data[, c(1:int_des_dtl_bern()$K,
-                                        (2*int_des_dtl_bern()$K + 3):
-                                          (4*int_des_dtl_bern()$K + 3))], 3),
+      round(int_des_dtl_bern()$data[, c(1:(int_des_dtl_bern()$K + 1),
+                                       (2*int_des_dtl_bern()$K + 4):
+                                         (4*int_des_dtl_bern()$K + 4))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -8785,8 +9296,9 @@ server <- function(input, output, session) {
 
   output$design_dtl_bern_table_other <- DT::renderDT({
     DT::datatable(
-      round(int_des_dtl_bern()$data[, -((2*int_des_dtl_bern()$K + 3):
-                                          (4*int_des_dtl_bern()$K + 3))], 3),
+      round(int_des_dtl_bern()$data[, -c((int_des_dtl_bern()$K + 2):
+                                          (4*int_des_dtl_bern()$K + 4),
+                                        4*int_des_dtl_bern()$K + 10)], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -9019,7 +9531,7 @@ server <- function(input, output, session) {
       max     = input$design_dtl_norm_delta1,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
@@ -9255,6 +9767,25 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_dtl_norm_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_dtl_norm(Kv              = c(",
+             paste(design$Kv, collapse = ", "), ")",
+             ",\n                       type           = \"", design$type,
+             "\",\n                       alpha          = ", design$alpha,
+             ",\n                       beta           = ", design$beta,
+             ",\n                       delta1         = ", design$delta1,
+             ",\n                       delta0         = ", design$delta0,
+             ",\n                       sigma          = c(",
+             paste(design$sigma, collapse = ", "), ")",
+             ",\n                       ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                       power          = \"", design$power,
+             "\",\n                       integer        = ", design$integer,
+             ")")
     if (input$design_dtl_norm_plots) {
       density             <- as.numeric(input$design_dtl_norm_density)
       plots               <- plot(design, density = density, output = TRUE,
@@ -9273,9 +9804,18 @@ server <- function(input, output, session) {
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>"),
                                  paste0("Equal #", 1:density),
                                  paste0("Shifted #", 1:density)))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_dtl_norm_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
-        data.frame(design$opchar$opchar,
+        data.frame(design$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
       design$equal_error  <- design$equal_power <- design$equal_other <-
@@ -9288,7 +9828,7 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
         "<i>Sensitivity</i>", "<i>Specificity</i>", "<i>ESS</i>", "<i>SDSS</i>",
-        "<i>MSS</i>", "<i>max N</i>")
+        "<i>MeSS</i>", "<i>MoSS</i>", "<i>max N</i>")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_dtl_norm_plots),
                  message = "Outputting results")
     design
@@ -9351,6 +9891,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Drop-the-losers (normal): Code #########################################
+
+  output$design_dtl_norm_code <- renderText({
+    input$design_dtl_norm_update
+    N <- int_des_dtl_norm()$N
+    int_des_dtl_norm()$repro_code
+  })
+
+  output$design_dtl_norm_clip <- renderUI({
+    input$design_dtl_norm_update
+    N <- int_des_dtl_norm()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_dtl_norm()$repro_code, icon("clipboard"))
+  })
+
   ##### Drop-the-losers (normal): Summary ######################################
 
   output$design_dtl_norm_summary <- shiny::renderUI({
@@ -9368,11 +9923,10 @@ server <- function(input, output, session) {
 
   output$design_dtl_norm_table_key   <- DT::renderDT({
     table_key                                      <-
-      int_des_dtl_norm()$data[, c(1:(int_des_dtl_norm()$K + 1),
-                                  (int_des_dtl_norm()$K + 3):
-                                    (2*int_des_dtl_norm()$K + 3),
-                                  4*int_des_dtl_norm()$K + 3)]
-    colnames(table_key)[2*int_des_dtl_norm()$K + 2] <- "<i>FWER</i>"
+      int_des_dtl_norm()$data[, c(1:(2*int_des_dtl_norm()$K + 3),
+                                 4*int_des_dtl_norm()$K + 3,
+                                 4*int_des_dtl_norm()$K + 9)]
+    colnames(table_key)[2*int_des_dtl_norm()$K + 3] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -9383,8 +9937,8 @@ server <- function(input, output, session) {
   output$design_dtl_norm_table_error <- DT::renderDT({
     DT::datatable(
       round(int_des_dtl_norm()$data[, c(1:int_des_dtl_norm()$K,
-                                        (2*int_des_dtl_norm()$K + 3):
-                                          (4*int_des_dtl_norm()$K + 3))], 3),
+                                       (2*int_des_dtl_norm()$K + 3):
+                                         (4*int_des_dtl_norm()$K + 3))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -9392,8 +9946,9 @@ server <- function(input, output, session) {
 
   output$design_dtl_norm_table_other <- DT::renderDT({
     DT::datatable(
-      round(int_des_dtl_norm()$data[, -((2*int_des_dtl_norm()$K + 3):
-                                          (4*int_des_dtl_norm()$K + 3))], 3),
+      round(int_des_dtl_norm()$data[, -c((int_des_dtl_norm()$K + 1):
+                                          (4*int_des_dtl_norm()$K + 3),
+                                        4*int_des_dtl_norm()$K + 9)], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -9616,7 +10171,7 @@ server <- function(input, output, session) {
           min     = 0,
           step    = 0.1
         ) %>%
-          shinyhelper:: helper(
+          shinyhelper::helper(
             type    = "markdown",
             title   = "",
             content = "design_delta1",
@@ -9631,14 +10186,14 @@ server <- function(input, output, session) {
       min     = -input$design_dtl_pois_lambda0,
       step    = 0.1
     ) %>%
-      shinyhelper:: helper(
+      shinyhelper::helper(
         type    = "markdown",
         title   = "",
         content = "design_delta0",
         size    = "m",
         colour  = "black"
       ))
-    inputTagList <- tagAppendChild(inputTagList, newInput)
+    inputTagList <- shiny::tagAppendChild(inputTagList, newInput)
     inputTagList
   })
 
@@ -9828,6 +10383,24 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_dtl_pois_summary_modified.html")
     )
     design$data_og        <- design$opchar
+    design$repro_code     <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will reproduce the design\n",
+             "design <- des_dtl_pois(Kv              = c(",
+             paste(design$Kv, collapse = ", "), ")",
+             ",\n                       type           = \"", design$type,
+             "\",\n                       alpha          = ", design$alpha,
+             ",\n                       beta           = ", design$beta,
+             ",\n                       lambda0        = ", design$lambda0,
+             ",\n                       delta1         = ", design$delta1,
+             ",\n                       delta0         = ", design$delta0,
+             ",\n                       ratio          = c(",
+             paste(design$ratio, collapse = ", "), ")",
+             ",\n                       power          = \"", design$power,
+             "\",\n                       integer        = ", design$integer,
+             ")")
     if (input$design_dtl_pois_plots) {
       density             <- as.numeric(input$design_dtl_pois_density)
       plots               <- plot(design, density = density, output = TRUE,
@@ -9847,9 +10420,18 @@ server <- function(input, output, session) {
                                  paste0("Equal #", 1:density),
                                  paste0("Shifted #",
                                         1:(nrow(opchar) - density))))
+      design$repro_code   <-
+        paste0(design$repro_code, "\n",
+               "# Running the following code will then reproduce the data given",
+               " in the tables and the figures\n",
+               "tables_and_figs <- plot(design,\n",
+               "                        density     = ",
+               as.numeric(input$design_dtl_pois_density), ",\n",
+               "                        output      = TRUE,\n",
+               "                        print_plots = TRUE)")
     } else {
       design$data         <-
-        data.frame(design$opchar$opchar,
+        data.frame(design$opchar,
                    row.names = c("<i>H<sub>G</sub></i>", "<i>H<sub>A</sub></i>",
                                  paste0("<i>LFC<sub>", seq_K, "</sub></i>")))
       design$equal_error  <- design$equal_power <- design$equal_other <-
@@ -9862,7 +10444,7 @@ server <- function(input, output, session) {
         paste0("<i>FWER<sub>II</sub></i><sub>", seq_K, "</sub>"),
         "<i>PHER</i>", "<i>FDR</i>", "<i>pFDR</i>", "<i>FNDR</i>",
         "<i>Sensitivity</i>", "<i>Specificity</i>", "<i>ESS</i>", "<i>SDSS</i>",
-        "<i>MSS</i>", "<i>max N</i>")
+        "<i>MeSS</i>", "<i>MoSS</i>", "<i>max N</i>")
     progress$inc(amount  = 0.25 + as.numeric(!input$design_dtl_pois_plots),
                  message = "Outputting results")
     design
@@ -9924,6 +10506,21 @@ server <- function(input, output, session) {
     )
   })
 
+  ##### Drop-the-losers (Poisson): Code ########################################
+
+  output$design_dtl_pois_code <- renderText({
+    input$design_dtl_pois_update
+    N <- int_des_dtl_pois()$N
+    int_des_dtl_pois()$repro_code
+  })
+
+  output$design_dtl_pois_clip <- renderUI({
+    input$design_dtl_pois_update
+    N <- int_des_dtl_pois()$N
+    rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
+                            int_des_dtl_pois()$repro_code, icon("clipboard"))
+  })
+
   ##### Drop-the-losers (Poisson): Summary #####################################
 
   output$design_dtl_pois_summary <- shiny::renderUI({
@@ -9941,11 +10538,10 @@ server <- function(input, output, session) {
 
   output$design_dtl_pois_table_key   <- DT::renderDT({
     table_key                                      <-
-      int_des_dtl_pois()$data[, c(1:(int_des_dtl_pois()$K + 1),
-                                  (int_des_dtl_pois()$K + 3):
-                                    (2*int_des_dtl_pois()$K + 3),
-                                  4*int_des_dtl_pois()$K + 3)]
-    colnames(table_key)[2*int_des_dtl_pois()$K + 2] <- "<i>FWER</i>"
+      int_des_dtl_pois()$data[, c(1:(2*int_des_dtl_pois()$K + 4),
+                                 4*int_des_dtl_pois()$K + 4,
+                                 4*int_des_dtl_pois()$K + 10)]
+    colnames(table_key)[2*int_des_dtl_pois()$K + 4] <- "<i>FWER</i>"
     DT::datatable(
       round(table_key, 3),
       escape        = FALSE,
@@ -9955,9 +10551,9 @@ server <- function(input, output, session) {
 
   output$design_dtl_pois_table_error <- DT::renderDT({
     DT::datatable(
-      round(int_des_dtl_pois()$data[, c(1:int_des_dtl_pois()$K,
-                                        (2*int_des_dtl_pois()$K + 3):
-                                          (4*int_des_dtl_pois()$K + 3))], 3),
+      round(int_des_dtl_pois()$data[, c(1:(int_des_dtl_pois()$K + 1),
+                                       (2*int_des_dtl_pois()$K + 4):
+                                         (4*int_des_dtl_pois()$K + 4))], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -9965,8 +10561,9 @@ server <- function(input, output, session) {
 
   output$design_dtl_pois_table_other <- DT::renderDT({
     DT::datatable(
-      round(int_des_dtl_pois()$data[, -((2*int_des_dtl_pois()$K + 3):
-                                          (4*int_des_dtl_pois()$K + 3))], 3),
+      round(int_des_dtl_pois()$data[, -c((int_des_dtl_pois()$K + 2):
+                                          (4*int_des_dtl_pois()$K + 4),
+                                        4*int_des_dtl_pois()$K + 10)], 3),
       escape        = FALSE,
       fillContainer = TRUE
     )
@@ -10042,12 +10639,12 @@ server <- function(input, output, session) {
                          n10          = int_des_dtl_pois()$n10,
                          n1           = int_des_dtl_pois()$n1,
                          opchar       = int_des_dtl_pois()$opchar,
-                         plots        = input$design_gs_pois_plots,
+                         plots        = input$design_dtl_pois_plots,
                          power        = int_des_dtl_pois()$power,
                          ratio_type   = input$design_gs_pois_ratio_type,
                          ratio_init   = input$design_gs_pois_ratio1,
                          ratio        = int_des_dtl_pois()$ratio,
-                         swss         = input$design_gs_pois_swss,
+                         swss         = input$design_dtl_pois_swss,
                          equal_error  = int_des_dtl_pois()$equal_error,
                          equal_power  = int_des_dtl_pois()$equal_power,
                          equal_other  = int_des_dtl_pois()$equal_other,
@@ -10109,13 +10706,13 @@ server <- function(input, output, session) {
   shiny::onBookmarked(updateQueryString)
 
   sever::sever(
-    html = tagList(
-      h1("Whoops...you have been disconnected"),
-      p("There are several reasons this could happen. You can try reconnecting",
-        "by clicking the button below. If this problem persists, please ",
-        "email:"),
-      HTML('<a href="mailto:michael.grayling@newcastle.ac.uk">michael.grayling@newcastle.ac.uk</a>'),
-      p(),
+    html = shiny::tagList(
+      shiny::h1("Whoops...you have been disconnected"),
+      shiny::p("There are several reasons this could happen. You can try",
+        "reconnecting by clicking the button below. If this problem persists,",
+        "please email:"),
+      shiny::HTML('<a href="mailto:michael.grayling@newcastle.ac.uk">michael.grayling@newcastle.ac.uk</a>'),
+      shiny::p(),
       sever::reload_button("Reconnect", "default")
     ),
     bg_color = "rgba(0,0,0,.5)",

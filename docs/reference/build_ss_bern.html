@@ -76,7 +76,7 @@ those returned by des_ss_bern." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multiarm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.13.0</span>
       </span>
     </div>
 
@@ -139,17 +139,17 @@ object assuming the primary outcome variable is Bernoulli distributed, like
 those returned by <code><a href='des_ss_bern.html'>des_ss_bern</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_ss_bern</span>(
-  n = <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>141</span>, <span class='fl'>3</span>),
-  alpha = <span class='fl'>0.025</span>,
-  beta = <span class='fl'>0.1</span>,
-  pi0 = <span class='fl'>0.3</span>,
-  delta1 = <span class='fl'>0.2</span>,
-  delta0 = <span class='fl'>0</span>,
-  correction = <span class='st'>"dunnett"</span>,
-  power = <span class='st'>"marginal"</span>,
-  summary = <span class='kw'>F</span>
-)</pre>
+    <pre class="usage"><span class='fu'>build_ss_bern</span><span class='op'>(</span>
+  n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>141</span>, <span class='fl'>3</span><span class='op'>)</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.025</span>,
+  beta <span class='op'>=</span> <span class='fl'>0.1</span>,
+  pi0 <span class='op'>=</span> <span class='fl'>0.3</span>,
+  delta1 <span class='op'>=</span> <span class='fl'>0.2</span>,
+  delta0 <span class='op'>=</span> <span class='fl'>0</span>,
+  correction <span class='op'>=</span> <span class='st'>"dunnett"</span>,
+  power <span class='op'>=</span> <span class='st'>"marginal"</span>,
+  summary <span class='op'>=</span> <span class='cn'>F</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -245,10 +245,10 @@ vector of allocation ratios,
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># The design for the default parameters</span>
-<span class='kw'>des</span>     <span class='op'>&lt;-</span> <span class='fu'>build_ss_bern</span>()
+<span class='va'>des</span>     <span class='op'>&lt;-</span> <span class='fu'>build_ss_bern</span><span class='op'>(</span><span class='op'>)</span>
 <span class='co'># Modifying the number of experimental treatments and the sample size in each</span>
 <span class='co'># arm</span>
-<span class='kw'>des_K_n</span> <span class='op'>&lt;-</span> <span class='fu'>build_ss_bern</span>(n = <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fl'>4</span>))
+<span class='va'>des_K_n</span> <span class='op'>&lt;-</span> <span class='fu'>build_ss_bern</span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
