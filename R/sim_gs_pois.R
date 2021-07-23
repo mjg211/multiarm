@@ -38,8 +38,8 @@
 #' @seealso \code{\link{build_gs_pois}}, \code{\link{des_gs_pois}},
 #' \code{\link{opchar_gs_pois}}, \code{\link{plot.multiarm_des_gs_pois}}.
 #' @export
-sim_gs_pois <- function(des = des_gs_pois(integer = TRUE), lambda, replicates = 1e5,
-                        summary = FALSE) {
+sim_gs_pois <- function(des = des_gs_pois(integer = TRUE), lambda,
+                        replicates = 1e5, summary = FALSE) {
 
   ##### Check input variables ##################################################
 
@@ -67,8 +67,9 @@ sim_gs_pois <- function(des = des_gs_pois(integer = TRUE), lambda, replicates = 
   for (i in 1:nrow_lambda) {
     sim[i, ]       <-
       sim_gs_pois_internal(lambda[i, ], (i - 1)*replicates, des$n_factor, des$e,
-                           des$f, des$ratio, des$stopping, des$type, replicates,
-                           des$K, des$J, summary, total_replicates)
+                           des$f, des$ratio, des$spacing, des$stopping,
+                           des$type, replicates, des$K, des$J, summary,
+                           total_replicates)
   }
   seq_K            <- 1:des$K
   colnames(sim)    <- c(paste0("lambda", c(0, seq_K)), "Pdis", "Pcon",
@@ -87,7 +88,7 @@ sim_gs_pois <- function(des = des_gs_pois(integer = TRUE), lambda, replicates = 
     message("..outputting.")
   }
   list(des        = des,
-       lambda         = lambda,
+       lambda     = lambda,
        replicates = replicates,
        sim        = sim,
        summary    = summary)

@@ -91,6 +91,24 @@ check_delta0_delta1        <- function(delta0, delta1, name_delta0, name_delta1,
   }
 }
 
+check_ef                   <- function(e, f, name_e, name_f) {
+  if (any(length(e) != length(f), !is.numeric(e), !is.numeric(f))) {
+    stop(name_e, " and ", name_f, " must be numeric vector of the same length")
+  }
+  if (any(f[1:(length(f) - 1)] >= e[1:(length(e) - 1)])) {
+    stop("Interim elements of ", name_f, " must be strictly less than ",
+         "corresponding elements of ", name_e)
+  }
+  if (f[length(f)] > e[length(e)]) {
+    stop("The final element of ", name_f, " must not be greater than the final",
+         " element of ", name_e)
+  }
+  if (e[length(e)] != f[length(f)]) {
+    warning("Typically the final elements of ", name_e, " and ", name_f,
+            " should be equal")
+  }
+}
+
 check_gamma_gammaO         <- function(gamma, gammaO, K, correction, name_gamma,
                                        name_gammaO, name_K, name_correction) {
   if (correction %in% c("bonferroni", "dunnett", "none", "sidak")) {

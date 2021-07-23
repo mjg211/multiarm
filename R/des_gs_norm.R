@@ -59,6 +59,11 @@
 #' @param efix A \code{\link{numeric}} indicating the chosen value for the fixed
 #' interim efficacy bounds. Only used when \code{eshape = "fixed"}. Defaults to
 #' \code{"3"}.
+#' @param spacing A \code{\link{numeric}} \code{\link{vector}} indicating the
+#' chosen spacing of the interim analyses in terms of the proportion of the
+#' maximal possible sample size. It must contain strictly increasing values,
+#' with final element equal to \code{1}. Defaults to
+#' \code{(1:J)/J} (i.e., to equally spaced analyses).
 #' @param integer A \code{\link{logical}} variable indicating whether the
 #' computed possible sample sizes required in each arm in each stage should be
 #' forced to be whole numbers. Defaults to \code{FALSE}. WARNING: If you set
@@ -106,7 +111,8 @@ des_gs_norm <- function(K = 2, J = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
                         delta0 = 0, sigma = 1, ratio = 1, power = "marginal",
                         stopping = "simultaneous", type = "variable",
                         fshape = "pocock", eshape = "pocock", ffix = -3,
-                        efix = 3, integer = FALSE, summary = FALSE) {
+                        efix = 3, spacing = (1:J)/J, integer = FALSE,
+                        summary = FALSE) {
 
   ##### Check input variables ##################################################
 
@@ -122,14 +128,15 @@ des_gs_norm <- function(K = 2, J = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
   check_belong(type, "type", c("fixed", "variable"), 1)
   check_boundaries(fshape, eshape, ffix, efix, "fshape", "eshape", "ffix",
                    "efix")
+  #check_spacing(spacing, "spacing", J)
   check_logical(integer, "integer")
   check_logical(summary, "summary")
 
   ##### Print summary ##########################################################
 
   comp <- components_gs_init(alpha, beta, delta0, delta1, efix, eshape, ffix,
-                             fshape, integer, J, K, power, ratio, stopping,
-                             summary, type, sigma)
+                             fshape, integer, J, K, power, ratio, spacing,
+                             stopping, summary, type, sigma)
   if (summary) {
     #summary_des_gs_norm(comp)
     message("")
@@ -201,6 +208,7 @@ des_gs_norm <- function(K = 2, J = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
                         power      = power,
                         ratio      = ratio,
                         sigma      = sigma,
+                        spacing    = spacing,
                         stopping   = stopping,
                         summary    = summary,
                         type       = type)

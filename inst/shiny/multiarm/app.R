@@ -313,6 +313,13 @@ ui <- function(request) {
               shiny::hr(),
               shiny::uiOutput("design_ss_bern_warning"),
               shiny::actionButton(
+                inputId = "design_ss_bern_code",
+                label   = "  Generate code  ",
+                icon    = shiny::icon(name = "code"),
+                width   = "100%"
+              ),
+              shiny::hr(),
+              shiny::actionButton(
                 inputId = "design_ss_bern_update",
                 label   = "  Update outputs  ",
                 icon    = shiny::icon(name = "check-square-o"),
@@ -4940,6 +4947,57 @@ server <- function(input, output, session) {
 
   ##### Single-stage (Bernoulli): int_des_ss_bern() ############################
 
+  int_des_ss_bern_code <- shiny::eventReactive(c(input$design_ss_bern_code,
+                                                 input$design_ss_bern_update), {
+    K                     <- input$design_ss_bern_K
+    if (input$design_ss_bern_ratio_type == "equal_all") {
+      ratio               <- rep(1, K)
+    } else if (input$design_ss_bern_ratio_type == "equal_exp") {
+      ratio               <- rep(input$design_ss_bern_ratio1, K)
+    } else if (input$design_ss_bern_ratio_type == "unequal") {
+      ratio               <- numeric(K)
+      for (i in 1:K) {
+        ratio[i]          <- input[[paste0("design_ss_bern_ratio", i)]]
+      }
+    } else if (input$design_ss_bern_ratio_type == "root_K") {
+      ratio               <- rep(1/sqrt(K), K)
+    }
+    if (input$design_ss_bern_ratio_type %in% c("A", "D", "E")) {
+      ratio               <- input$design_ss_bern_ratio_type
+      ratio_scenario      <- input$design_ss_bern_ratio_scenario
+    } else {
+      ratio_scenario      <- "HG"
+    }
+    repro_code            <-
+      paste0("install.packages(\"devtools\")\n",
+             "devtools::install_github(\"mjg211/multiarm\")\n",
+             "library(multiarm)\n",
+             "# Running the following code within R will (re)produce the ",
+             "design\n",
+             "design <- des_ss_bern(K              = ", K,
+             ",\n                      alpha          = ",
+             input$design_ss_bern_alpha,
+             ",\n                      beta           = ",
+             1 - input$design_ss_bern_beta,
+             ",\n                      pi0            = ",
+             input$design_ss_bern_pi0,
+             ",\n                      delta1         = ",
+             input$design_ss_bern_delta1,
+             ",\n                      delta0         = ",
+             input$design_ss_bern_delta0,
+             ",\n                      ratio          = c(",
+             paste(ratio, collapse = ", "), ")",
+             ",\n                      correction     = \"",
+             input$design_ss_bern_correction,
+             "\",\n                      power          = \"",
+             input$design_ss_bern_power,
+             "\",\n                      integer        = ",
+             input$design_ss_bern_integer,
+             ",\n                      ratio_scenario = \"",
+             ratio_scenario, "\")")
+    list(repro_code = repro_code)
+  })
+
   int_des_ss_bern <- shiny::eventReactive(input$design_ss_bern_update, {
     K                     <- input$design_ss_bern_K
     seq_K                 <- 1:K
@@ -5015,30 +5073,30 @@ server <- function(input, output, session) {
       file = paste0(tempdir(), "/design_ss_bern_summary_modified.html")
     )
     design$data_og        <- design$opchar
-    design$repro_code     <-
-      paste0("install.packages(\"devtools\")\n",
-             "devtools::install_github(\"mjg211/multiarm\")\n",
-             "library(multiarm)\n",
-             "# Running the following code within R will reproduce the design\n",
-             "design <- des_ss_bern(K              = ", design$K,
-             ",\n                      alpha          = ",
-             design$alpha,
-             ",\n                      beta           = ", design$beta,
-             ",\n                      pi0            = ", design$pi0,
-             ",\n                      delta1         = ",
-             design$delta1,
-             ",\n                      delta0         = ",
-             design$delta0,
-             ",\n                      ratio          = c(",
-             paste(design$ratio, collapse = ", "), ")",
-             ",\n                      correction     = \"",
-             design$correction,
-             "\",\n                      power          = \"",
-             design$power,
-             "\",\n                      integer        = ",
-             design$integer,
-             ",\n                      ratio_scenario = \"",
-             design$ratio_scenario, "\")")
+    #design$repro_code     <-
+    #  paste0("install.packages(\"devtools\")\n",
+    #         "devtools::install_github(\"mjg211/multiarm\")\n",
+    #         "library(multiarm)\n",
+    #         "# Running the following code within R will reproduce the design\n",
+    #         "design <- des_ss_bern(K              = ", design$K,
+    #         ",\n                      alpha          = ",
+    #         design$alpha,
+    #         ",\n                      beta           = ", design$beta,
+    #         ",\n                      pi0            = ", design$pi0,
+    #         ",\n                      delta1         = ",
+    #         design$delta1,
+    #         ",\n                      delta0         = ",
+    #         design$delta0,
+    #         ",\n                      ratio          = c(",
+    #         paste(design$ratio, collapse = ", "), ")",
+    #         ",\n                      correction     = \"",
+    #         design$correction,
+    #         "\",\n                      power          = \"",
+    #         design$power,
+    #         "\",\n                      integer        = ",
+    #         design$integer,
+    #         ",\n                      ratio_scenario = \"",
+    #         design$ratio_scenario, "\")")
     if (input$design_ss_bern_plots) {
       density             <- as.numeric(input$design_ss_bern_density)
       progress$inc(amount  = 0.25,
@@ -5062,15 +5120,15 @@ server <- function(input, output, session) {
                                  paste0("Shifted <i>&pi;</i><sub>",
                                         rep(seq_K, each = rows_shifted),
                                         "</sub>, #", rep(1:rows_shifted, K))))
-      design$repro_code   <-
-        paste0(design$repro_code, "\n",
-              "# Running the following code will then reproduce the data given",
-              " in the tables and the figures\n",
-              "tables_and_figs <- plot(design,\n",
-              "                        density     = ",
-              as.numeric(input$design_ss_bern_density), ",\n",
-              "                        output      = TRUE,\n",
-              "                        print_plots = TRUE)")
+      #design$repro_code   <-
+      #  paste0(design$repro_code, "\n",
+      #        "# Running the following code will then reproduce the data given",
+      #        " in the tables and the figures\n",
+      #        "tables_and_figs <- plot(design,\n",
+      #        "                        density     = ",
+      #        as.numeric(input$design_ss_bern_density), ",\n",
+      #        "                        output      = TRUE,\n",
+      #        "                        print_plots = TRUE)")
     } else {
       design$data         <-
         data.frame(design$opchar,
@@ -5159,16 +5217,19 @@ server <- function(input, output, session) {
   ##### Single-stage (Bernoulli): Code #########################################
 
   output$design_ss_bern_code <- renderText({
+    input$design_ss_bern_code
     input$design_ss_bern_update
-    N <- int_des_ss_bern()$N
-    int_des_ss_bern()$repro_code
+    repro_code <- int_des_ss_bern_code()$repro_code
+    int_des_ss_bern_code()$repro_code
   })
 
   output$design_ss_bern_clip <- renderUI({
+    input$design_ss_bern_code
     input$design_ss_bern_update
-    N <- int_des_ss_bern()$N
+    repro_code <- int_des_ss_bern_code()$repro_code
     rclipboard::rclipButton("clipbtn", "Copy to Clipboard",
-                            int_des_ss_bern()$repro_code, icon("clipboard"))
+                            int_des_ss_bern_code()$repro_code,
+                            icon("clipboard"))
   })
 
   ##### Single-stage (Bernoulli): Summary ######################################

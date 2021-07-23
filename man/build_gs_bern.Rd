@@ -6,8 +6,8 @@
 distributed primary outcome}
 \usage{
 build_gs_bern(
-  n1 = 231,
   n10 = 77,
+  n1 = n10 * (1 + K * ratio),
   e = c(2.42, 2.42),
   f = c(-2.42, 2.42),
   K = 2,
@@ -20,17 +20,18 @@ build_gs_bern(
   power = "marginal",
   stopping = "simultaneous",
   type = "variable",
-  summary = F
+  spacing = (1:length(e))/length(e),
+  summary = FALSE
 )
 }
 \arguments{
-\item{n1}{A \code{\link{numeric}} indicating the chosen value for
-\ifelse{html}{\out{<i>n</i><sub>1</sub>}}{\eqn{n_1}}, the total sample size
-required in stage one of the trial. Defaults to \code{162}.}
-
 \item{n10}{A \code{\link{numeric}} indicating the chosen value for
 \ifelse{html}{\out{<i>n</i><sub>10</sub>}}{\eqn{n_{10}}}, the sample size
 required in the control arm in stage one of the trial. Defaults to \code{54}.}
+
+\item{n1}{A \code{\link{numeric}} indicating the chosen value for
+\ifelse{html}{\out{<i>n</i><sub>1</sub>}}{\eqn{n_1}}, the total sample size
+required in stage one of the trial. Defaults to \code{n10\*(1 + K\*ratio)}.}
 
 \item{e}{A \code{\link{numeric}} \code{\link{vector}} indicating the chosen
 value for \ifelse{html}{\out{<b><i>e</i></b>}}{\eqn{\bold{e}}}, the efficacy
@@ -79,6 +80,12 @@ to \code{"simultaneous"}.}
 \item{type}{A \code{\link{character}} string indicating the choice for the
 stage-wise sample size. Can be \code{"variable"} or \code{"fixed"}. Defaults
 to \code{"variable"}.}
+
+\item{spacing}{A \code{\link{numeric}} \code{\link{vector}} indicating the
+chosen spacing of the interim analyses in terms of the proportion of the
+maximal possible sample size. It must contain strictly increasing values,
+with final element equal to \code{1}. Defaults to
+\code{(1:length(e))/length(e)} (i.e., to equally spaced analyses).}
 
 \item{summary}{A \code{\link{logical}} variable indicating whether a summary
 of the function's progress should be printed to the console. Defaults to

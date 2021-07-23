@@ -21,8 +21,9 @@ des_gs_bern(
   eshape = "pocock",
   ffix = -3,
   efix = 3,
-  integer = F,
-  summary = F
+  spacing = (1:J)/J,
+  integer = FALSE,
+  summary = FALSE
 )
 }
 \arguments{
@@ -87,6 +88,12 @@ interim futility bounds. Only used when \code{fshape = "fixed"}. Defaults to
 \item{efix}{A \code{\link{numeric}} indicating the chosen value for the fixed
 interim efficacy bounds. Only used when \code{eshape = "fixed"}. Defaults to
 \code{"3"}.}
+
+\item{spacing}{A \code{\link{numeric}} \code{\link{vector}} indicating the
+chosen spacing of the interim analyses in terms of the proportion of the
+maximal possible sample size. It must contain strictly increasing values,
+with final element equal to \code{1}. Defaults to
+\code{(1:J)/J} (i.e., to equally spaced analyses).}
 
 \item{integer}{A \code{\link{logical}} variable indicating whether the
 computed possible sample sizes required in each arm in each stage should be

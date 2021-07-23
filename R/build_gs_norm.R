@@ -5,12 +5,12 @@
 #' clinical trial design object assuming the primary outcome variable is
 #' normally distributed, like those returned by \code{\link{des_gs_norm}}.
 #'
-#' @param n1 A \code{\link{numeric}} indicating the chosen value for
-#' \ifelse{html}{\out{<i>n</i><sub>1</sub>}}{\eqn{n_1}}, the total sample size
-#' required in stage one of the trial. Defaults to \code{162}.
 #' @param n10 A \code{\link{numeric}} indicating the chosen value for
 #' \ifelse{html}{\out{<i>n</i><sub>10</sub>}}{\eqn{n_{10}}}, the sample size
 #' required in the control arm in stage one of the trial. Defaults to \code{54}.
+#' @param n1 A \code{\link{numeric}} indicating the chosen value for
+#' \ifelse{html}{\out{<i>n</i><sub>1</sub>}}{\eqn{n_1}}, the total sample size
+#' required in stage one of the trial. Defaults to \code{n10\*(1 + K\*ratio)}.
 #' @param e A \code{\link{numeric}} \code{\link{vector}} indicating the chosen
 #' value for \ifelse{html}{\out{<b><i>e</i></b>}}{\eqn{\bold{e}}}, the efficacy
 #' (upper) stopping boundaries. Defaults to \code{c(2.42, 2.42)}.
@@ -53,6 +53,11 @@
 #' @param type A \code{\link{character}} string indicating the choice for the
 #' stage-wise sample size. Can be \code{"variable"} or \code{"fixed"}. Defaults
 #' to \code{"variable"}.
+#' @param spacing A \code{\link{numeric}} \code{\link{vector}} indicating the
+#' chosen spacing of the interim analyses in terms of the proportion of the
+#' maximal possible sample size. It must contain strictly increasing values,
+#' with final element equal to \code{1}. Defaults to
+#' \code{(1:length(e))/length(e)} (i.e., to equally spaced analyses).
 #' @param summary A \code{\link{logical}} variable indicating whether a summary
 #' of the function's progress should be printed to the console. Defaults to
 #' \code{FALSE}.
@@ -78,33 +83,36 @@
 #' \code{\link{opchar_gs_norm}}, \code{\link{plot.multiarm_des_gs_norm}},
 #' \code{\link{sim_gs_norm}}.
 #' @export
-build_gs_norm <- function(n1 = 162, n10 = 54, e = c(2.42, 2.42),
+build_gs_norm <- function(n10 = 77, n1 = n10*(1 + K*ratio), e = c(2.42, 2.42),
                           f = c(-2.42, 2.42), K = 2, alpha = 0.025, beta = 0.1,
                           delta1 = 0.5, delta0 = 0, sigma = 1, ratio = 1,
                           power = "marginal", stopping = "simultaneous",
-                          type = "variable", summary = FALSE) {
+                          type = "variable", spacing = (1:length(e))/length(e),
+                          summary = FALSE) {
 
   ##### Check input variables ##################################################
 
-  #check_n1_n10(n1, n10, "n1", "n10", int = F)
+  check_real_range_strict(n10, "n10", c(0, Inf), 1)
+  check_real_range_strict(n1, "n1", c(0, Inf), 1)
   #check_ef(e, f, "e", "f")
-  J     <- length(e)
-  K     <- check_integer_range(K, "K", c(1, Inf), 1)
+  J             <- length(e)
+  K             <- check_integer_range(K, "K", c(1, Inf), 1)
   check_real_range_strict(alpha, "alpha", c(0, 1), 1)
   check_real_range_strict(beta, "beta", c(0, 1), 1)
   check_delta0_delta1(delta0, delta1, "delta0", "delta1")
-  sigma <- check_sigma(sigma, name_sigma = "sigma", des = "mams")
+  sigma         <- check_sigma(sigma, name_sigma = "sigma", des = "mams")
   check_real_range_strict(ratio, "ratio", c(0, Inf), 1)
   check_belong(power, "power", c("conjunctive", "disjunctive", "marginal"), 1)
   check_belong(stopping, "stopping", c("simultaneous", "separate"), 1)
   check_belong(type, "type", c("fixed", "variable"), 1)
+  #check_spacing(spacing, "spacing", J)
   check_logical(summary, "summary")
 
   ##### Print summary ##########################################################
 
   if (summary) {
-    #summary_build_gs_norm(n1, n10, e, f, K, alpha, beta, delta1, delta0, sigma,
-    #                      ratio, power, stopping, type)
+    #summary_build_gs_norm(n10, n1, e, f, K, alpha, beta, delta1, delta0, sigma,
+    #                      ratio, power, spacing, stopping, type)
     message("")
   }
 
@@ -113,20 +121,20 @@ build_gs_norm <- function(n1 = 162, n10 = 54, e = c(2.42, 2.42),
   if (summary) {
     message(" Building outputs..")
   }
-  integer    <- all(c(n1, n10)%%1 == 0)
+  integer       <- all(c(n1, n10) %% 1 == 0)
   if (type == "variable") {
-    n_factor <- n10
+    n_factor    <- n10
   } else {
-    n_factor <- n1
+    n_factor    <- n1
   }
-  comp       <- components_gs_init(alpha, beta, delta0, delta1, NA, NA, NA, NA,
-                                   integer, J, K, power, ratio, stopping,
-                                   summary, type, sigma, n_factor = n_factor,
-                                   f = f, e = e)
-  tau        <- rbind(numeric(K), rep(delta1, K),
-                      matrix(delta0, K, K) + (delta1 - delta0)*diag(K))
-  comp       <- components_gs_update(comp, tau)
-  comp       <- opchar_gs_internal(comp)
+  comp          <- components_gs_init(alpha, beta, delta0, delta1, NA, NA, NA,
+                                      NA, integer, J, K, power, ratio, spacing,
+                                      stopping, summary, type, sigma,
+                                      n_factor = n_factor, f = f, e = e)
+  tau           <- rbind(numeric(K), rep(delta1, K),
+                         matrix(delta0, K, K) + (delta1 - delta0)*diag(K))
+  comp          <- components_gs_update(comp, tau)
+  comp          <- opchar_gs_internal(comp)
 
   ##### Outputting #############################################################
 
@@ -146,6 +154,7 @@ build_gs_norm <- function(n1 = 162, n10 = 54, e = c(2.42, 2.42),
                         integer    = integer,
                         J          = J,
                         K          = K,
+                        maxN       = comp$opchar$maxN[1],
                         n_factor   = comp$n_factor,
                         n10        = n10,
                         n1         = n1,
@@ -154,6 +163,7 @@ build_gs_norm <- function(n1 = 162, n10 = 54, e = c(2.42, 2.42),
                         power      = power,
                         ratio      = ratio,
                         sigma      = sigma,
+                        spacing    = spacing,
                         stopping   = stopping,
                         summary    = summary,
                         type       = type)

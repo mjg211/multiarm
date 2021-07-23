@@ -72,8 +72,8 @@ sim_gs_norm <- function(des = des_gs_norm(integer = TRUE), tau,
   for (i in 1:nrow_tau) {
     sim[i, ]       <-
       sim_gs_norm_internal(tau[i, ], (i - 1)*replicates, des$n_factor, des$e,
-                           des$f, sigma, des$ratio, des$stopping, des$type,
-                           replicates, des$K, des$J, summary,
+                           des$f, sigma, des$ratio, des$spacing, des$stopping,
+                           des$type, replicates, des$K, des$J, summary,
                            total_replicates)
   }
   seq_K            <- 1:des$K

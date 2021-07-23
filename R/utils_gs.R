@@ -757,9 +757,10 @@ components_gs_hg_lfc               <- function(comp) {
 components_gs_init                 <- function(alpha, beta, delta0, delta1,
                                                efix, eshape, ffix, fshape,
                                                integer, J, K, power, ratio,
-                                               stopping, summary, type, sigma,
-                                               pi0, lambda0, n_factor = 1,
-                                               f = NULL, e = NULL) {
+                                               spacing, stopping, summary, type,
+                                               sigma, pi0, lambda0,
+                                               n_factor = 1, f = NULL,
+                                               e = NULL) {
   a                    <- 1L
   if (power == "marginal") {
     b                  <- c <- 1L
@@ -822,7 +823,6 @@ components_gs_init                 <- function(alpha, beta, delta0, delta1,
   } else {
     bounds             <- NULL
   }
-  spacing              <- seq_J
   list(a = a, alpha = alpha, b = b, beta = beta, bounds = bounds, c = c, d = d,
        delta0 = delta0, delta1 = delta1, e = e, efix = efix, eshape = eshape,
        f = f, ffix = ffix, fshape = fshape, integer = integer, J = J,
@@ -833,10 +833,10 @@ components_gs_init                 <- function(alpha, beta, delta0, delta1,
        outcome = outcome, pi0 = pi0, power = power, r = ratio, seqs = seqs,
        seq_J = seq_J, seq_JpJ = J + seq_J, seq_js = seq_js, seq_K = seq_K,
        seq_ks = seq_ks, seq_KpK = 1:K + K, seq_nrow_stage_K = seq_nrow_stage_K,
-       sigma = sigma, spacing = spacing, stage_K = stage_K, stopping = stopping,
-       summary = summary, twoJ = 2*J, twoJp1 = 2*J + 1, twoJp2 = 2*J + 2,
-       twoKp1 = 2*K + 1, twoKp2 = 2*K + 2, twoKp3 = 2*K + 3, twoKp4 = 2*K + 4,
-       type = type, w = NA)
+       sigma = sigma, spacing = J*spacing, stage_K = stage_K,
+       stopping = stopping, summary = summary, twoJ = 2*J, twoJp1 = 2*J + 1,
+       twoJp2 = 2*J + 2, twoKp1 = 2*K + 1, twoKp2 = 2*K + 2, twoKp3 = 2*K + 3,
+       twoKp4 = 2*K + 4, type = type, w = NA)
 }
 
 components_gs_update               <- function(comp, tau, pi, lambda) {
@@ -1062,7 +1062,7 @@ root_ss_gs                         <- function(ss, comp) {
 }
 
 sim_gs_bern_internal               <- function(pi, completed_replicates, n, e,
-                                               f, ratio, stopping, type,
+                                               f, ratio, spacing, stopping, type,
                                                replicates, K, J, summary,
                                                total_replicates) {
   summary_i                   <-
@@ -1116,6 +1116,7 @@ sim_gs_bern_internal               <- function(pi, completed_replicates, n, e,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
+        nj                    <- nj*(spacing[j + 1] - spacing[j])
         N[i, ]                <- N[i, ] + nj
       }
     }
@@ -1157,8 +1158,8 @@ sim_gs_bern_internal               <- function(pi, completed_replicates, n, e,
 }
 
 sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
-                                               e, f, ratio, stopping, type,
-                                               replicates, K, J, summary,
+                                               e, f, ratio, spacing, stopping,
+                                               type, replicates, K, J, summary,
                                                total_replicates) {
   summary_i                       <-
     round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
@@ -1212,6 +1213,7 @@ sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
+        nj                    <- nj*(spacing[j + 1] - spacing[j])
         N[i, ]                <- N[i, ] + nj
       }
     }
@@ -1253,9 +1255,9 @@ sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
 }
 
 sim_gs_norm_internal               <- function(tau, completed_replicates, n, e,
-                                               f, sigma, ratio, stopping, type,
-                                               replicates, K, J, summary,
-                                               total_replicates) {
+                                               f, sigma, ratio, spacing,
+                                               stopping, type, replicates, K, J,
+                                               summary, total_replicates) {
   summary_i                   <-
     round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
   tau                         <- c(0, tau)
@@ -1308,6 +1310,7 @@ sim_gs_norm_internal               <- function(tau, completed_replicates, n, e,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
+        nj                    <- nj*(spacing[j + 1] - spacing[j])
         N[i, ]                <- N[i, ] + nj
       }
     }
