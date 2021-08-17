@@ -1052,11 +1052,14 @@ root_bounds_gs                     <- function(C, comp) {
 root_ss_gs                         <- function(ss, comp) {
   power   <- 0
   for (i in which(comp$thetas_bc_LFC_power[, comp$twoKp2] > 0)) {
-    power <- power + comp$thetas_bc_LFC_power[i, comp$twoKp2]*
+    local <- comp$thetas_bc_LFC_power[i, comp$twoKp2]*
       mvtnorm::pmvnorm(comp$bounds[comp$l_indices_LFC[[i]]],
                        comp$bounds[comp$u_indices_LFC[[i]]],
                        sqrt(ss)*comp$means_factors_LFC[[i]],
                        sigma = comp$Lambdas_LFC[[i]])[1]
+    if (!is.nan(local)) {
+      power <- power + local
+    }
   }
   power - (1 - comp$beta)
 }
