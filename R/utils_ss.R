@@ -121,6 +121,9 @@ components_ss_power_setup  <- function(comp) {
       } else if (comp$correction %in% c("benjamini_hochberg",
                                         "benjamini_yekutieli", "hochberg")) {
         comp$power_index              <- which(Var == min(Var))[1]
+      } else if (comp$correction %in%
+                 c("bonerroni", "dunnett", "none", "sidak")) {
+        comp$power_index              <- which(Var == max(Var))[1]
       }
     } else if (comp$outcome %in% c("bern", "pois")) {
       comp$power_index                <- 1
