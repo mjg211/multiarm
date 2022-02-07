@@ -56,7 +56,7 @@ opchar_gs_bern <- function(des = des_gs_bern(), pi, summary = FALSE) {
   comp <- components_gs_init(des$alpha, des$beta, des$delta0, des$delta1,
                              des$efix, des$eshape, des$ffix, des$fshape,
                              des$integer, des$J, des$K, des$power, des$ratio,
-                             des$stopping, des$summary, des$type,
+                             des$spacing, des$stopping, des$summary, des$type,
                              pi0 = des$pi0, n_factor = des$n_factor, f = des$f,
                              e = des$e)
   comp <- components_gs_update(comp, pi = pi)

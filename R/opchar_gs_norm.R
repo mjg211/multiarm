@@ -56,9 +56,15 @@ opchar_gs_norm <- function(des = des_gs_norm(), tau, summary = FALSE) {
   comp <- components_gs_init(des$alpha, des$beta, des$delta0, des$delta1,
                              des$efix, des$eshape, des$ffix, des$fshape,
                              des$integer, des$J, des$K, des$power, des$ratio,
+<<<<<<< HEAD
                              "identity", des$spacing, des$stopping, summary,
                              des$type, des$sigma, n_factor = des$n_factor,
                              f = des$f, e = des$e)
+=======
+                             des$spacing, des$stopping, summary, des$type,
+                             des$sigma, n_factor = des$n_factor, f = des$f,
+                             e = des$e)
+>>>>>>> 1411f5ed4e172e3293a4b2e5be91dabec7595d12
   comp <- components_gs_update(comp, tau)
   comp <- opchar_gs_internal(comp)
   if (summary) {
