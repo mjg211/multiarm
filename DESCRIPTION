@@ -1,7 +1,7 @@
 Package: multiarm
 Type: Package
 Title: Design of single- and multi-stage multi-arm clinical trials
-Version: 0.13.1
+Version: 0.13.2
 Authors@R: c(person(given = "Michael J", family = "Grayling",
                     email = "michael.grayling@newcastle.ac.uk",
                     role = c("aut", "cre")))
