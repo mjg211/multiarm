@@ -37,10 +37,11 @@ components_gs_all                  <- function(comp) {
   ceil_perms_obj                                <- ceiling(perms_d/2)
   outcomes                                      <-
     cbind(1*(perms_d%%2 == 0), ceil_perms_obj,
-          comp$spacing[apply(ceil_perms_obj, 1, max)] +
+          comp$spacing[apply(ceil_perms_obj, 1, max)]/comp$spacing[1] +
             (comp$type == "variable")*
-            Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
-                                  byrow = FALSE)),
+            Rfast::rowsums(matrix(comp$r*comp$spacing[ceil_perms_obj]/
+                                    comp$spacing[1],
+                                  ncol = comp$K, byrow = FALSE)),
           numeric(num_perms_d))
   colnames(outcomes)                            <-
     c(paste0("psi_", comp$seq_K), paste0("omega_", comp$seq_K),
@@ -261,7 +262,8 @@ components_gs_covariances_sqrt_Is  <- function(comp) {
     list()
   if (comp$outcome == "norm") {
     if (comp$type == "variable") {
-      NC                                      <- comp$n_factor*comp$spacing
+      NC                                      <-
+        comp$n_factor*comp$spacing/comp$spacing[1]
       NE                                      <- comp$r*NC
       sqrt_Is_null                            <- matrix(0, 1, comp$JK)
       Cov_taus[[1]]                           <- list()
@@ -284,7 +286,7 @@ components_gs_covariances_sqrt_Is  <- function(comp) {
         for (j in comp$seq_J[-1]) {
           NC[k, j]                            <- NC[k, j - 1] +
             comp$n_factor*(comp$spacing[j] - comp$spacing[j - 1])/
-            (comp$r*comp$stage_K[k, j] + 1)
+            ((comp$r*comp$stage_K[k, j] + 1)*comp$spacing[1])
         }
       }
       NE                                      <- comp$r*NC
@@ -313,7 +315,8 @@ components_gs_covariances_sqrt_Is  <- function(comp) {
     }
   } else if (comp$outcome %in% c("bern", "pois")) {
     if (comp$type == "variable") {
-      NC                                      <- comp$n_factor*comp$spacing
+      NC                                      <-
+        comp$n_factor*comp$spacing/comp$spacing[1]
       NE                                      <- comp$r*NC
       sqrt_Is_null                            <- matrix(0, 1, comp$JK)
       for (i in 1:nrow(comp$sigma)) {
@@ -338,7 +341,7 @@ components_gs_covariances_sqrt_Is  <- function(comp) {
         for (j in comp$seq_J[-1]) {
           NC[k, j]                            <- NC[k, j - 1] +
             comp$n_factor*(comp$spacing[j] - comp$spacing[j - 1])/
-            (comp$r*comp$stage_K[k, j] + 1)
+            ((comp$r*comp$stage_K[k, j] + 1)*comp$spacing[1])
         }
       }
       NE                                      <- comp$r*NC
@@ -414,10 +417,11 @@ components_gs_hg_lfc               <- function(comp) {
   ceil_perms_obj                                 <- ceiling(perms_d_HG/2)
   thetas_d_HG_a_fwer                             <-
     cbind(1*fact, ceil_perms_obj, deg_d_HG, deg_d_HG_a_fwer,
-          comp$spacing[apply(ceil_perms_obj, 1, max)] +
+          comp$spacing[apply(ceil_perms_obj, 1, max)]/comp$spacing[1] +
             (comp$type == "variable")*
-            Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
-                                  byrow = FALSE)), prob_col)
+            Rfast::rowsums(matrix(comp$r*comp$spacing[ceil_perms_obj]/
+                                    comp$spacing[1],
+                                  ncol = comp$K, byrow = FALSE)), prob_col)
   colnames(thetas_d_HG_a_fwer)                   <-
     c(paste0("psi_", comp$seq_K), paste0("omega_", comp$seq_K),
       "deg_{HG}(psi,omega)", "deg_{HG,a-FWER}(psi,omega)",
@@ -490,20 +494,22 @@ components_gs_hg_lfc               <- function(comp) {
     thetas_bc_LFC_power                          <-
       cbind(1*(perms_K_d_bc_LFC%%2 == 0), ceil_perms_obj, deg_K_d_bc_LFC,
             deg_K_d_bc_LFC_power,
-            comp$spacing[apply(ceil_perms_obj, 1, max)] +
+            comp$spacing[apply(ceil_perms_obj, 1, max)]/comp$spacing[1] +
               (comp$type == "variable")*
-              Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
-                                    byrow = FALSE)),
+              Rfast::rowsums(matrix(comp$r*comp$spacing[ceil_perms_obj]/
+                                      comp$spacing[1],
+                                    ncol = comp$K, byrow = FALSE)),
             numeric(num_perms_c_delta1*num_perms_Kmin_c_delta0))
   } else {
     ceil_perms_obj                               <- ceiling(perms_c_delta1/2)
     thetas_bc_LFC_power                          <-
       cbind(1*(perms_c_delta1%%2 == 0), ceil_perms_obj, deg_c_delta1,
             deg_c_delta1_b_power,
-            comp$spacing[apply(ceil_perms_obj, 1, max)] +
+            comp$spacing[apply(ceil_perms_obj, 1, max)]/comp$spacing[1] +
               (comp$type == "variable")*
-              Rfast::rowsums(matrix(comp$spacing[ceil_perms_obj], ncol = comp$K,
-                                    byrow = FALSE)),
+              Rfast::rowsums(matrix(comp$r*comp$spacing[ceil_perms_obj]/
+                                      comp$spacing[1],
+                                    ncol = comp$K, byrow = FALSE)),
             numeric(num_perms_c_delta1))
   }
   colnames(thetas_bc_LFC_power)                  <-
@@ -761,6 +767,7 @@ components_gs_init                 <- function(alpha, beta, delta0, delta1,
                                                sigma, pi0, lambda0,
                                                n_factor = 1, f = NULL,
                                                e = NULL) {
+  print("a")
   a                    <- 1L
   if (power == "marginal") {
     b                  <- c <- 1L
@@ -833,7 +840,7 @@ components_gs_init                 <- function(alpha, beta, delta0, delta1,
        outcome = outcome, pi0 = pi0, power = power, r = ratio, seqs = seqs,
        seq_J = seq_J, seq_JpJ = J + seq_J, seq_js = seq_js, seq_K = seq_K,
        seq_ks = seq_ks, seq_KpK = 1:K + K, seq_nrow_stage_K = seq_nrow_stage_K,
-       sigma = sigma, spacing = J*spacing, stage_K = stage_K,
+       sigma = sigma, spacing = spacing, stage_K = stage_K,
        stopping = stopping, summary = summary, twoJ = 2*J, twoJp1 = 2*J + 1,
        twoJp2 = 2*J + 2, twoKp1 = 2*K + 1, twoKp2 = 2*K + 2, twoKp3 = 2*K + 3,
        twoKp4 = 2*K + 4, type = type, w = NA)
@@ -1076,11 +1083,11 @@ sim_gs_bern_internal               <- function(pi, completed_replicates, n, e,
   if (type == "variable") {
     N                         <- matrix(c(n, rep(n*ratio, K)), replicates, Kp1)
     nj_base                   <- c(n, rep(n*ratio, K))
-    maxN                      <- J*n*(1 + ratio*K)
+    maxN                      <- n*(1 + ratio*K)/spacing[1]
   } else {
     N                         <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
                                         replicates, K + 1L)
-    maxN                      <- n*J
+    maxN                      <- n/spacing[1]
   }
   rej_mat                     <- matrix(0L, replicates, K)
   numeric_Kp1                 <- numeric(Kp1)
@@ -1119,7 +1126,7 @@ sim_gs_bern_internal               <- function(pi, completed_replicates, n, e,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
-        nj                    <- nj*(spacing[j + 1] - spacing[j])
+        nj                    <- nj*(spacing[j + 1] - spacing[j])/spacing[1]
         N[i, ]                <- N[i, ] + nj
       }
     }
@@ -1173,11 +1180,11 @@ sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
     N                             <- matrix(c(n, rep(n*ratio, K)), replicates,
                                             Kp1)
     nj_base                       <- c(n, rep(n*ratio, K))
-    maxN                          <- J*n*(1 + ratio*K)
+    maxN                          <- n*(1 + ratio*K)/spacing[1]
   } else {
     N                             <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
                                             replicates, K + 1L)
-    maxN                          <- n*J
+    maxN                          <- n/spacing[1]
   }
   rej_mat                         <- matrix(0L, replicates, K)
   numeric_Kp1                     <- numeric(Kp1)
@@ -1216,7 +1223,7 @@ sim_gs_pois_internal               <- function(lambda, completed_replicates, n,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
-        nj                    <- nj*(spacing[j + 1] - spacing[j])
+        nj                    <- nj*(spacing[j + 1] - spacing[j])/spacing[1]
         N[i, ]                <- N[i, ] + nj
       }
     }
@@ -1270,11 +1277,11 @@ sim_gs_norm_internal               <- function(tau, completed_replicates, n, e,
   if (type == "variable") {
     N                         <- matrix(c(n, rep(n*ratio, K)), replicates, Kp1)
     nj_base                   <- c(n, rep(n*ratio, K))
-    maxN                      <- J*n*(1 + ratio*K)
+    maxN                      <- n*(1 + ratio*K)/spacing[1]
   } else {
     N                         <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
                                         replicates, K + 1L)
-    maxN                      <- n*J
+    maxN                      <- n/spacing[1]
   }
   rej_mat                     <- matrix(0L, replicates, K)
   numeric_Kp1                 <- numeric(Kp1)
@@ -1313,7 +1320,7 @@ sim_gs_norm_internal               <- function(tau, completed_replicates, n, e,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
-        nj                    <- nj*(spacing[j + 1] - spacing[j])
+        nj                    <- nj*(spacing[j + 1] - spacing[j])/spacing[1]
         N[i, ]                <- N[i, ] + nj
       }
     }

@@ -135,7 +135,7 @@ des_gs_norm <- function(K = 2, J = 2, alpha = 0.025, beta = 0.1, delta1 = 0.5,
   ##### Print summary ##########################################################
 
   comp <- components_gs_init(alpha, beta, delta0, delta1, efix, eshape, ffix,
-                             fshape, integer, J, K, power, ratio, spacing,
+                             fshape, integer, J, K, power, ratio, "identity", spacing,
                              stopping, summary, type, sigma)
   if (summary) {
     #summary_des_gs_norm(comp)

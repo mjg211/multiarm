@@ -62,9 +62,9 @@ sim_gs_norm <- function(des = des_gs_norm(integer = TRUE), tau,
     message("  Beginning the required simulations..")
   }
   if (length(des$sigma) == 1) {
-    sigma <- rep(des$sigma, des$K + 1)
+    sigma          <- rep(des$sigma, des$K + 1)
   } else {
-    sigma <- c(des$sigma[1], rep(des$sigma[2], des$K))
+    sigma          <- c(des$sigma[1], rep(des$sigma[2], des$K))
   }
   nrow_tau         <- nrow(tau)
   total_replicates <- nrow_tau*replicates

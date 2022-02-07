@@ -158,10 +158,13 @@ components_dtl_covariances_sqrt_Is <- function(comp) {
   Cov_taus                               <- diag_sqrt_Is <- sqrt_Is <- list()
   sqrt_Is_null                           <- matrix(0, 1, comp$JK)
   if (comp$type == "variable") {
-    NC                                   <- comp$n_factor*comp$seq_J
-  } else if (comp$type == "fixed") {
     NC                                   <-
-      comp$n_factor*cumsum(1/(comp$r*comp$Kv + 1))
+      comp$n_factor*comp$spacing/comp$spacing[1]
+  } else if (comp$type == "fixed") {
+    fact                                 <-
+      (comp$spacing - c(0, comp$spacing[-1]))/comp$spacing[1]
+    NC                                   <-
+      cumsum(comp$n_factor*fact/(comp$r*comp$Kv + 1))
   }
   NE                                     <- comp$r*NC
   if (comp$outcome == "norm") {
@@ -332,8 +335,8 @@ components_dtl_hg_lfc              <- function(comp) {
 
 components_dtl_init                <- function(alpha, beta, delta0, delta1,
                                                integer, Kv, power, ratio,
-                                               summary, type, sigma, pi0,
-                                               lambda0, n_factor = 1,
+                                               spacing, summary, type, sigma,
+                                               pi0, lambda0, n_factor = 1,
                                                e = NULL) {
   J             <- length(Kv)
   K             <- Kv[1]
@@ -347,7 +350,9 @@ components_dtl_init                <- function(alpha, beta, delta0, delta1,
   } else if (power == "disjunctive") {
     c           <- K
   }
+  print("his")
   if (!missing(sigma)) {
+    print("hi")
     outcome     <- "norm"
     pi0         <- lambda0 <- NA
   } else if (!missing(pi0)) {
@@ -362,8 +367,8 @@ components_dtl_init                <- function(alpha, beta, delta0, delta1,
        Kp1 = K + 1, Kv = Kv, KvJ = Kv[J], lambda0 = lambda0,
        n_factor = n_factor, outcome = outcome, pi0 = pi0, power = power,
        r = ratio, seq_J = seq_J, seq_js = seq_js, seq_K = 1:K,
-       seq_KvJ = 1:Kv[J], sigma = sigma, summary = summary, twoKp1 = 2*K + 1,
-       type = type)
+       seq_KvJ = 1:Kv[J], sigma = sigma, spacing = spacing, summary = summary,
+       twoKp1 = 2*K + 1, type = type)
 }
 
 components_dtl_update              <- function(comp, tau, pi, lambda) {
@@ -438,10 +443,15 @@ opchar_dtl_internal                <- function(comp) {
     opchar[i, ]    <- opchar_dtl_internal_2(comp, i)
   }
   if (comp$type == "fixed") {
-    ess            <- mess <- moss <- maxN <- comp$n_factor*comp$J
-  } else {
     ess            <- mess <- moss <- maxN <-
-      comp$n_factor*(comp$J + sum(comp$Kv)*comp$r)
+      comp$n_factor*comp$spacing[comp$J]/comp$spacing[1]
+  } else {
+    ess            <- comp$n_factor*(1 + comp$K*comp$r)
+    for (j in comp$seq_J[-1]) {
+      ess          <- ess + comp$n_factor*(1 + comp$Kv[j]*comp$r)*
+        (comp$spacing[j] - comp$spacing[j - 1])/comp$spacing[1]
+    }
+    mess           <- moss <- maxN <- ess
   }
   opchar           <- cbind(opchar, ess, 0, mess, moss, maxN)
   if (comp$outcome == "norm") {
@@ -538,8 +548,9 @@ root_ss_dtl                        <- function(ss, comp) {
 }
 
 sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
-                                               Kv, ratio, type, replicates,
-                                               summary, total_replicates) {
+                                               Kv, ratio, type, spacing,
+                                               replicates, summary,
+                                               total_replicates) {
   summary_i                   <-
     round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
   J                           <- length(Kv)
@@ -550,11 +561,15 @@ sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
   if (type == "variable") {
     N                         <- matrix(c(n, rep(n*ratio, K)), replicates, Kp1)
     nj_base                   <- c(n, rep(n*ratio, K))
-    maxN                      <- J*n*(1 + ratio*K)
+    maxN                      <- n*(1 + ratio*K)
+    for (j in seq_J[-1]) {
+      maxN                    <- maxN + n*(1 + ratio*Kv[j])*
+        (spacing[j] - spacing[j - 1])/spacing[1]
+    }
   } else {
     N                         <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
                                         replicates, K + 1L)
-    maxN                      <- n*J
+    maxN                      <- n/spacing[1]
   }
   rej_mat                     <- matrix(0L, replicates, K)
   numeric_Kp1                 <- numeric(Kp1)
@@ -592,6 +607,7 @@ sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
+        nj                    <- nj*(spacing[j + 1] - spacing[j])/spacing[1]
         N[i, ]                <- N[i, ] + nj
       } else {
         for (k in which(present[-1])) {
@@ -640,7 +656,7 @@ sim_dtl_bern_internal              <- function(pi, completed_replicates, n, e,
 }
 
 sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
-                                               Kv, sigma, ratio, type,
+                                               Kv, sigma, ratio, type, spacing,
                                                replicates, summary,
                                                total_replicates) {
   summary_i                   <-
@@ -654,11 +670,15 @@ sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
   if (type == "variable") {
     N                         <- matrix(c(n, rep(n*ratio, K)), replicates, Kp1)
     nj_base                   <- c(n, rep(n*ratio, K))
-    maxN                      <- J*n*(1 + ratio*K)
+    maxN                      <- n*(1 + ratio*K)
+    for (j in seq_J[-1]) {
+      maxN                    <- maxN + n*(1 + ratio*Kv[j])*
+        (spacing[j] - spacing[j - 1])/spacing[1]
+    }
   } else {
     N                         <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
                                         replicates, K + 1L)
-    maxN                      <- n*J
+    maxN                      <- n/spacing[1]
   }
   rej_mat                     <- matrix(0L, replicates, K)
   numeric_Kp1                 <- numeric(Kp1)
@@ -695,6 +715,7 @@ sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
+        nj                    <- nj*(spacing[j + 1] - spacing[j])/spacing[1]
         N[i, ]                <- N[i, ] + nj
       } else {
         for (k in which(present[-1])) {
@@ -742,8 +763,9 @@ sim_dtl_norm_internal              <- function(tau, completed_replicates, n, e,
 }
 
 sim_dtl_pois_internal              <- function(lambda, completed_replicates, n,
-                                               e, Kv, ratio, type, replicates,
-                                               summary, total_replicates) {
+                                               e, Kv, ratio, type, spacing,
+                                               replicates, summary,
+                                               total_replicates) {
   summary_i                       <-
     round(seq(1, total_replicates, length.out = 11)[-c(1, 11)])
   J                               <- length(Kv)
@@ -752,14 +774,17 @@ sim_dtl_pois_internal              <- function(lambda, completed_replicates, n,
   seq_K                           <- 1:K
   Kp1                             <- K + 1L
   if (type == "variable") {
-    N                             <- matrix(c(n, rep(n*ratio, K)), replicates,
-                                            Kp1)
-    nj_base                       <- c(n, rep(n*ratio, K))
-    maxN                          <- J*n*(1 + ratio*K)
+    N                         <- matrix(c(n, rep(n*ratio, K)), replicates, Kp1)
+    nj_base                   <- c(n, rep(n*ratio, K))
+    maxN                      <- n*(1 + ratio*K)
+    for (j in seq_J[-1]) {
+      maxN                    <- maxN + n*(1 + ratio*Kv[j])*
+        (spacing[j] - spacing[j - 1])/spacing[1]
+    }
   } else {
-    N                             <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
-                                            replicates, K + 1L)
-    maxN                          <- n*J
+    N                         <- matrix(c(n, rep(n*ratio, K))/(1 + ratio*K),
+                                        replicates, K + 1L)
+    maxN                      <- n/spacing[1]
   }
   rej_mat                         <- matrix(0L, replicates, K)
   numeric_Kp1                     <- numeric(Kp1)
@@ -798,6 +823,7 @@ sim_dtl_pois_internal              <- function(lambda, completed_replicates, n,
             c(n, rep(n*ratio, K))/(1 + ratio*sum(present[-1]))
           nj[which(!present)] <- 0
         }
+        nj                    <- nj*(spacing[j + 1] - spacing[j])/spacing[1]
         N[i, ]                <- N[i, ] + nj
       } else {
         for (k in which(present[-1])) {

@@ -41,6 +41,11 @@
 #' @param type A \code{\link{character}} string indicating the choice for the
 #' stage-wise sample size. Can be \code{"variable"} or \code{"fixed"}. Defaults
 #' to \code{"variable"}.
+#' @param spacing A \code{\link{numeric}} \code{\link{vector}} indicating the
+#' chosen spacing of the interim analyses in terms of the proportion of the
+#' maximal possible sample size. It must contain strictly increasing values,
+#' with final element equal to \code{1}. Defaults to
+#' \code{((1:length(Kv))/length(Kv)} (i.e., to equally spaced analyses).
 #' @param integer A \code{\link{logical}} variable indicating whether the
 #' computed possible sample sizes required in each arm in each stage should be
 #' forced to be whole numbers. Defaults to \code{FALSE}. WARNING: If you set
@@ -80,7 +85,8 @@
 #' @export
 des_dtl_norm <- function(Kv = c(2, 1), alpha = 0.025, beta = 0.1, delta1 = 0.5,
                          delta0 = 0, sigma = 1, ratio = 1, power = "marginal",
-                         type = "variable", integer = FALSE, summary = FALSE) {
+                         type = "variable", spacing = (1:length(Kv))/length(Kv),
+                         integer = FALSE, summary = FALSE) {
 
   ##### Check input variables ##################################################
 
@@ -92,13 +98,14 @@ des_dtl_norm <- function(Kv = c(2, 1), alpha = 0.025, beta = 0.1, delta1 = 0.5,
   check_ratio(ratio, name_ratio = "ratio", des = "dtl")
   check_belong(power, "power", c("disjunctive", "marginal"), 1)
   check_belong(type, "type", c("fixed", "variable"), 1)
+  #check_spacing(spacing, "spacing", J)
   check_logical(integer, "integer")
   check_logical(summary, "summary")
 
   ##### Print summary ##########################################################
 
   comp <- components_dtl_init(alpha, beta, delta0, delta1, integer, Kv, power,
-                              ratio, summary, type, sigma)
+                              ratio, spacing, summary, type, sigma)
   if (summary) {
     #summary_des_dtl_norm(comp)
     message("")
@@ -162,6 +169,7 @@ des_dtl_norm <- function(Kv = c(2, 1), alpha = 0.025, beta = 0.1, delta1 = 0.5,
                         power      = power,
                         ratio      = ratio,
                         sigma      = sigma,
+                        spacing    = spacing,
                         summary    = summary,
                         type       = type)
   class(output) <- c("multiarm_des_dtl_norm", class(output))

@@ -67,8 +67,8 @@ sim_dtl_bern <- function(des = des_dtl_bern(integer = TRUE), pi,
   for (i in 1:nrow_pi) {
     sim[i, ]       <-
       sim_dtl_bern_internal(pi[i, ], (i - 1)*replicates, des$n_factor, des$e,
-                            des$Kv, des$ratio, des$type, replicates, summary,
-                            total_replicates)
+                            des$Kv, des$ratio, des$type, des$spacing,
+                            replicates, summary, total_replicates)
   }
   seq_K            <- 1:des$Kv[1]
   colnames(sim)    <- c(paste0("pi", c(0, seq_K)), "Pdis", "Pcon",

@@ -72,8 +72,8 @@ sim_dtl_norm <- function(des = des_dtl_norm(integer = TRUE), tau,
   for (i in 1:nrow_tau) {
     sim[i, ]       <-
       sim_dtl_norm_internal(tau[i, ], (i - 1)*replicates, des$n_factor, des$e,
-                            des$Kv, sigma, des$ratio, des$type, replicates,
-                            summary, total_replicates)
+                            des$Kv, sigma, des$ratio, des$type, des$spacing,
+                            replicates, summary, total_replicates)
   }
   seq_K            <- 1:des$Kv[1]
   colnames(sim)    <- c(paste0("tau", seq_K), "Pdis", "Pcon",

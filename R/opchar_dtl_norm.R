@@ -53,9 +53,10 @@ opchar_dtl_norm <- function(des = des_dtl_norm(), tau, summary = FALSE) {
   if (summary) {
     message("  Beginning the required calculations..")
   }
+  print("hi")
   comp <- components_dtl_init(des$alpha, des$beta, des$delta0, des$delta1,
-                              des$integer, des$Kv, des$power, des$ratio,
-                              des$summary, des$type, des$sigma,
+                              des$integer, des$Kv, des$power, des$ratio, NA,
+                              des$spacing, des$summary, des$type, des$sigma,
                               n_factor = des$n_factor, e = des$e)
   comp <- components_dtl_update(comp, tau)
   comp <- opchar_dtl_internal(comp)

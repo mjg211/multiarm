@@ -67,8 +67,8 @@ sim_dtl_pois <- function(des = des_dtl_pois(integer = TRUE), lambda,
   for (i in 1:nrow_lambda) {
     sim[i, ]       <-
       sim_dtl_pois_internal(lambda[i, ], (i - 1)*replicates, des$n_factor, des$e,
-                            des$Kv, des$ratio, des$type, replicates, summary,
-                            total_replicates)
+                            des$Kv, des$ratio, des$type, des$spacing,
+                            replicates, summary, total_replicates)
   }
   seq_K            <- 1:des$Kv[1]
   colnames(sim)    <- c(paste0("lambda", c(0, seq_K)), "Pdis", "Pcon",
