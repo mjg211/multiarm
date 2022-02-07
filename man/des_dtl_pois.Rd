@@ -15,6 +15,7 @@ des_dtl_pois(
   ratio = 1,
   power = "marginal",
   type = "variable",
+  spacing = (1:length(Kv))/length(Kv),
   integer = F,
   summary = F
 )
@@ -57,6 +58,12 @@ power to design the trial for. Can be \code{"disjunctive"} or
 \item{type}{A \code{\link{character}} string indicating the choice for the
 stage-wise sample size. Can be \code{"variable"} or \code{"fixed"}. Defaults
 to \code{"variable"}.}
+
+\item{spacing}{A \code{\link{numeric}} \code{\link{vector}} indicating the
+chosen spacing of the interim analyses in terms of the proportion of the
+maximal possible sample size. It must contain strictly increasing values,
+with final element equal to \code{1}. Defaults to
+\code{((1:length(Kv))/length(Kv)} (i.e., to equally spaced analyses).}
 
 \item{integer}{A \code{\link{logical}} variable indicating whether the
 computed possible sample sizes required in each arm in each stage should be
