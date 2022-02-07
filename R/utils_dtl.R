@@ -350,9 +350,7 @@ components_dtl_init                <- function(alpha, beta, delta0, delta1,
   } else if (power == "disjunctive") {
     c           <- K
   }
-  print("his")
   if (!missing(sigma)) {
-    print("hi")
     outcome     <- "norm"
     pi0         <- lambda0 <- NA
   } else if (!missing(pi0)) {

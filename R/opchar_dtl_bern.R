@@ -55,8 +55,10 @@ opchar_dtl_bern <- function(des = des_dtl_bern(), pi, summary = FALSE) {
   }
   comp <- components_dtl_init(des$alpha, des$beta, des$delta0, des$delta1,
                               des$integer, des$Kv, des$power, des$ratio,
-                              des$summary, des$type, pi0 = des$pi0,
+                              des$spacing, des$summary, des$type, pi0 = des$pi0,
                               n_factor = des$n_factor, e = des$e)
+
+
   comp <- components_dtl_update(comp, pi = pi)
   comp <- opchar_dtl_internal(comp)
   if (summary) {

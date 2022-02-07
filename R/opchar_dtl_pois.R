@@ -55,8 +55,9 @@ opchar_dtl_pois <- function(des = des_dtl_pois(), lambda, summary = FALSE) {
   }
   comp <- components_dtl_init(des$alpha, des$beta, des$delta0, des$delta1,
                               des$integer, des$Kv, des$power, des$ratio,
-                              des$summary, des$type, lambda0 = des$lambda0,
-                              n_factor = des$n_factor, e = des$e)
+                              des$spacing, des$summary, des$type,
+                              lambda0 = des$lambda0, n_factor = des$n_factor,
+                              e = des$e)
   comp <- components_dtl_update(comp, lambda = lambda)
   comp <- opchar_dtl_internal(comp)
   if (summary) {
