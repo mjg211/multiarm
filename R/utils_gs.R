@@ -767,7 +767,6 @@ components_gs_init                 <- function(alpha, beta, delta0, delta1,
                                                sigma, pi0, lambda0,
                                                n_factor = 1, f = NULL,
                                                e = NULL) {
-  print("a")
   a                    <- 1L
   if (power == "marginal") {
     b                  <- c <- 1L
