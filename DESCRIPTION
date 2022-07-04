@@ -19,6 +19,7 @@ RoxygenNote: 7.1.1
 VignetteBuilder: rmarkdown
 Imports:
     dplyr,
+    DT,
     GA,
     ggplot2,
     ggthemes,
@@ -26,6 +27,7 @@ Imports:
     knitr,
     magrittr,
     mvtnorm,
+    rclipboard,
     Rfast,
     rmarkdown,
     Rsolnp,
@@ -34,6 +36,7 @@ Imports:
     shinyalert,
     shinycssloaders,
     shinydashboard,
+    shinydashboardPlus,
     shinyFeedback,
     shinyhelper,
     shinyjs,
