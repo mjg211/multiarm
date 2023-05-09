@@ -162,7 +162,7 @@ components_dtl_covariances_sqrt_Is <- function(comp) {
       comp$n_factor*comp$spacing/comp$spacing[1]
   } else if (comp$type == "fixed") {
     fact                                 <-
-      (comp$spacing - c(0, comp$spacing[-1]))/comp$spacing[1]
+      (comp$spacing - c(0, comp$spacing[-comp$J]))/comp$spacing[1]
     NC                                   <-
       cumsum(comp$n_factor*fact/(comp$r*comp$Kv + 1))
   }
